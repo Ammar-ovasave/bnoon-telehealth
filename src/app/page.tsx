@@ -11,7 +11,7 @@ export default function Home() {
   const [selectedLocation, setSelectedLocation] = useState<string>("");
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800 pb-20">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -39,7 +39,7 @@ export default function Home() {
         {/* Continue Button */}
         <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-800 block md:hidden">
           <Link
-            href={selectedLocation ? `/interest?clinicLocation=${encodeURIComponent(selectedLocation)}` : "#"}
+            href={selectedLocation ? `/interest?selectedClinicLocation=${encodeURIComponent(selectedLocation)}` : "#"}
             aria-disabled={!selectedLocation}
           >
             <Button disabled={!selectedLocation} size="lg" className="px-8 w-full py-3 text-lg font-semibold">
@@ -49,7 +49,7 @@ export default function Home() {
         </div>
         <div className="justify-center hidden md:flex">
           <Link
-            href={selectedLocation ? `/interest?clinicLocation=${encodeURIComponent(selectedLocation)}` : "#"}
+            href={selectedLocation ? `/interest?selectedClinicLocation=${encodeURIComponent(selectedLocation)}` : "#"}
             aria-disabled={!selectedLocation}
           >
             <Button disabled={!selectedLocation} size="lg" className="px-8 py-3 text-lg font-semibold">

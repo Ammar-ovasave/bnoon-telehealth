@@ -1,25 +1,19 @@
 "use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { services } from "@/models/ServiceModel";
-import ServiceCard from "@/components/ServiceCard";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ServiceCard from "@/components/ServiceCard";
+import Link from "next/link";
 
 export default function InterestPage() {
   const [selectedService, setSelectedService] = useState<string>("");
   const router = useRouter();
-
-  const handleContinue = () => {
-    if (selectedService) {
-      console.log("Selected service:", selectedService);
-      // Here you would typically navigate to the next step or make an API call
-      alert(`Selected: ${services.find((service) => service.id === selectedService)?.title}`);
-    }
-  };
+  const searchParams = useSearchParams();
+  const selectedClinicLocation = searchParams.get("selectedClinicLocation");
 
   const handleBack = () => {
     router.back();
@@ -57,7 +51,7 @@ export default function InterestPage() {
         </div>
         {/* Action Buttons */}
         <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex flex-col-reverse md:flex-row gap-6 justify-between items-center container">
+          <div className="flex flex-col-reverse md:flex-row gap-6 justify-between container">
             <Button
               onClick={handleBack}
               variant="outline"
@@ -66,15 +60,24 @@ export default function InterestPage() {
             >
               <ArrowLeft /> Back to Clinic Selection
             </Button>
-            <Button
-              onClick={handleContinue}
-              disabled={!selectedService}
-              id="continue-button"
-              size="lg"
-              className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
+            <Link
+              href={
+                selectedService
+                  ? `/doctors?selectedService=${encodeURIComponent(
+                      selectedService
+                    )}&selectedClinicLocation=${selectedClinicLocation}`
+                  : "#"
+              }
             >
-              Continue with Selected Service <ArrowRight />
-            </Button>
+              <Button
+                disabled={!selectedService}
+                id="continue-button"
+                size="lg"
+                className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
+              >
+                Continue with Selected Service <ArrowRight />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

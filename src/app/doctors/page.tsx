@@ -156,7 +156,7 @@ export default function DoctorsListPage() {
             <Link
               href={
                 selectedDoctor
-                  ? `/appointment?selectedDoctor=${encodeURIComponent(
+                  ? `/select-visit-type?selectedDoctor=${encodeURIComponent(
                       selectedDoctor
                     )}&selectedService=${selectedService}&selectedClinicLocation=${selectedClinicLocation}`
                   : "#"

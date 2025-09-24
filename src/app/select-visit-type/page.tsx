@@ -64,7 +64,7 @@ export default function SelectVisitTypePage() {
             <Link
               href={
                 selectedVisitType
-                  ? `/appointment?selectedVisitType=${encodeURIComponent(
+                  ? `/verify-phone?selectedVisitType=${encodeURIComponent(
                       selectedVisitType
                     )}&selectedDoctor=${selectedDoctor}&selectedService=${selectedService}&selectedClinicLocation=${selectedClinicLocation}`
                   : "#"

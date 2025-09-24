@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { doctors } from "@/models/DoctorModel";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Filter, MapPin, Video, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -15,9 +15,6 @@ export default function DoctorsListPage() {
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
   const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("all");
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const selectedService = searchParams.get("selectedService");
-  const selectedClinicLocation = searchParams.get("selectedClinicLocation");
 
   const handleBack = () => {
     router.back();
@@ -42,6 +39,14 @@ export default function DoctorsListPage() {
       }
     });
   }, [availabilityFilter]);
+
+  const continueButtonUrl = useMemo(() => {
+    if (!selectedDoctor) return "#";
+    if (availabilityFilter === "clinic" || availabilityFilter === "virtual") {
+      return `/select-date-and-time${window.location.search}&selectedDoctor=${selectedDoctor}&selectedVisitType=${availabilityFilter}`;
+    }
+    return `/select-visit-type${window.location.search}&selectedDoctor=${selectedDoctor}`;
+  }, [availabilityFilter, selectedDoctor]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -153,15 +158,7 @@ export default function DoctorsListPage() {
             >
               <ArrowLeft /> Back to Service Selection
             </Button>
-            <Link
-              href={
-                selectedDoctor
-                  ? `/select-visit-type?selectedDoctor=${encodeURIComponent(
-                      selectedDoctor
-                    )}&selectedService=${selectedService}&selectedClinicLocation=${selectedClinicLocation}`
-                  : "#"
-              }
-            >
+            <Link href={continueButtonUrl}>
               <Button
                 disabled={!selectedDoctor}
                 id="continue-button"

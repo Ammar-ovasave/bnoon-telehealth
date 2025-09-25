@@ -3,15 +3,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ArrowLeft, ArrowRight, Phone, Shield } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function VerifyPhonePage() {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [otp, setOtp] = useState<string>("");
   const [showOtpInput, setShowOtpInput] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const searchParams = useSearchParams();
-  const selectedVisitType = searchParams.get("selectedVisitType");
+  //   const searchParams = useSearchParams();
+  //   const selectedVisitType = searchParams.get("selectedVisitType");
   const router = useRouter();
 
   const handleBack = () => {
@@ -39,6 +39,8 @@ export default function VerifyPhonePage() {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
+      const urlSearchParams = new URLSearchParams(window.location.search);
+      const selectedVisitType = urlSearchParams.get("selectedVisitType");
       setIsLoading(false);
       if (selectedVisitType === "clinic") {
         router.push(`/in-person-appointment-info${window.location.search}`);

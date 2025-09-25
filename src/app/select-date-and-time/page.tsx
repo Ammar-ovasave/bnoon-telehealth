@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { add, format } from "date-fns";
@@ -33,13 +33,13 @@ export default function SelectDateAndTimePage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
   const router = useRouter();
-  const searchParams = useSearchParams();
+  //   const searchParams = useSearchParams();
 
   // Get URL parameters
-  const selectedVisitType = searchParams.get("selectedVisitType");
-  const selectedDoctor = searchParams.get("selectedDoctor");
-  const selectedService = searchParams.get("selectedService");
-  const selectedClinicLocation = searchParams.get("selectedClinicLocation");
+  //   const selectedVisitType = searchParams.get("selectedVisitType");
+  //   const selectedDoctor = searchParams.get("selectedDoctor");
+  //   const selectedService = searchParams.get("selectedService");
+  //   const selectedClinicLocation = searchParams.get("selectedClinicLocation");
 
   const handleBack = () => {
     router.back();
@@ -58,14 +58,17 @@ export default function SelectDateAndTimePage() {
 
   const getNextPageUrl = () => {
     if (!selectedDate || !selectedTimeSlot) return "#";
-    const params = new URLSearchParams();
-    if (selectedVisitType) params.set("selectedVisitType", selectedVisitType);
-    if (selectedDoctor) params.set("selectedDoctor", selectedDoctor);
-    if (selectedService) params.set("selectedService", selectedService);
-    if (selectedClinicLocation) params.set("selectedClinicLocation", selectedClinicLocation);
-    params.set("selectedDate", format(selectedDate, "yyyy-MM-dd"));
-    params.set("selectedTimeSlot", selectedTimeSlot);
-    return `/verify-phone?${params.toString()}`;
+    // const params = new URLSearchParams();
+    // if (selectedVisitType) params.set("selectedVisitType", selectedVisitType);
+    // if (selectedDoctor) params.set("selectedDoctor", selectedDoctor);
+    // if (selectedService) params.set("selectedService", selectedService);
+    // if (selectedClinicLocation) params.set("selectedClinicLocation", selectedClinicLocation);
+    // params.set("selectedDate", format(selectedDate, "yyyy-MM-dd"));
+    // params.set("selectedTimeSlot", selectedTimeSlot);
+    return `/verify-phone${window.location.search}&selectedDate=${format(
+      selectedDate,
+      "yyyy-MM-dd"
+    )}&selectedTimeSlot=${selectedTimeSlot}`;
   };
 
   return (

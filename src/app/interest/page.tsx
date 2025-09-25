@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { services } from "@/models/ServiceModel";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ServiceCard from "@/components/ServiceCard";
@@ -12,8 +12,8 @@ import Link from "next/link";
 export default function InterestPage() {
   const [selectedService, setSelectedService] = useState<string>("");
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const selectedClinicLocation = searchParams.get("selectedClinicLocation");
+  // const searchParams = useSearchParams();
+  // const selectedClinicLocation = searchParams.get("selectedClinicLocation");
 
   const handleBack = () => {
     router.back();
@@ -60,15 +60,7 @@ export default function InterestPage() {
             >
               <ArrowLeft /> Back to Clinic Selection
             </Button>
-            <Link
-              href={
-                selectedService
-                  ? `/doctors?selectedService=${encodeURIComponent(
-                      selectedService
-                    )}&selectedClinicLocation=${selectedClinicLocation}`
-                  : "#"
-              }
-            >
+            <Link href={selectedService ? `/doctors${window.location.search}&selectedService=${selectedService}` : "#"}>
               <Button
                 disabled={!selectedService}
                 id="continue-button"

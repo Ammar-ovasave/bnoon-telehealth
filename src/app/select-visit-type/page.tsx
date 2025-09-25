@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { visitTypes } from "@/models/VisitTypeModel";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,10 +12,10 @@ import VisitTypeCard from "@/components/VisitTypeCard";
 export default function SelectVisitTypePage() {
   const [selectedVisitType, setSelectedVisitType] = useState<string>("");
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const selectedService = searchParams.get("selectedService");
-  const selectedClinicLocation = searchParams.get("selectedClinicLocation");
-  const selectedDoctor = searchParams.get("selectedDoctor");
+  // const searchParams = useSearchParams();
+  // const selectedService = searchParams.get("selectedService");
+  // const selectedClinicLocation = searchParams.get("selectedClinicLocation");
+  // const selectedDoctor = searchParams.get("selectedDoctor");
 
   const handleBack = () => {
     router.back();
@@ -63,11 +63,7 @@ export default function SelectVisitTypePage() {
             </Button>
             <Link
               href={
-                selectedVisitType
-                  ? `/select-date-and-time?selectedVisitType=${encodeURIComponent(
-                      selectedVisitType
-                    )}&selectedDoctor=${selectedDoctor}&selectedService=${selectedService}&selectedClinicLocation=${selectedClinicLocation}`
-                  : "#"
+                selectedVisitType ? `/select-date-and-time${window.location.search}&selectedVisitType=${selectedVisitType}` : "#"
               }
             >
               <Button

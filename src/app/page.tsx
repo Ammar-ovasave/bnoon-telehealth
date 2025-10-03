@@ -1,37 +1,57 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
-import { clinicLocations } from "@/models/ClinicModel";
-import { ArrowRight } from "lucide-react";
+import { groupClinicsByCity } from "@/models/ClinicModel";
+import { ArrowRight, MapPinned } from "lucide-react";
 import ClinicCard from "@/components/ClinicCard";
 import Link from "next/link";
 
 export default function Home() {
   const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const clinicsByCity = useMemo(() => groupClinicsByCity(), []);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800 pb-20">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Clinic Location</h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Choose your preferred Bnoon clinic location for your virtual visit. All locations offer the same high-quality
             services.
           </p>
         </div>
-        {/* Clinic Selection */}
+        {/* Clinic Selection by City */}
         <div className="mb-8">
           <RadioGroup value={selectedLocation} onValueChange={setSelectedLocation}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {clinicLocations.map((clinic) => (
-                <ClinicCard
-                  key={clinic.id}
-                  clinic={clinic}
-                  selectedLocation={selectedLocation}
-                  setSelectedLocation={setSelectedLocation}
-                />
+            <div className="space-y-12">
+              {Object.entries(clinicsByCity).map(([city, clinics]) => (
+                <div key={city} className="relative">
+                  {/* City Header */}
+                  <div className="mb-6 flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
+                      <MapPinned className="h-7 w-7 text-secondary" />
+                      <h2>{city}</h2>
+                    </div>
+                    <div className="flex-1 h-px bg-gradient-to-r from-gray-300 dark:from-gray-700 to-transparent ml-4"></div>
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      {clinics.length} {clinics.length === 1 ? "location" : "locations"}
+                    </span>
+                  </div>
+
+                  {/* Clinics Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {clinics.map((clinic) => (
+                      <ClinicCard
+                        key={clinic.id}
+                        clinic={clinic}
+                        selectedLocation={selectedLocation}
+                        setSelectedLocation={setSelectedLocation}
+                      />
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </RadioGroup>

@@ -1,6 +1,7 @@
 export interface ClinicLocation {
   id: string;
   name: string;
+  city: string;
   address: string;
   doctors: string;
   imageSrc: string;
@@ -12,6 +13,7 @@ export const clinicLocations: ClinicLocation[] = [
   {
     id: "jeddah",
     name: "Bnoon Jeddah",
+    city: "Jeddah",
     address: "Jeddah, Saudi Arabia",
     doctors: "12 specialists",
     imageSrc: "/images/bnoon-jeddah.jpg",
@@ -21,6 +23,7 @@ export const clinicLocations: ClinicLocation[] = [
   {
     id: "riyadh-king-salman",
     name: "Bnoon Riyadh - King Salman Road",
+    city: "Riyadh",
     address: "King Salman Road, Riyadh, Saudi Arabia",
     doctors: "18 specialists",
     imageSrc: "/images/bnoon-north-riiyadh.jpg",
@@ -30,6 +33,7 @@ export const clinicLocations: ClinicLocation[] = [
   {
     id: "riyadh-granada",
     name: "Bnoon Riyadh - Granada",
+    city: "Riyadh",
     address: "Granada District, Riyadh, Saudi Arabia",
     doctors: "15 specialists",
     imageSrc: "/images/bnoon-riyadh.jpg",
@@ -37,3 +41,14 @@ export const clinicLocations: ClinicLocation[] = [
     contactNumber: "+966114448080",
   },
 ];
+
+// Helper function to group clinics by city
+export const groupClinicsByCity = () => {
+  return clinicLocations.reduce((acc, clinic) => {
+    if (!acc[clinic.city]) {
+      acc[clinic.city] = [];
+    }
+    acc[clinic.city].push(clinic);
+    return acc;
+  }, {} as Record<string, ClinicLocation[]>);
+};

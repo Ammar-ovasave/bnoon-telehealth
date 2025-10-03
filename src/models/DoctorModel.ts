@@ -16,9 +16,10 @@ export interface DoctorModel {
 export const doctors: DoctorModel[] = [
   {
     id: "dr-sarah-ahmed",
-    name: "Dr. Sarah Ahmed",
-    specialty: "Reproductive Endocrinology",
-    photo: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face",
+    name: "Dr. Abdalaziz Al-Shahrani",
+    specialty:
+      "Group Medical Director Consultant, Reproductive Endorinology, Infertility (IVF) & Gynecological Laproscopic Surgery",
+    photo: "/images/dr_ abdulaziz.jpg",
     availability: {
       clinic: true,
       virtual: true,
@@ -29,9 +30,10 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-mohammed-alrashid",
-    name: "Dr. Mohammed Al-Rashid",
-    specialty: "Fertility Specialist",
-    photo: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face",
+    name: "Dr. Fawaz Edris",
+    specialty:
+      "Executive Director, Bnoon -Jeddah Consultant, Obstetrics, Gynecology, Maternal Fetal Medicine, Reproductive Endocrinology & Infertility",
+    photo: "/images/dr-fawad.jpg",
     availability: {
       clinic: true,
       virtual: false,
@@ -42,9 +44,9 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-fatima-hassan",
-    name: "Dr. Fatima Hassan",
-    specialty: "Gynecologist",
-    photo: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face",
+    name: "Dr. Mazin Bishara ",
+    specialty: "Medical Director, Bnoon - Jeddah Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology & Infertility",
+    photo: "/images/dr-mazin-bishra.jpg",
     availability: {
       clinic: false,
       virtual: true,
@@ -55,9 +57,9 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-omar-khalil",
-    name: "Dr. Omar Khalil",
-    specialty: "Andrologist",
-    photo: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face",
+    name: "Dr. Asim Al Wuhaibi",
+    specialty: "Consultant, Reproductive Endorinology & Infertility (IVF)",
+    photo: "/images/dr-asim.jpg",
     availability: {
       clinic: true,
       virtual: true,
@@ -68,9 +70,9 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-layla-mansour",
-    name: "Dr. Layla Mansour",
-    specialty: "Obstetrician",
-    photo: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face",
+    name: "Dr. Hussein Sabban  ",
+    specialty: "Consultant, Obstetrics, Gynecology, Reproductive Endocrinology, & Infertility",
+    photo: "/images/dr-hussein-sabban.jpg",
     availability: {
       clinic: true,
       virtual: true,
@@ -81,15 +83,106 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-youssef-nasser",
-    name: "Dr. Youssef Nasser",
-    specialty: "Fertility Preservation Specialist",
-    photo: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face",
+    name: "Dr. Ahmed Alshaikh",
+    specialty: "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology & Infertility",
+    photo: "/images/dr-ahmed-bekar.jpg",
     availability: {
       clinic: true,
       virtual: false,
     },
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "11 years of experience",
+    languages: ["Arabic", "English"],
+  },
+  {
+    id: "dr-wajdi-al-omari",
+    name: "Dr. Wajdi Al Omari",
+    specialty: "Consultant, Reproductive Endorinology & Infertility (IVF)",
+    photo: "/images/dr-wajdi.jpg",
+    availability: {
+      clinic: true,
+      virtual: true,
+    },
+    firstAvailableSlot: "Wednesday, 11:00 AM",
+    experience: "8 years of experience",
+    languages: ["Arabic", "English"],
+  },
+  {
+    id: "dr-dalia-adel",
+    name: "Dr. Dalia Adel",
+    specialty: "Consultant, Obstetrics, Gynecology & Infertility (IVF)",
+    photo: "/images/dr-dalia.jpg",
+    availability: {
+      clinic: true,
+      virtual: true,
+    },
+    firstAvailableSlot: "Wednesday, 11:00 AM",
+    experience: "6 years of experience",
+    languages: ["Arabic", "English"],
+  },
+  {
+    id: "dr-ahmad-haroun",
+    name: "Dr. Ahmad Haroun",
+    specialty: "Consultant, Urology & Andrology",
+    photo: "/images/dr-haroun.jpg",
+    availability: {
+      clinic: false,
+      virtual: true,
+    },
+    firstAvailableSlot: "Wednesday, 11:00 AM",
+    experience: "7 years of experience",
+    languages: ["Arabic", "English"],
+  },
+  {
+    id: "dr-moussa-el-naiemy",
+    name: "Dr. Moussa El Naiemy",
+    specialty: "Consultant, Male Infertility & Andrology",
+    photo: "/images/dr-moussa.jpg",
+    availability: {
+      clinic: true,
+      virtual: false,
+    },
+    firstAvailableSlot: "Wednesday, 11:00 AM",
+    experience: "11 years of experience",
+    languages: ["Arabic", "English"],
+  },
+  {
+    id: "dr-maya-albezreh",
+    name: "Dr. Maya  Albezreh",
+    specialty: "Consultant, Obstetrics, Gynecology & Infertility",
+    photo: "/images/dr-maya-albezreh.jpg",
+    availability: {
+      clinic: true,
+      virtual: true,
+    },
+    firstAvailableSlot: "Wednesday, 11:00 AM",
+    experience: "7 years of experience",
+    languages: ["Arabic", "English"],
+  },
+  {
+    id: "dr-razan-ghaith",
+    name: "Dr. Razan Ghaith",
+    specialty: "Consultant, Obstetrics, Gynecology & Infertility",
+    photo: "/images/dr-razan-ghaith.jpg",
+    availability: {
+      clinic: true,
+      virtual: true,
+    },
+    firstAvailableSlot: "Wednesday, 11:00 AM",
+    experience: "9 years of experience",
+    languages: ["Arabic", "English"],
+  },
+  {
+    id: "dr-maram-dadoua",
+    name: "Dr. Maram Dadoua",
+    specialty: "Senior Registrar, Obstetrics & Gynecology",
+    photo: "/images/dr-maram.jpg",
+    availability: {
+      clinic: true,
+      virtual: false,
+    },
+    firstAvailableSlot: "Wednesday, 11:00 AM",
+    experience: "10 years of experience",
     languages: ["Arabic", "English"],
   },
 ];

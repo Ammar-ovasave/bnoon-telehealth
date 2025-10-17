@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { groupClinicsByCity } from "@/models/ClinicModel";
 import { MapPinned } from "lucide-react";
 import ClinicCard from "@/components/ClinicCard";
@@ -39,16 +39,18 @@ export default function Home() {
                 </div>
 
                 {/* Clinics Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {clinics.map((clinic) => (
-                    <ClinicCard
-                      key={clinic.id}
-                      clinic={clinic}
-                      // selectedLocation={selectedLocation}
-                      // setSelectedLocation={setSelectedLocation}
-                    />
-                  ))}
-                </div>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    {clinics.map((clinic) => (
+                      <ClinicCard
+                        key={clinic.id}
+                        clinic={clinic}
+                        // selectedLocation={selectedLocation}
+                        // setSelectedLocation={setSelectedLocation}
+                      />
+                    ))}
+                  </div>
+                </Suspense>
               </div>
             ))}
           </div>

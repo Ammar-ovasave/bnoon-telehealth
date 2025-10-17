@@ -1,14 +1,11 @@
 "use client";
-import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { RadioGroup } from "@/components/ui/radio-group";
+import { Suspense, useMemo } from "react";
 import { groupClinicsByCity } from "@/models/ClinicModel";
-import { ArrowRight, MapPinned } from "lucide-react";
+import { MapPinned } from "lucide-react";
 import ClinicCard from "@/components/ClinicCard";
-import Link from "next/link";
 
 export default function Home() {
-  const [selectedLocation, setSelectedLocation] = useState<string>("");
+  // const [selectedLocation, setSelectedLocation] = useState<string>("");
   const clinicsByCity = useMemo(() => groupClinicsByCity(), []);
 
   return (
@@ -24,40 +21,42 @@ export default function Home() {
         </div>
         {/* Clinic Selection by City */}
         <div className="mb-8">
-          <RadioGroup value={selectedLocation} onValueChange={setSelectedLocation}>
-            <div className="space-y-12">
-              {Object.entries(clinicsByCity).map(([city, clinics]) => (
-                <div key={city} className="relative">
-                  {/* City Header */}
-                  <div className="mb-6 flex items-center gap-3">
-                    <div className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
-                      <MapPinned className="h-7 w-7 text-secondary" />
-                      <h2>{city}</h2>
-                    </div>
-                    <div className="flex-1 h-px bg-gradient-to-r from-gray-300 dark:from-gray-700 to-transparent ml-4"></div>
-                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      {clinics.length} {clinics.length === 1 ? "location" : "locations"}
-                    </span>
+          {/* <RadioGroup value={selectedLocation} onValueChange={setSelectedLocation}>
+          </RadioGroup> */}
+          <div className="space-y-12">
+            {Object.entries(clinicsByCity).map(([city, clinics]) => (
+              <div key={city} className="relative">
+                {/* City Header */}
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
+                    <MapPinned className="h-7 w-7 text-secondary" />
+                    <h2>{city}</h2>
                   </div>
+                  <div className="flex-1 h-px bg-gradient-to-r from-gray-300 dark:from-gray-700 to-transparent ml-4"></div>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {clinics.length} {clinics.length === 1 ? "location" : "locations"}
+                  </span>
+                </div>
 
-                  {/* Clinics Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Clinics Grid */}
+                <Suspense fallback={<div>Loading...</div>}>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     {clinics.map((clinic) => (
                       <ClinicCard
                         key={clinic.id}
                         clinic={clinic}
-                        selectedLocation={selectedLocation}
-                        setSelectedLocation={setSelectedLocation}
+                        // selectedLocation={selectedLocation}
+                        // setSelectedLocation={setSelectedLocation}
                       />
                     ))}
                   </div>
-                </div>
-              ))}
-            </div>
-          </RadioGroup>
+                </Suspense>
+              </div>
+            ))}
+          </div>
         </div>
         {/* Continue Button */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-800 block md:hidden">
+        {/* <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-800 block md:hidden">
           <Link
             href={selectedLocation ? `/interest?selectedClinicLocation=${encodeURIComponent(selectedLocation)}` : "#"}
             aria-disabled={!selectedLocation}
@@ -66,18 +65,17 @@ export default function Home() {
               Continue with Selected Location <ArrowRight />
             </Button>
           </Link>
-        </div>
-        <div className="justify-center hidden md:flex">
+        </div> */}
+        {/* <div className="justify-center hidden md:flex">
           <Link
             href={selectedLocation ? `/interest?selectedClinicLocation=${encodeURIComponent(selectedLocation)}` : "#"}
             aria-disabled={!selectedLocation}
           >
             <Button disabled={!selectedLocation} size="lg" className="px-8 py-3 text-lg font-semibold">
-              {/* onClick={handleContinue} */}
               Continue with Selected Location <ArrowRight />
             </Button>
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   );

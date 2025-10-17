@@ -1,0 +1,54 @@
+"use client";
+import { visitTypes } from "@/models/VisitTypeModel";
+import VisitTypeCard from "@/components/VisitTypeCard";
+import { FC } from "react";
+
+export const PageContent: FC = () => {
+  return (
+    <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-8 max-w-4xl pb-30">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Visit Type</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            Choose how you&apos;d like to have your consultation. Both options provide excellent care tailored to your needs.
+          </p>
+        </div>
+        {/* Visit Type Selection */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {visitTypes.map((visitType) => (
+              <VisitTypeCard key={visitType.id} visitType={visitType} />
+            ))}
+          </div>
+        </div>
+        {/* <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-800">
+          <div className="flex flex-col-reverse md:flex-row gap-6 justify-between container">
+            <Button
+              onClick={handleBack}
+              variant="outline"
+              size="lg"
+              className={cn("px-6 py-3 w-full md:w-auto", selectedVisitType && "opacity-50")}
+            >
+              <ArrowLeft /> Back to Doctor Selection
+            </Button>
+            <Link
+              href={
+                selectedVisitType ? `/select-date-and-time${window.location.search}&selectedVisitType=${selectedVisitType}` : "#"
+              }
+            >
+              <Button
+                disabled={!selectedVisitType}
+                id="continue-button"
+                size="lg"
+                className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
+              >
+                Continue with Selected Visit Type <ArrowRight />
+              </Button>
+            </Link>
+          </div>
+        </div> */}
+      </div>
+    </div>
+  );
+};

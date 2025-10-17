@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import { PageContent } from "./SelectVisitPageType";
+import { PageContent } from "./PageContent";
 
-export default function SelectVisitTypePage() {
+export default function AppointmentConfirmationPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <PageContent />

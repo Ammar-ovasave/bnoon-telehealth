@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { add, format } from "date-fns";
@@ -56,6 +56,15 @@ export default function SelectDateAndTimePage() {
     return date < today;
   };
 
+  const searchParams = useSearchParams();
+
+  const newUrlSearchParams = useMemo(() => {
+    const params = new URLSearchParams(searchParams);
+    if (selectedDate) params.set("selectedDate", format(selectedDate, "yyyy-MM-dd"));
+    if (selectedTimeSlot) params.set("selectedTimeSlot", selectedTimeSlot);
+    return params.toString();
+  }, [selectedDate, selectedTimeSlot, searchParams]);
+
   const getNextPageUrl = () => {
     if (!selectedDate || !selectedTimeSlot) return "#";
     // const params = new URLSearchParams();
@@ -65,15 +74,12 @@ export default function SelectDateAndTimePage() {
     // if (selectedClinicLocation) params.set("selectedClinicLocation", selectedClinicLocation);
     // params.set("selectedDate", format(selectedDate, "yyyy-MM-dd"));
     // params.set("selectedTimeSlot", selectedTimeSlot);
-    return `/verify-phone${window.location.search}&selectedDate=${format(
-      selectedDate,
-      "yyyy-MM-dd"
-    )}&selectedTimeSlot=${selectedTimeSlot}`;
+    return `/verify-phone?${newUrlSearchParams.toString()}`;
   };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-8 max-w-6xl pb-30">
+      <div className="container mx-auto px-4 py-8 max-w-6xl pb-40">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -91,7 +97,7 @@ export default function SelectDateAndTimePage() {
           {/* Date Selection */}
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-4">
-              <CalendarIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <CalendarIcon className="h-5 w-5 text-primary dark:text-primary-400" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Select Date</h2>
             </div>
             <div className="flex justify-center">
@@ -140,8 +146,8 @@ export default function SelectDateAndTimePage() {
                       "p-3 rounded-md border text-sm font-medium transition-all duration-200",
                       slot.available
                         ? selectedTimeSlot === slot.id
-                          ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                          : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-500"
+                          ? "bg-primary text-white border-primary shadow-md"
+                          : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
                         : "bg-gray-100 dark:bg-gray-600 border-gray-200 dark:border-gray-500 text-gray-400 dark:text-gray-500 cursor-not-allowed"
                     )}
                   >
@@ -152,8 +158,8 @@ export default function SelectDateAndTimePage() {
             )}
 
             {selectedTimeSlot && (
-              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                <p className="text-sm text-blue-800 dark:text-blue-200">
+              <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
+                <p className="text-sm text-primary dark:text-primary-200">
                   Selected: <span className="font-medium">{timeSlots.find((slot) => slot.id === selectedTimeSlot)?.label}</span>
                 </p>
               </div>

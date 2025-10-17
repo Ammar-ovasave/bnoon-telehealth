@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, User, Mail, Globe, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, User, Mail, Globe, Users, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -33,11 +33,18 @@ const genders = [
   { id: "female", label: "Female" },
 ];
 
+const idTypes = [
+  { id: "passport", label: "Passport" },
+  { id: "nationalId", label: "National ID" },
+];
+
 interface FormData {
   fullName: string;
   email: string;
   nationality: string;
   gender: string;
+  idType: string;
+  idNumber: string;
 }
 
 interface FormErrors {
@@ -45,6 +52,8 @@ interface FormErrors {
   email?: string;
   nationality?: string;
   gender?: string;
+  idType?: string;
+  idNumber?: string;
 }
 
 export default function VirtualVisitInfoPage() {
@@ -53,9 +62,11 @@ export default function VirtualVisitInfoPage() {
     email: "",
     nationality: "",
     gender: "",
+    idType: "",
+    idNumber: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   //   const searchParams = useSearchParams();
 
@@ -102,9 +113,19 @@ export default function VirtualVisitInfoPage() {
       newErrors.gender = "Please select your gender";
     }
 
+    if (!formData.idType) {
+      newErrors.idType = "Please select your ID type";
+    }
+
+    if (!formData.idNumber.trim()) {
+      newErrors.idNumber = "ID number is required";
+    } else if (formData.idNumber.trim().length < 3) {
+      newErrors.idNumber = "ID number must be at least 3 characters";
+    }
+
     // setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData.email, formData.fullName, formData.gender, formData.nationality]);
+  }, [formData.email, formData.fullName, formData.gender, formData.nationality, formData.idType, formData.idNumber]);
 
   //   const handleSubmit = async () => {
   //     if (!validateForm()) {
@@ -133,7 +154,7 @@ export default function VirtualVisitInfoPage() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-full">
-              <User className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+              <User className="h-8 w-8 text-primary dark:text-purple-400" />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Personal Information</h1>
@@ -161,7 +182,7 @@ export default function VirtualVisitInfoPage() {
                 onChange={(e) => handleInputChange("fullName", e.target.value)}
                 placeholder="Enter your full name"
                 className={cn(
-                  "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white",
+                  "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent dark:bg-gray-700 dark:text-white",
                   errors.fullName ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
                 )}
               />
@@ -183,7 +204,7 @@ export default function VirtualVisitInfoPage() {
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder="Enter your email address"
                 className={cn(
-                  "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white",
+                  "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent dark:bg-gray-700 dark:text-white",
                   errors.email ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
                 )}
               />
@@ -203,7 +224,7 @@ export default function VirtualVisitInfoPage() {
                 value={formData.nationality}
                 onChange={(e) => handleInputChange("nationality", e.target.value)}
                 className={cn(
-                  "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white",
+                  "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent dark:bg-gray-700 dark:text-white",
                   errors.nationality ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
                 )}
               >
@@ -233,8 +254,8 @@ export default function VirtualVisitInfoPage() {
                     className={cn(
                       "p-3 rounded-md border text-sm font-medium transition-all duration-200",
                       formData.gender === gender.id
-                        ? "bg-purple-600 text-white border-purple-600 shadow-md"
-                        : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-300 dark:hover:border-purple-500"
+                        ? "bg-primary text-white border-primary shadow-md"
+                        : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 dark:hover:bg-purple-900/20 hover:border-primary"
                     )}
                   >
                     {gender.label}
@@ -242,6 +263,66 @@ export default function VirtualVisitInfoPage() {
                 ))}
               </div>
               {errors.gender && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.gender}</p>}
+            </div>
+
+            {/* ID Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-gray-500" />
+                  ID Type *
+                </div>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {idTypes.map((idType) => (
+                  <button
+                    key={idType.id}
+                    onClick={() => handleInputChange("idType", idType.id)}
+                    className={cn(
+                      "p-3 rounded-md border text-sm font-medium transition-all duration-200",
+                      formData.idType === idType.id
+                        ? "bg-primary text-white border-primary shadow-md"
+                        : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 dark:hover:bg-purple-900/20 hover:border-primary"
+                    )}
+                  >
+                    {idType.label}
+                  </button>
+                ))}
+              </div>
+              {errors.idType && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.idType}</p>}
+            </div>
+
+            {/* ID Number */}
+            <div>
+              <label htmlFor="idNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-gray-500" />
+                  {formData.idType === "passport"
+                    ? "Passport Number"
+                    : formData.idType === "nationalId"
+                    ? "National ID Number"
+                    : "ID Number"}{" "}
+                  *
+                </div>
+              </label>
+              <input
+                id="idNumber"
+                type="text"
+                value={formData.idNumber}
+                onChange={(e) => handleInputChange("idNumber", e.target.value)}
+                placeholder={
+                  formData.idType === "passport"
+                    ? "Enter your passport number"
+                    : formData.idType === "nationalId"
+                    ? "Enter your national ID number"
+                    : "Enter your ID number"
+                }
+                className={cn(
+                  "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent dark:bg-gray-700 dark:text-white",
+                  errors.idNumber ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
+                )}
+              />
+              {errors.idNumber && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.idNumber}</p>}
             </div>
           </div>
 
@@ -252,11 +333,18 @@ export default function VirtualVisitInfoPage() {
             </Button>
             <Link href={getNextPageUrl}>
               <Button
-                disabled={!formData.fullName || !formData.email || !formData.nationality || !formData.gender || isSubmitting}
+                disabled={
+                  !formData.fullName ||
+                  !formData.email ||
+                  !formData.nationality ||
+                  !formData.gender ||
+                  !formData.idType ||
+                  !formData.idNumber
+                }
                 size="lg"
                 className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
               >
-                {isSubmitting ? "Saving..." : "Continue"} <ArrowRight />
+                {"Continue"} <ArrowRight />
               </Button>
             </Link>
           </div>

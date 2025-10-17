@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { doctors } from "@/models/DoctorModel";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Filter, MapPin, Video, Monitor } from "lucide-react";
+import { ArrowLeft, Filter, MapPin, Video, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import DoctorCard from "@/components/DoctorCard";
 
 type AvailabilityFilter = "all" | "clinic" | "virtual" | "both";
@@ -22,6 +21,15 @@ export default function DoctorsListPage() {
 
   const handleDoctorChange = (doctor: string) => {
     setSelectedDoctor(doctor);
+    // Auto-navigate to next page when doctor is selected
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("selectedDoctor", doctor);
+    // Determine next page based on availability filter
+    router.push(`/select-date-and-time?${searchParams.toString()}&selectedVisitType=${availabilityFilter}`);
+    // if (availabilityFilter === "clinic" || availabilityFilter === "virtual") {
+    // } else {
+    //   router.push(`/select-visit-type?${searchParams.toString()}&selectedDoctor=${doctor}`);
+    // }
   };
 
   const filteredDoctors = useMemo(() => {
@@ -39,14 +47,6 @@ export default function DoctorsListPage() {
       }
     });
   }, [availabilityFilter]);
-
-  const continueButtonUrl = useMemo(() => {
-    if (!selectedDoctor) return "#";
-    if (availabilityFilter === "clinic" || availabilityFilter === "virtual") {
-      return `/select-date-and-time${window.location.search}&selectedDoctor=${selectedDoctor}&selectedVisitType=${availabilityFilter}`;
-    }
-    return `/select-visit-type${window.location.search}&selectedDoctor=${selectedDoctor}`;
-  }, [availabilityFilter, selectedDoctor]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -147,28 +147,11 @@ export default function DoctorsListPage() {
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex flex-col-reverse md:flex-row gap-6 justify-between container">
-            <Button
-              onClick={handleBack}
-              variant="outline"
-              size="lg"
-              className={cn("px-6 py-3 w-full md:w-auto", selectedDoctor && "opacity-50")}
-            >
-              <ArrowLeft /> Back to Service Selection
-            </Button>
-            <Link href={continueButtonUrl}>
-              <Button
-                disabled={!selectedDoctor}
-                id="continue-button"
-                size="lg"
-                className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
-              >
-                Continue with Selected Doctor <ArrowRight />
-              </Button>
-            </Link>
-          </div>
+        {/* Back Button */}
+        <div className="mt-8 text-center">
+          <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3">
+            <ArrowLeft /> Back to Service Selection
+          </Button>
         </div>
       </div>
     </div>

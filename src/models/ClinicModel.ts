@@ -7,29 +7,10 @@ export interface ClinicLocation {
   imageSrc: string;
   contactNumber: string;
   contactEmail: string;
+  isCommingSoon?: boolean;
 }
 
 export const clinicLocations: ClinicLocation[] = [
-  {
-    id: "jeddah",
-    name: "Bnoon Jeddah",
-    city: "Jeddah",
-    address: "Jeddah, Saudi Arabia",
-    doctors: "12 specialists",
-    imageSrc: "/images/bnoon-jeddah.jpg",
-    contactEmail: "info.jeddah@bnoon.sa",
-    contactNumber: "+966126800800",
-  },
-  {
-    id: "riyadh-king-salman",
-    name: "Bnoon Riyadh - King Salman Road",
-    city: "Riyadh",
-    address: "King Salman Road, Riyadh, Saudi Arabia",
-    doctors: "18 specialists",
-    imageSrc: "/images/bnoon-north-riiyadh.jpg",
-    contactEmail: "info@bnoon.sa",
-    contactNumber: "+966114448080",
-  },
   {
     id: "riyadh-granada",
     name: "Bnoon Riyadh - Granada",
@@ -40,9 +21,29 @@ export const clinicLocations: ClinicLocation[] = [
     contactEmail: "info@bnoon.sa",
     contactNumber: "+966114448080",
   },
+  {
+    id: "riyadh-king-salman",
+    name: "Bnoon Riyadh - King Salman Road",
+    city: "Riyadh",
+    address: "King Salman Road, Riyadh, Saudi Arabia",
+    doctors: "18 specialists",
+    imageSrc: "/images/bnoon-north-riiyadh.jpg",
+    contactEmail: "info@bnoon.sa",
+    contactNumber: "+966114448080",
+    isCommingSoon: true,
+  },
+  {
+    id: "jeddah",
+    name: "Bnoon Jeddah",
+    city: "Jeddah",
+    address: "Jeddah, Saudi Arabia",
+    doctors: "12 specialists",
+    imageSrc: "/images/bnoon-jeddah.jpg",
+    contactEmail: "info.jeddah@bnoon.sa",
+    contactNumber: "+966126800800",
+  },
 ];
 
-// Helper function to group clinics by city
 export const groupClinicsByCity = () => {
   return clinicLocations.reduce((acc, clinic) => {
     if (!acc[clinic.city]) {

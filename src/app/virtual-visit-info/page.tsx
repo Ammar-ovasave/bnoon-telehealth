@@ -153,8 +153,8 @@ export default function VirtualVisitInfoPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-full">
-              <User className="h-8 w-8 text-primary dark:text-purple-400" />
+            <div className="bg-primary/10 p-3 rounded-full">
+              <User className="h-8 w-8 text-primary" />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Personal Information</h1>
@@ -351,14 +351,14 @@ export default function VirtualVisitInfoPage() {
         </div>
 
         {/* Information Notice */}
-        <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+        <div className="mt-6 bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
           <div className="flex items-start gap-3">
-            <div className="bg-blue-100 dark:bg-blue-900 p-1 rounded-full mt-0.5">
-              <User className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <div className="bg-green-100 dark:bg-green-900 p-1 rounded-full mt-0.5">
+              <User className="h-4 w-4 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">Privacy & Security</h4>
-              <p className="text-sm text-blue-700 dark:text-blue-300">
+              <h4 className="text-sm font-medium text-green-800 dark:text-green-200 mb-1">Privacy & Security</h4>
+              <p className="text-sm text-green-700 dark:text-green-300">
                 Your personal information is encrypted and stored securely. We only use this information to provide you with
                 healthcare services and will never share it with third parties without your consent.
               </p>

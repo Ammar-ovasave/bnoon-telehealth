@@ -6,11 +6,11 @@ import Link from "next/link";
 import { clinicLocations } from "@/models/ClinicModel";
 import { services } from "@/models/ServiceModel";
 import { FC } from "react";
+import { doctors } from "@/models/DoctorModel";
 
 export const PageContent: FC = () => {
   const searchParams = useSearchParams();
 
-  // Get URL parameters for appointment details
   const selectedVisitType = searchParams.get("selectedVisitType") || "Virtual Visit";
   const selectedDoctor = searchParams.get("selectedDoctor") || "Dr. Ahmad Bekar";
   const selectedService = searchParams.get("selectedService") || "General Consultation";
@@ -24,12 +24,13 @@ export const PageContent: FC = () => {
   const idType = searchParams.get("idType") || "National ID";
   const idNumber = searchParams.get("idNumber") || "1234567890";
 
-  // Generate a confirmation number
   const confirmationNumber = `BN${Date.now().toString().slice(-8)}`;
 
   const clinic = clinicLocations.find((clinic) => clinic.id === selectedClinicLocation);
 
   const service = services.find((service) => service.id === selectedService);
+
+  const doctor = doctors.find((doc) => doc.id === selectedDoctor);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -73,7 +74,7 @@ export const PageContent: FC = () => {
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                 <span className="text-gray-600 dark:text-gray-400">Doctor</span>
-                <span className="font-medium text-gray-900 dark:text-white">{selectedDoctor}</span>
+                <span className="font-medium text-gray-900 dark:text-white">{doctor?.name}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                 <span className="text-gray-600 dark:text-gray-400">Service</span>

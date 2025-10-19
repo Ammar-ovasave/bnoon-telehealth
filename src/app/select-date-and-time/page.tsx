@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import PageContent from "./PageContent";
+import LoadingPage from "../loading";
 
 export default function SelectDateAndTimePage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingPage />}>
       <PageContent />
     </Suspense>
   );

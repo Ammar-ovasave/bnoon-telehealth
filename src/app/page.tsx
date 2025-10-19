@@ -3,6 +3,7 @@ import { Suspense, useMemo } from "react";
 import { groupClinicsByCity } from "@/models/ClinicModel";
 import { MapPinned } from "lucide-react";
 import ClinicCard from "@/components/ClinicCard";
+import LoadingPage from "./loading";
 
 export default function Home() {
   // const [selectedLocation, setSelectedLocation] = useState<string>("");
@@ -39,7 +40,7 @@ export default function Home() {
                 </div>
 
                 {/* Clinics Grid */}
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<LoadingPage />}>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     {clinics.map((clinic) => (
                       <ClinicCard

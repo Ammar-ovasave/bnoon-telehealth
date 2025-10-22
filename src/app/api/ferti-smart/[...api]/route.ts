@@ -23,7 +23,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const res = await axios.post(getRequestUrl(request.url), request.body);
+    const payload = await request.json();
+    const res = await axios.post(getRequestUrl(request.url), payload);
     return Response.json(res.data);
   } catch (e) {
     console.log("--- post ferti smart error", e);

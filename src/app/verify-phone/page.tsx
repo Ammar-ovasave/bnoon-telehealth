@@ -1,10 +1,15 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ArrowLeft, ArrowRight, Phone, Shield, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { countryCodes } from "@/constants";
+import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
+import { toast } from "sonner";
+import { createPatient, sendOTP, verifyOTP } from "@/services/client";
+
+const OTP_LENGTH = 6;
 
 export default function VerifyPhonePage() {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -15,8 +20,6 @@ export default function VerifyPhonePage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-  //   const searchParams = useSearchParams();
-  //   const selectedVisitType = searchParams.get("selectedVisitType");
   const router = useRouter();
 
   useEffect(() => {
@@ -36,46 +39,72 @@ export default function VerifyPhonePage() {
     router.back();
   };
 
+  const { data: branchesData } = useFertiSmartBranches();
+
+  const selectedBranch = branchesData?.[0];
+
+  const fullPhoneNumber = useMemo(() => {
+    return `${selectedCountryCode}${phoneNumber ?? ""}`;
+  }, [phoneNumber, selectedCountryCode]);
+
   const handleSendOtp = async () => {
+    if (!selectedBranch) {
+      return toast.error("Branch not found");
+    }
     if (!phoneNumber || phoneNumber.length < 7) {
       alert("Please enter a valid phone number");
       return;
     }
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    const createPatientResponse = await createPatient({
+      branchId: selectedBranch.id ?? 0,
+      patient: { contactNumber: fullPhoneNumber, firstName: "-", lastName: "-" },
+    });
+    if (!createPatientResponse?.mrn) {
       setIsLoading(false);
-      setShowOtpInput(true);
-    }, 1500);
+      return toast.error("Faild to create a patient");
+    }
+    const purpose = "verify phone number";
+    const sendOTPResponse = await sendOTP({
+      mrn: createPatientResponse.mrn,
+      channel: "sms",
+      maxAttempts: 5,
+      purpose: "verify phone number",
+      ttlMinutes: 10 * 60,
+    });
+    if (!sendOTPResponse?.code) {
+      setIsLoading(false);
+      return toast.error("Faild to send OTP");
+    }
+    sessionStorage.setItem("mrn", createPatientResponse?.mrn);
+    sessionStorage.setItem("purpose", purpose);
+    setIsLoading(false);
+    setShowOtpInput(true);
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp || otp.length !== 4) {
-      alert("Please enter a valid 4-digit OTP code");
+    if (!otp || otp.length !== OTP_LENGTH) {
+      alert(`Please enter a valid ${OTP_LENGTH}-digit OTP code`);
       return;
     }
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const urlSearchParams = new URLSearchParams(window.location.search);
-      const selectedVisitType = urlSearchParams.get("selectedVisitType");
+    const response = await verifyOTP({
+      code: otp,
+      mrn: sessionStorage.getItem("mrn") ?? "",
+      purpose: sessionStorage.getItem("purpose") ?? "",
+    });
+    if (!response?.verified) {
       setIsLoading(false);
-      if (selectedVisitType === "clinic") {
-        router.push(`/in-person-appointment-info${window.location.search}`);
-      } else {
-        router.push(`/virtual-visit-info${window.location.search}`);
-      }
-    }, 1500);
-  };
-
-  const handleResendOtp = () => {
-    setOtp("");
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      alert("OTP code resent successfully!");
-    }, 1000);
+      return toast.error("Invalid OTP. Please try again.");
+    }
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const selectedVisitType = urlSearchParams.get("selectedVisitType");
+    setIsLoading(false);
+    if (selectedVisitType === "clinic") {
+      router.push(`/in-person-appointment-info${window.location.search}`);
+    } else {
+      router.push(`/virtual-visit-info${window.location.search}`);
+    }
   };
 
   const handleCountryCodeSelect = (code: string) => {
@@ -207,8 +236,6 @@ export default function VerifyPhonePage() {
             </div>
           </div>
         )}
-
-        {/* OTP Input */}
         {showOtpInput && (
           <div className="mb-8">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
@@ -223,21 +250,13 @@ export default function VerifyPhonePage() {
               <div className="flex justify-center">
                 <InputOTP maxLength={6} value={otp} onChange={setOtp} className="gap-2">
                   <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
+                    {Array(OTP_LENGTH)
+                      .fill(0)
+                      .map((_, i) => {
+                        return <InputOTPSlot key={i} index={i} />;
+                      })}
                   </InputOTPGroup>
                 </InputOTP>
-              </div>
-              <div className="text-center mt-4">
-                <button
-                  onClick={handleResendOtp}
-                  disabled={isLoading}
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 disabled:opacity-50"
-                >
-                  {`Didn't receive the code? Resend`}
-                </button>
               </div>
               <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
                 <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
@@ -245,7 +264,7 @@ export default function VerifyPhonePage() {
                 </Button>
                 <Button
                   onClick={handleVerifyOtp}
-                  disabled={!otp || otp.length !== 4 || isLoading}
+                  disabled={!otp || otp.length !== OTP_LENGTH || isLoading}
                   size="lg"
                   className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
                 >

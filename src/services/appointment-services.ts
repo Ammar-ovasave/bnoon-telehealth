@@ -1,6 +1,7 @@
 import { AppointmentServiceModel } from "@/models/AppointmentServiceModel";
 import { FSResourceModel } from "@/models/FSResourceModel";
 import axios from "./axios";
+import { FertiSmartBranchModel } from "@/models/FertiSmartBranchModel";
 
 export async function getAppointmentServices({ activeOnly }: { activeOnly?: boolean }) {
   try {
@@ -15,6 +16,16 @@ export async function getAppointmentServices({ activeOnly }: { activeOnly?: bool
 export async function getResources() {
   try {
     const res = await axios.get<FSResourceModel[]>(`/resources`);
+    return res.data;
+  } catch (e) {
+    console.log("--- getAppointmentServices error", e);
+    return null;
+  }
+}
+
+export async function getBranches() {
+  try {
+    const res = await axios.get<FertiSmartBranchModel[]>(`/branches`);
     return res.data;
   } catch (e) {
     console.log("--- getAppointmentServices error", e);

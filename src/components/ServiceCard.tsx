@@ -29,16 +29,6 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
         )}
         // onClick={() => setSelectedService(service.id)}
       >
-        {/* <div className="absolute top-4 left-4">
-        <RadioGroupItem
-          value={service.id}
-          id={service.id}
-          className={cn(
-            "bg-white/90 cursor-pointer size-4 rounded-full backdrop-blur-sm border-2 border-white/50",
-            selectedService === service.id ? "ring-2 ring-primary" : ""
-          )}
-        />
-      </div> */}
         <CardHeader className="text-center">
           <div className="text-4xl mb-3">{service.icon}</div>
           <CardTitle className="text-lg font-bold text-gray-900 dark:text-white mb-2">{service.title}</CardTitle>

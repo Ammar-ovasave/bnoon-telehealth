@@ -7,39 +7,27 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { add, format } from "date-fns";
-
-// Mock time slots data
-const timeSlots = [
-  { id: "09:00", label: "9:00 AM", available: true },
-  { id: "09:30", label: "9:30 AM", available: true },
-  //   { id: "10:00", label: "10:00 AM", available: false },
-  { id: "10:30", label: "10:30 AM", available: true },
-  { id: "11:00", label: "11:00 AM", available: true },
-  //   { id: "11:30", label: "11:30 AM", available: false },
-  { id: "12:00", label: "12:00 PM", available: true },
-  { id: "12:30", label: "12:30 PM", available: true },
-  { id: "13:00", label: "1:00 PM", available: true },
-  //   { id: "13:30", label: "1:30 PM", available: false },
-  { id: "14:00", label: "2:00 PM", available: true },
-  { id: "14:30", label: "2:30 PM", available: true },
-  { id: "15:00", label: "3:00 PM", available: true },
-  //   { id: "15:30", label: "3:30 PM", available: false },
-  { id: "16:00", label: "4:00 PM", available: true },
-  { id: "16:30", label: "4:30 PM", available: true },
-  { id: "17:00", label: "5:00 PM", available: true },
-];
+import useFertiSmartResources from "@/hooks/useFertiSmartResources";
+import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
+import { VISIT_DURATION_IN_MINUTES } from "@/constants";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SelectDateAndTimePage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("");
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>();
   const router = useRouter();
-  //   const searchParams = useSearchParams();
 
-  // Get URL parameters
-  //   const selectedVisitType = searchParams.get("selectedVisitType");
-  //   const selectedDoctor = searchParams.get("selectedDoctor");
-  //   const selectedService = searchParams.get("selectedService");
-  //   const selectedClinicLocation = searchParams.get("selectedClinicLocation");
+  const { data: resourcesData } = useFertiSmartResources();
+
+  const selectedResource = useMemo(() => {
+    return resourcesData?.find((item) => item.name?.startsWith("Dr."));
+  }, [resourcesData]);
+
+  const { data: availabilityData, isLoading: loadingTimeslots } = useFertiSmartResourceAvailability({
+    resourceId: selectedResource?.id?.toString(),
+    date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined,
+    serviceDuration: VISIT_DURATION_IN_MINUTES,
+  });
 
   const handleBack = () => {
     router.back();
@@ -50,7 +38,6 @@ export default function SelectDateAndTimePage() {
   };
 
   const isDateDisabled = (date: Date) => {
-    // Disable past dates
     const today = add(new Date(), { days: 1 });
     today.setHours(0, 0, 0, 0);
     return date < today;
@@ -67,13 +54,6 @@ export default function SelectDateAndTimePage() {
 
   const getNextPageUrl = () => {
     if (!selectedDate || !selectedTimeSlot) return "#";
-    // const params = new URLSearchParams();
-    // if (selectedVisitType) params.set("selectedVisitType", selectedVisitType);
-    // if (selectedDoctor) params.set("selectedDoctor", selectedDoctor);
-    // if (selectedService) params.set("selectedService", selectedService);
-    // if (selectedClinicLocation) params.set("selectedClinicLocation", selectedClinicLocation);
-    // params.set("selectedDate", format(selectedDate, "yyyy-MM-dd"));
-    // params.set("selectedTimeSlot", selectedTimeSlot);
     return `/verify-phone?${newUrlSearchParams.toString()}`;
   };
 
@@ -104,7 +84,10 @@ export default function SelectDateAndTimePage() {
               <Calendar
                 mode="single"
                 selected={selectedDate}
-                onSelect={setSelectedDate}
+                onSelect={(value) => {
+                  setSelectedDate(value);
+                  setSelectedTimeSlot(undefined);
+                }}
                 disabled={isDateDisabled}
                 className="rounded-md border"
                 classNames={{
@@ -124,7 +107,7 @@ export default function SelectDateAndTimePage() {
           </div>
 
           {/* Time Selection */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="bg-white flex flex-col dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-4">
               <Clock className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Select Time</h2>
@@ -136,31 +119,42 @@ export default function SelectDateAndTimePage() {
                 <p className="text-gray-500 dark:text-gray-400">Please select a date first to view available time slots</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
-                {timeSlots.map((slot) => (
-                  <button
-                    key={slot.id}
-                    onClick={() => slot.available && handleTimeSlotSelect(slot.id)}
-                    disabled={!slot.available}
-                    className={cn(
-                      "p-3 rounded-md border text-sm font-medium transition-all duration-200",
-                      slot.available
-                        ? selectedTimeSlot === slot.id
+              <div className="grid grid-cols-2 gap-3 max-h-96 flex-1 overflow-y-auto">
+                {loadingTimeslots ? (
+                  <div className="col-span-2 flex justify-center">
+                    <Spinner className="size-8" />
+                  </div>
+                ) : (availabilityData?.length ?? 0) > 0 ? (
+                  availabilityData?.map((slot) => (
+                    <button
+                      key={slot.start}
+                      onClick={() => handleTimeSlotSelect(slot.start ?? "")}
+                      className={cn(
+                        "p-3 rounded-md border text-sm font-medium transition-all duration-200 cursor-pointer",
+                        selectedTimeSlot === slot.start
                           ? "bg-primary text-white border-primary shadow-md"
                           : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
-                        : "bg-gray-100 dark:bg-gray-600 border-gray-200 dark:border-gray-500 text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                    )}
-                  >
-                    {slot.label}
-                  </button>
-                ))}
+                      )}
+                    >
+                      {format(slot.start ?? "", "hh:mm aa")}
+                    </button>
+                  ))
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400 text-center col-span-2">
+                    No availability on {selectedDate ? format(selectedDate, "yyyy-MM-dd") : "the selected date"}. Please select a
+                    different date.
+                  </p>
+                )}
               </div>
             )}
 
-            {selectedTimeSlot && (
+            {selectedTimeSlot && (availabilityData?.length ?? 0) > 0 && (
               <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
                 <p className="text-sm text-primary dark:text-primary-200">
-                  Selected: <span className="font-medium">{timeSlots.find((slot) => slot.id === selectedTimeSlot)?.label}</span>
+                  Selected:{" "}
+                  <span className="font-medium">
+                    {format(availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? "", "hh:mm aa")}
+                  </span>
                 </p>
               </div>
             )}
@@ -181,7 +175,9 @@ export default function SelectDateAndTimePage() {
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Time</p>
                 <p className="font-medium text-gray-900 dark:text-white">
-                  {selectedTimeSlot ? timeSlots.find((slot) => slot.id === selectedTimeSlot)?.label : "Not selected"}
+                  {selectedTimeSlot && (availabilityData?.length ?? 0) > 0
+                    ? format(availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? "", "hh:mm aa")
+                    : "Not selected"}
                 </p>
               </div>
             </div>
@@ -192,7 +188,7 @@ export default function SelectDateAndTimePage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col-reverse md:flex-row gap-6 justify-between container">
             <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
-              <ArrowLeft /> Back to Visit Type
+              <ArrowLeft /> Back
             </Button>
             <Link href={getNextPageUrl()}>
               <Button

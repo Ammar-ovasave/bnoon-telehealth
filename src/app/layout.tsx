@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import SWRProvider from "@/providers/SWRProvider";
 
 export const metadata: Metadata = {
   title: "Bnoon",
@@ -32,8 +33,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`antialiased ${helvetica.className}`}>{children}</body>
-    </html>
+    <SWRProvider>
+      <html lang="en">
+        <body className={`antialiased ${helvetica.className}`}>{children}</body>
+      </html>
+    </SWRProvider>
   );
 }

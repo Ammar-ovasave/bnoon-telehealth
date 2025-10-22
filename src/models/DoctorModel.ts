@@ -36,7 +36,7 @@ export const doctors: DoctorModel[] = [
     photo: "/images/dr-fawad.jpg",
     availability: {
       clinic: true,
-      virtual: false,
+      virtual: true,
     },
     firstAvailableSlot: "Tomorrow, 10:00 AM",
     experience: "15 years of experience",
@@ -48,7 +48,7 @@ export const doctors: DoctorModel[] = [
     specialty: "Medical Director, Bnoon - Jeddah Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology & Infertility",
     photo: "/images/dr-mazin-bishra.jpg",
     availability: {
-      clinic: false,
+      clinic: true,
       virtual: true,
     },
     firstAvailableSlot: "Today, 4:30 PM",
@@ -88,7 +88,7 @@ export const doctors: DoctorModel[] = [
     photo: "/images/dr-ahmed-bekar.jpg",
     availability: {
       clinic: true,
-      virtual: false,
+      virtual: true,
     },
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "11 years of experience",
@@ -126,7 +126,7 @@ export const doctors: DoctorModel[] = [
     specialty: "Consultant, Urology & Andrology",
     photo: "/images/dr-haroun.jpg",
     availability: {
-      clinic: false,
+      clinic: true,
       virtual: true,
     },
     firstAvailableSlot: "Wednesday, 11:00 AM",
@@ -140,7 +140,7 @@ export const doctors: DoctorModel[] = [
     photo: "/images/dr-moussa.jpg",
     availability: {
       clinic: true,
-      virtual: false,
+      virtual: true,
     },
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "11 years of experience",
@@ -179,7 +179,7 @@ export const doctors: DoctorModel[] = [
     photo: "/images/dr-maram.jpg",
     availability: {
       clinic: true,
-      virtual: false,
+      virtual: true,
     },
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "10 years of experience",

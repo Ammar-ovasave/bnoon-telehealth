@@ -1,3 +1,4 @@
+export const AUTH_TOKEN_NAME = "auth-token";
 export const VISIT_DURATION_IN_MINUTES = 30;
 export const countryCodes = [
   { code: "+966", country: "Saudi Arabia", flag: "🇸🇦" },

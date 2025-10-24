@@ -1,4 +1,4 @@
-export interface FertiSmartPatientModel {
+export type FertiSmartPatientModel = {
   fileId?: number;
   mrn?: string;
   mrnLeg?: string;
@@ -24,4 +24,4 @@ export interface FertiSmartPatientModel {
   type?: number;
   bloodTypeId?: number;
   fileDisabled?: number;
-}
+};

@@ -76,6 +76,7 @@ export default function VerifyPhonePage() {
       setIsLoading(false);
       return toast.error("Faild to send OTP");
     }
+    console.log("sendOTPResponse", sendOTPResponse);
     sessionStorage.setItem("mrn", createPatientResponse?.mrn);
     sessionStorage.setItem("purpose", purpose);
     setIsLoading(false);

@@ -36,7 +36,7 @@ export async function verifyOTP(params: { code: string; purpose: string; mrn: st
   try {
     const res = await instance.post<{
       verified?: boolean;
-    }>(`/api/ferti-smart/patients/${params.mrn}/otps:verify`, params);
+    }>(`/api/verify-otp`, params);
     return res.data;
   } catch (e) {
     console.log("--- verifyOTP error", e);

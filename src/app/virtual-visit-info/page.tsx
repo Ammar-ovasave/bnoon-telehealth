@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, User, Mail, Globe, Users, CreditCard } from "luc
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 // Mock nationality options
 const nationalities = [
@@ -66,17 +67,9 @@ export default function VirtualVisitInfoPage() {
     idNumber: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  // const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-  //   const searchParams = useSearchParams();
 
-  //   // Get URL parameters
-  //   const selectedVisitType = searchParams.get("selectedVisitType");
-  //   const selectedDoctor = searchParams.get("selectedDoctor");
-  //   const selectedService = searchParams.get("selectedService");
-  //   const selectedClinicLocation = searchParams.get("selectedClinicLocation");
-  //   const selectedDate = searchParams.get("selectedDate");
-  //   const selectedTimeSlot = searchParams.get("selectedTimeSlot");
+  useCurrentUser();
 
   const handleBack = () => {
     router.back();
@@ -126,21 +119,6 @@ export default function VirtualVisitInfoPage() {
     // setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData.email, formData.fullName, formData.gender, formData.nationality, formData.idType, formData.idNumber]);
-
-  //   const handleSubmit = async () => {
-  //     if (!validateForm()) {
-  //       return;
-  //     }
-
-  //     setIsSubmitting(true);
-  //     // Simulate API call
-  //     setTimeout(() => {
-  //       setIsSubmitting(false);
-  //       // Navigate to next page or show success
-  //       alert("Information saved successfully!");
-  //       // router.push("/next-page");
-  //     }, 1500);
-  //   };
 
   const getNextPageUrl = useMemo(() => {
     if (!validateForm) return "#";

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, User, MapPin, CalendarDays, RefreshCw, X, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -7,6 +7,10 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { clinicLocations } from "@/models/ClinicModel";
 import { services } from "@/models/ServiceModel";
+import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
+import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 
 interface Appointment {
   id: string;
@@ -17,7 +21,7 @@ interface Appointment {
   doctor: string;
   service: string;
   clinicLocation: string;
-  status: "upcoming" | "completed" | "cancelled";
+  status: string; // "upcoming" | "completed" | "cancelled";
   fullName: string;
   email: string;
   nationality: string;
@@ -30,25 +34,65 @@ export default function ManageAppointmentsPage() {
   const router = useRouter();
   const [showCancelConfirm, setShowCancelConfirm] = useState<string | null>(null);
 
-  // Mock appointment data - in a real app, this would come from an API
-  const [appointments] = useState<Appointment[]>([
-    {
-      id: "1",
-      confirmationNumber: "BN12345678",
-      date: new Date().toLocaleDateString(),
-      timeSlot: "10:00 AM",
-      visitType: "Virtual Visit",
-      doctor: "Dr. Ahmad Bekar",
-      service: "general-consultation",
-      clinicLocation: "virtual",
-      status: "upcoming",
-      fullName: "John Doe",
-      email: "john.doe@email.com",
-      nationality: "Saudi Arabia",
-      gender: "Male",
-      idType: "National ID",
-      idNumber: "1234567890",
-    },
+  const { data: currentUserAppointmentsData } = useCurrentUserAppointments();
+
+  const { data: currentUserData } = useCurrentUser();
+
+  // const [appointments] = useState<Appointment[]>([
+  //   {
+  //     id: "1",
+  //     confirmationNumber: "BN12345678",
+  //     date: new Date().toLocaleDateString(),
+  //     timeSlot: "10:00 AM",
+  //     visitType: "Virtual Visit",
+  //     doctor: "Dr. Ahmad Bekar",
+  //     service: "general-consultation",
+  //     clinicLocation: "virtual",
+  //     status: "upcoming",
+  //     fullName: "John Doe",
+  //     email: "john.doe@email.com",
+  //     nationality: "Saudi Arabia",
+  //     gender: "Male",
+  //     idType: "National ID",
+  //     idNumber: "1234567890",
+  //   },
+  // ]);
+
+  const { data: patientData } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+
+  const { data: resourcesData } = useFertiSmartResources();
+
+  const appointments = useMemo<Appointment[]>(() => {
+    return (
+      currentUserAppointmentsData?.map<Appointment>((item) => {
+        const resourceId = item.resources?.[0]?.id;
+        const resource = resourcesData?.find((resource) => resource.id === resourceId);
+        return {
+          clinicLocation: "Virtual",
+          confirmationNumber: item.id?.toString() ?? "",
+          date: item.time?.start ?? "",
+          doctor: resource?.name ?? "-",
+          email: currentUserData?.emailAddress ?? "-",
+          fullName: `${currentUserData?.firstName} ${currentUserData?.lastName}`,
+          gender: "Female",
+          idNumber: patientData?.identityId ?? "-",
+          idType: "-",
+          nationality: "-",
+          service: "-",
+          status: item.status?.name ?? "",
+          timeSlot: item.time?.start ?? "",
+          visitType: "Virtual Visit",
+          id: item.id?.toString() ?? "",
+        };
+      }) ?? []
+    );
+  }, [
+    currentUserAppointmentsData,
+    currentUserData?.emailAddress,
+    currentUserData?.firstName,
+    currentUserData?.lastName,
+    patientData?.identityId,
+    resourcesData,
   ]);
 
   const handleReschedule = (appointmentId: string) => {

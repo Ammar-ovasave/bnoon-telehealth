@@ -5,6 +5,27 @@ const instance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+export async function createAppointment(params: {
+  patientMrn: string;
+  serviceId: number;
+  resourceIds: number[];
+  startTime: string;
+  endTime: string;
+  branchId: number;
+  statusId: number;
+  description: string;
+}) {
+  try {
+    console.log("--- create appointment", params);
+    const res = await instance.post<{ id?: number }>(`/api/appointments`, params);
+    console.log("--- appointment response", res.data);
+    return res.data;
+  } catch (e) {
+    console.log("--- createPatient error", e);
+    return null;
+  }
+}
+
 export async function createPatient(params: {
   patient: { firstName: string; lastName: string; sex?: 0 | 1; contactNumber: string; middleName?: string; dob?: string };
   branchId: number;

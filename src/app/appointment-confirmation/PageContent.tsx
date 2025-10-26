@@ -5,8 +5,9 @@ import { CheckCircle, Calendar, User, Mail, Globe, Users, CreditCard, CalendarDa
 import Link from "next/link";
 import { clinicLocations } from "@/models/ClinicModel";
 import { services } from "@/models/ServiceModel";
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { doctors } from "@/models/DoctorModel";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 export const PageContent: FC = () => {
   const searchParams = useSearchParams();
@@ -18,19 +19,22 @@ export const PageContent: FC = () => {
   const selectedDate = searchParams.get("selectedDate") || new Date().toLocaleDateString();
   const selectedTimeSlot = searchParams.get("selectedTimeSlot") || "10:00 AM";
   const fullName = searchParams.get("fullName") || "Patient Name";
-  const email = searchParams.get("email") || "patient@email.com";
   const nationality = searchParams.get("nationality") || "Saudi Arabia";
   const gender = searchParams.get("gender") || "Male";
   const idType = searchParams.get("idType") || "National ID";
   const idNumber = searchParams.get("idNumber") || "1234567890";
 
-  const confirmationNumber = `BN${Date.now().toString().slice(-8)}`;
+  const confirmationNumber = useMemo(() => {
+    return `BN${Date.now().toString().slice(-8)}`;
+  }, []);
 
-  const clinic = clinicLocations.find((clinic) => clinic.id === selectedClinicLocation);
+  const clinic = useMemo(() => clinicLocations.find((clinic) => clinic.id === selectedClinicLocation), [selectedClinicLocation]);
 
-  const service = services.find((service) => service.id === selectedService);
+  const service = useMemo(() => services.find((service) => service.id === selectedService), [selectedService]);
 
-  const doctor = doctors.find((doc) => doc.id === selectedDoctor);
+  const doctor = useMemo(() => doctors.find((doc) => doc.id === selectedDoctor), [selectedDoctor]);
+
+  const { data: currentUserData } = useCurrentUser();
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -104,9 +108,9 @@ export const PageContent: FC = () => {
               <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                 <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                   <Mail className="h-4 w-4" />
-                  Email
+                  Mobile Number
                 </span>
-                <span className="font-medium text-gray-900 dark:text-white">{email}</span>
+                <span className="font-medium text-gray-900 dark:text-white">{currentUserData?.contactNumber}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                 <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">

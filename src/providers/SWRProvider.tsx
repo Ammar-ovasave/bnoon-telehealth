@@ -7,10 +7,11 @@ const instance = axios.create({
   headers: { "Content-Type": "application/json", "x-api-key": "7g9ictK-GragXQD70hL1LBYRLPY33O4paVyyQxUQ" },
 });
 
-const SWRProvider: FC<PropsWithChildren> = ({ children }) => {
+const SWRProvider: FC<PropsWithChildren & { fallback?: { [key: string]: unknown } }> = ({ children, fallback }) => {
   return (
     <SWRConfig
       value={{
+        fallback: fallback,
         fetcher: (resource, init) => instance.get(resource, init).then((res) => res.data),
       }}
     >

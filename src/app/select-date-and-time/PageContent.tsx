@@ -17,7 +17,7 @@ export default function SelectDateAndTimePage() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>();
   const router = useRouter();
 
-  const { data: resourcesData } = useFertiSmartResources();
+  const { data: resourcesData, isLoading: loadingResources } = useFertiSmartResources();
 
   const selectedResource = useMemo(() => {
     return resourcesData?.find((item) => item.name?.startsWith("Dr."));
@@ -120,7 +120,7 @@ export default function SelectDateAndTimePage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3 max-h-96 flex-1 overflow-y-auto">
-                {loadingTimeslots ? (
+                {loadingTimeslots || loadingResources ? (
                   <div className="col-span-2 flex justify-center">
                     <Spinner className="size-8" />
                   </div>

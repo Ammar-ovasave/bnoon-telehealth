@@ -14,6 +14,7 @@ export async function createAppointment(params: {
   branchId: number;
   statusId: number;
   description: string;
+  email: string;
 }) {
   try {
     console.log("--- create appointment", params);
@@ -61,6 +62,26 @@ export async function verifyOTP(params: { code: string; purpose: string; mrn: st
     return res.data;
   } catch (e) {
     console.log("--- verifyOTP error", e);
+    return null;
+  }
+}
+
+export async function logout() {
+  try {
+    const res = await instance.post(`/api/logout`);
+    return res.data;
+  } catch (e) {
+    console.log("--- logout error", e);
+    return null;
+  }
+}
+
+export async function getPatientsByPhoneNumber({ phoneNumber }: { phoneNumber: string }) {
+  try {
+    const res = await instance.get<FertiSmartPatientModel[]>(`/api/ferti-smart/patients?contactNumber=${phoneNumber}`);
+    return res.data;
+  } catch (e) {
+    console.log("--- getPatientsByPhoneNumber error", e);
     return null;
   }
 }

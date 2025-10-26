@@ -4,15 +4,25 @@ import { cookies } from "next/headers";
 
 export async function GET() {
   try {
+    const currentUser = await getCurrentUser();
+    return Response.json(currentUser);
+  } catch (error) {
+    console.log("--- get current user error ", error);
+    return Response.error();
+  }
+}
+
+export async function getCurrentUser() {
+  try {
     const cookiesStore = await cookies();
     const authToken = cookiesStore.get(AUTH_TOKEN_NAME);
     const decodedToken = verifyToken({ secret: process.env.JWT_SECRET ?? "", token: authToken?.value ?? "" });
     if (!decodedToken) {
-      return Response.error();
+      return null;
     }
-    return Response.json(decodedToken);
+    return decodedToken;
   } catch (error) {
     console.log("--- get current user error ", error);
-    return Response.error();
+    return null;
   }
 }

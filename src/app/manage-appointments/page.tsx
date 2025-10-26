@@ -35,7 +35,7 @@ export default function ManageAppointmentsPage() {
               <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Appointments Found</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">{`You don't have any appointments scheduled.`}</p>
-              <Link href="/select-visit-type">
+              <Link href="/">
                 <Button size="lg" className="px-8 py-3">
                   Book New Appointment
                 </Button>

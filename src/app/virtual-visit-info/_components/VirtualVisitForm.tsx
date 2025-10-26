@@ -91,31 +91,29 @@ export default function VirtualVisitForm() {
     }
   };
 
-  const validateForm = useMemo((): boolean => {
-    const newErrors: FormErrors = {};
+  const validateForm = useMemo((): string | undefined => {
     if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
+      return "Full name is required";
     } else if (formData.fullName.trim().length < 2) {
-      newErrors.fullName = "Full name must be at least 2 characters";
+      return "Full name must be at least 2 characters";
     }
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      return "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      return "Please enter a valid email address";
     }
     if (!formData.nationality) {
-      newErrors.nationality = "Please select your nationality";
+      return "Please select your nationality";
     }
     if (!formData.gender) {
-      newErrors.gender = "Please select your gender";
+      return "Please select your gender";
     }
     if (!formData.idType) {
-      newErrors.idType = "Please select your ID type";
+      return "Please select your ID type";
     }
     if (!formData.idNumber.trim()) {
-      newErrors.idNumber = "ID number is required";
+      return "ID number is required";
     }
-    return Object.keys(newErrors).length === 0;
   }, [formData.email, formData.fullName, formData.gender, formData.nationality, formData.idType, formData.idNumber]);
 
   // const getNextPageUrl = useMemo(() => {
@@ -133,9 +131,9 @@ export default function VirtualVisitForm() {
   const selectedTimeSlot = decodeURIComponent(searchParams.get("selectedTimeSlot") ?? "");
 
   const handleFormSubmit = useCallback(async () => {
-    if (!validateForm) {
+    if (validateForm) {
       console.log("invalid data");
-      return toast.error("Please enter valid information for all the required fields");
+      return toast.error(validateForm);
     }
     if (!currentUserData?.mrn) {
       console.log("--- no current user mrn");
@@ -157,6 +155,7 @@ export default function VirtualVisitForm() {
     setLoading(true);
     try {
       const res = await createAppointment({
+        email: formData.email,
         statusId: status.id ?? 0,
         branchId: branchesData?.[0].id ?? 0,
         description: isVirtualVisit ? `Virtual Visit` : ``,

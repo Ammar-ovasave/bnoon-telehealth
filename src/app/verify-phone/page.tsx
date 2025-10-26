@@ -8,6 +8,7 @@ import { countryCodes } from "@/constants";
 import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
 import { toast } from "sonner";
 import { createPatient, sendOTP, verifyOTP } from "@/services/client";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 const OTP_LENGTH = 6;
 
@@ -43,6 +44,8 @@ export default function VerifyPhonePage() {
 
   const selectedBranch = branchesData?.[0];
 
+  const { data: currentUserData } = useCurrentUser();
+
   const fullPhoneNumber = useMemo(() => {
     return `${selectedCountryCode}${phoneNumber ?? ""}`;
   }, [phoneNumber, selectedCountryCode]);
@@ -56,20 +59,23 @@ export default function VerifyPhonePage() {
       return;
     }
     setIsLoading(true);
-    const createPatientResponse = await createPatient({
-      branchId: selectedBranch.id ?? 0,
-      patient: { contactNumber: fullPhoneNumber, firstName: "-", lastName: "-" },
-    });
-    if (!createPatientResponse?.mrn) {
+    const createPatientResponse = currentUserData?.mrn
+      ? { mrn: currentUserData.mrn }
+      : await createPatient({
+          branchId: selectedBranch.id ?? 0,
+          patient: { contactNumber: fullPhoneNumber, firstName: "-", lastName: "-" },
+        });
+    const mrnToUse = currentUserData?.mrn ? currentUserData.mrn : createPatientResponse?.mrn;
+    if (!mrnToUse) {
       setIsLoading(false);
       return toast.error("Faild to create a patient");
     }
     const purpose = "verify phone number";
     const sendOTPResponse = await sendOTP({
-      mrn: createPatientResponse.mrn,
+      mrn: mrnToUse,
       channel: "sms",
       maxAttempts: 5,
-      purpose: "verify phone number",
+      purpose: purpose,
       ttlMinutes: 10 * 60,
     });
     if (!sendOTPResponse?.code) {
@@ -77,7 +83,7 @@ export default function VerifyPhonePage() {
       return toast.error("Faild to send OTP");
     }
     console.log("sendOTPResponse", sendOTPResponse);
-    sessionStorage.setItem("mrn", createPatientResponse?.mrn);
+    sessionStorage.setItem("mrn", mrnToUse);
     sessionStorage.setItem("purpose", purpose);
     setIsLoading(false);
     setShowOtpInput(true);

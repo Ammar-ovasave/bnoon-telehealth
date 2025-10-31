@@ -8,9 +8,23 @@ import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel"
 import { format } from "date-fns";
 import { Calendar, CheckCircle, Clock, MapPin, RefreshCw, User, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { cancelAppointment } from "@/services/client";
+import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
 
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const { mutate: mutateCurrentUserAppointments } = useCurrentUserAppointments();
 
   const { data: resourcesData } = useFertiSmartResources();
 
@@ -56,12 +70,12 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
           </div>
           <span className="text-sm text-gray-500 dark:text-gray-400">Confirmation: {appointment.id}</span>
         </div>
-        {appointment.status?.name === "upcoming" && (
-          <div className="flex gap-2">
-            <Button onClick={() => handleReschedule()} variant="outline" size="sm" className="flex items-center gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Reschedule
-            </Button>
+        <div className="flex gap-2 mt-2 md:mt-0">
+          <Button onClick={() => handleReschedule()} variant="outline" size="sm" className="flex items-center gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Reschedule
+          </Button>
+          {appointment.status?.name !== "Cancelled" && (
             <Button
               onClick={() => handleCancel()}
               variant="outline"
@@ -71,8 +85,8 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               <X className="h-4 w-4" />
               Cancel
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Appointment Details */}
@@ -142,23 +156,37 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
         </div>
       </div>
 
-      {/* Cancel Confirmation Modal */}
-      {showCancelConfirm && (
-        <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <h4 className="text-red-800 dark:text-red-200 font-medium mb-2">Cancel Appointment?</h4>
-          <p className="text-red-700 dark:text-red-300 text-sm mb-4">
-            Are you sure you want to cancel this appointment? This action cannot be undone.
-          </p>
-          <div className="flex gap-2">
-            <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white">
-              Yes, Cancel
-            </Button>
-            <Button variant="outline" size="sm">
-              Keep Appointment
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel appointment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to cancel this appointment? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isCancelling}>Keep Appointment</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isCancelling}
+              className="bg-red-600 hover:bg-red-700"
+              onClick={async () => {
+                try {
+                  setIsCancelling(true);
+                  if (!appointment.id) return;
+                  await cancelAppointment(appointment.id);
+                  mutateCurrentUserAppointments(undefined);
+                } finally {
+                  setIsCancelling(false);
+                  setShowCancelConfirm(false);
+                }
+              }}
+            >
+              {isCancelling ? "Cancelling..." : "Yes, Cancel"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

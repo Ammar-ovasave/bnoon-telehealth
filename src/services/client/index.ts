@@ -1,3 +1,4 @@
+import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import axios from "axios";
 
@@ -5,17 +6,28 @@ const instance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-export async function createAppointment(params: {
-  patientMrn: string;
-  serviceId: number;
-  resourceIds: number[];
-  startTime: string;
-  endTime: string;
-  branchId: number;
-  statusId: number;
-  description: string;
-  email: string;
+export async function updateAppointment(params: {
+  startTime?: string;
+  endTime?: string;
+  resourceIds?: number[];
+  branchId?: number;
+  statusId?: number;
+  appointmentId: number;
 }) {
+  try {
+    const res = await instance.post<{ id?: number }>(`/api/ferti-smart/appointments/${params.appointmentId}`, params);
+    return res.data;
+  } catch (e) {
+    console.log("--- updateAppointment error", e);
+    return null;
+  }
+}
+
+export async function cancelAppointment(appointmentId: number) {
+  return await updateAppointment({ appointmentId, statusId: 6 });
+}
+
+export async function createAppointment(params: CreateAppointmentPayload) {
   try {
     console.log("--- create appointment", params);
     const res = await instance.post<{ id?: number }>(`/api/appointments`, params);

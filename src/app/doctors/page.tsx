@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { doctors } from "@/models/DoctorModel";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Filter, MapPin, Video, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DoctorCard from "@/components/DoctorCard";
@@ -11,8 +11,11 @@ import DoctorCard from "@/components/DoctorCard";
 type AvailabilityFilter = "all" | "clinic" | "virtual" | "both";
 
 export default function DoctorsListPage() {
+  const searchParams = useSearchParams();
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
-  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>(
+    (searchParams.get("selectedVisitType") as AvailabilityFilter) ?? "all"
+  );
   const router = useRouter();
 
   const handleBack = () => {
@@ -25,7 +28,7 @@ export default function DoctorsListPage() {
     const searchParams = new URLSearchParams(window.location.search);
     searchParams.set("selectedDoctor", doctor);
     // Determine next page based on availability filter
-    router.push(`/select-date-and-time?${searchParams.toString()}&selectedVisitType=${availabilityFilter}`);
+    router.push(`/select-date-and-time?${searchParams.toString()}`);
     // if (availabilityFilter === "clinic" || availabilityFilter === "virtual") {
     // } else {
     //   router.push(`/select-visit-type?${searchParams.toString()}&selectedDoctor=${doctor}`);

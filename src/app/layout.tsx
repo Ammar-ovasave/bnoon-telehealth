@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
 import localFont from "next/font/local";
+import SWRProvider from "@/providers/SWRProvider";
+import NavHeader from "@/components/NavHeader";
 import "./globals.css";
+import { getCurrentUser } from "./api/current-user/_services";
 
 export const metadata: Metadata = {
   title: "Bnoon",
@@ -26,14 +30,22 @@ const helvetica = localFont({
   ],
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const currentUser = await getCurrentUser();
+
   return (
-    <html lang="en">
-      <body className={`antialiased ${helvetica.className}`}>{children}</body>
-    </html>
+    <SWRProvider fallback={{ "/api/current-user": currentUser }}>
+      <html lang="en">
+        <body className={`antialiased ${helvetica.className}`}>
+          <NavHeader />
+          {children}
+          <Toaster />
+        </body>
+      </html>
+    </SWRProvider>
   );
 }

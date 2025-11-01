@@ -1,0 +1,28 @@
+export type FertiSmartPatientModel = {
+  fileId?: number;
+  mrn?: string;
+  mrnLeg?: string;
+  // titleId?: number;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  maidenName?: string;
+  arabicName?: string;
+  dob?: string;
+  age?: number;
+  contactNumber?: string;
+  alternativeContactNumber?: string;
+  registerDate?: string;
+  emailAddress?: string;
+  branch?: { id?: number; name?: string };
+  // nationalityId?: number;
+  identityId?: string;
+  // occupationStatusId?: number;
+  occupation?: string;
+  // branchId?: number;
+  // oldBranchId?: number;
+  // physicianId?: number;
+  type?: number;
+  // bloodTypeId?: number;
+  // fileDisabled?: number;
+};

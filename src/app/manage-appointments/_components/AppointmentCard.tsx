@@ -6,7 +6,7 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { cn } from "@/lib/utils";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import { format, add } from "date-fns";
-import { Calendar, CheckCircle, Clock, MapPin, RefreshCw, User, X } from "lucide-react";
+import { Calendar, CheckCircle, Clock, MapPin, Phone, RefreshCw, User, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
 import {
   AlertDialog,
@@ -25,6 +25,7 @@ import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvai
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -122,6 +123,12 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
         <div className="flex gap-2 mt-2 md:mt-0">
           {appointment.status?.name !== "Cancelled" && (
             <>
+              <Link href={`/video-call/${appointment.id}/prepare`}>
+                <Button variant="default" size="sm" className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  Join
+                </Button>
+              </Link>
               <Button onClick={() => handleReschedule()} variant="outline" size="sm" className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" />
                 Reschedule

@@ -90,7 +90,8 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
       setIsLoading(false);
       return toast.error("Faild to send OTP");
     }
-    console.log("sendOTPResponse", sendOTPResponse);
+    // console.log("sendOTPResponse", sendOTPResponse);
+    sessionStorage.setItem("otp", sendOTPResponse.code);
     sessionStorage.setItem("mrn", mrnToUse);
     sessionStorage.setItem("purpose", purpose);
     setIsLoading(false);
@@ -104,7 +105,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
     }
     setIsLoading(true);
     const response = await verifyOTP({
-      code: otp,
+      code: sessionStorage.getItem("otp") ?? "", // otp,
       mrn: sessionStorage.getItem("mrn") ?? "",
       purpose: sessionStorage.getItem("purpose") ?? "",
     });

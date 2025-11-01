@@ -5,7 +5,7 @@ import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { cn } from "@/lib/utils";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
-import { format } from "date-fns";
+import { format, add } from "date-fns";
 import { Calendar, CheckCircle, Clock, MapPin, RefreshCw, User, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
 import {
@@ -18,12 +18,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { cancelAppointment } from "@/services/client";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { cancelAppointment, updateAppointment } from "@/services/client";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
+import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
+import { VISIT_DURATION_IN_MINUTES } from "@/constants";
+import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [showRescheduleDialog, setShowRescheduleDialog] = useState(false);
+  const [selectedRescheduleDate, setSelectedRescheduleDate] = useState<Date | undefined>(undefined);
+  const [selectedRescheduleTimeSlot, setSelectedRescheduleTimeSlot] = useState<string>();
+  const [isRescheduling, setIsRescheduling] = useState(false);
   const { mutate: mutateCurrentUserAppointments } = useCurrentUserAppointments();
 
   const { data: resourcesData } = useFertiSmartResources();
@@ -45,7 +54,47 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 
   const { data: patientData } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
 
-  const handleReschedule = () => {};
+  const { data: availabilityData, isLoading: loadingTimeslots } = useFertiSmartResourceAvailability({
+    resourceId: resourceId?.toString(),
+    date: selectedRescheduleDate ? format(selectedRescheduleDate, "yyyy-MM-dd") : undefined,
+    serviceDuration: VISIT_DURATION_IN_MINUTES,
+  });
+
+  const isDateDisabled = (date: Date) => {
+    const today = add(new Date(), { days: 1 });
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
+  const handleReschedule = () => {
+    setShowRescheduleDialog(true);
+  };
+
+  const handleRescheduleConfirm = async () => {
+    if (!selectedRescheduleDate || !selectedRescheduleTimeSlot || !appointment.id) return;
+
+    try {
+      setIsRescheduling(true);
+      const selectedSlot = availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot);
+      if (!selectedSlot?.start || !selectedSlot?.end) return;
+
+      await updateAppointment({
+        appointmentId: appointment.id,
+        startTime: selectedSlot.start,
+        endTime: selectedSlot.end,
+      });
+
+      mutateCurrentUserAppointments(undefined);
+      setShowRescheduleDialog(false);
+      setSelectedRescheduleDate(undefined);
+      setSelectedRescheduleTimeSlot(undefined);
+    } catch (error) {
+      console.error("Error rescheduling appointment:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setIsRescheduling(false);
+    }
+  };
 
   const handleCancel = () => {
     setShowCancelConfirm(true);
@@ -71,20 +120,22 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
           <span className="text-sm text-gray-500 dark:text-gray-400">Confirmation: {appointment.id}</span>
         </div>
         <div className="flex gap-2 mt-2 md:mt-0">
-          <Button onClick={() => handleReschedule()} variant="outline" size="sm" className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Reschedule
-          </Button>
           {appointment.status?.name !== "Cancelled" && (
-            <Button
-              onClick={() => handleCancel()}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
-            >
-              <X className="h-4 w-4" />
-              Cancel
-            </Button>
+            <>
+              <Button onClick={() => handleReschedule()} variant="outline" size="sm" className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Reschedule
+              </Button>
+              <Button
+                onClick={() => handleCancel()}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+              >
+                <X className="h-4 w-4" />
+                Cancel
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -155,6 +206,95 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
           </div>
         </div>
       </div>
+
+      {/* Reschedule Dialog */}
+      <AlertDialog open={showRescheduleDialog} onOpenChange={setShowRescheduleDialog}>
+        <AlertDialogContent className="!max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reschedule Appointment</AlertDialogTitle>
+            <AlertDialogDescription>Choose your preferred date and time for this appointment.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-4">
+            {/* Date Selection */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Date</h3>
+              <div className="flex justify-center">
+                <CalendarComponent
+                  mode="single"
+                  selected={selectedRescheduleDate}
+                  onSelect={(value) => {
+                    setSelectedRescheduleDate(value);
+                    setSelectedRescheduleTimeSlot(undefined);
+                  }}
+                  disabled={isDateDisabled}
+                  className="rounded-md border"
+                  classNames={{
+                    day: "hover:bg-green-50 dark:hover:bg-green-900/20",
+                    day_selected: "bg-green-600 text-white hover:bg-green-700",
+                    day_today: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
+                  }}
+                />
+              </div>
+              {selectedRescheduleDate && (
+                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
+                  <p className="text-sm text-green-800 dark:text-green-200">
+                    Selected: <span className="font-medium">{format(selectedRescheduleDate, "EEEE, MMMM do, yyyy")}</span>
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Time Selection */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Time</h3>
+              {!selectedRescheduleDate ? (
+                <div className="text-center py-8">
+                  <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-500 dark:text-gray-400">Please select a date first to view available time slots</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+                  {loadingTimeslots ? (
+                    <div className="col-span-2 flex justify-center">
+                      <Spinner className="size-8" />
+                    </div>
+                  ) : (availabilityData?.length ?? 0) > 0 ? (
+                    availabilityData?.map((slot) => (
+                      <button
+                        key={slot.start}
+                        onClick={() => setSelectedRescheduleTimeSlot(slot.start ?? "")}
+                        className={cn(
+                          "p-3 rounded-md border text-sm font-medium transition-all duration-200 cursor-pointer",
+                          selectedRescheduleTimeSlot === slot.start
+                            ? "bg-primary text-white border-primary shadow-md"
+                            : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
+                        )}
+                      >
+                        {format(slot.start ?? "", "hh:mm aa")}
+                      </button>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-400 text-center col-span-2">
+                      No availability on{" "}
+                      {selectedRescheduleDate ? format(selectedRescheduleDate, "yyyy-MM-dd") : "the selected date"}. Please select
+                      a different date.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRescheduling}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isRescheduling || !selectedRescheduleDate || !selectedRescheduleTimeSlot}
+              onClick={handleRescheduleConfirm}
+            >
+              {isRescheduling ? "Rescheduling..." : "Confirm Reschedule"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Cancel Confirmation Dialog */}
       <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>

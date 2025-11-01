@@ -6,6 +6,28 @@ const instance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+export async function updatePatient(params: {
+  mrn: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  maidenName?: string;
+  arabicName?: string;
+  dob?: string;
+  contactNumber?: string;
+  alternativeContactNumber?: string;
+  emailAddress?: string;
+}) {
+  try {
+    const res = await instance.patch<{ id?: number }>(`/api/ferti-smart/patients/${params.mrn}`, params);
+    console.log("update patient response", res.data);
+    return res.data;
+  } catch (error) {
+    console.log("--- updatePatient error", error);
+    return null;
+  }
+}
+
 export async function updateAppointment(params: {
   startTime?: string;
   endTime?: string;
@@ -15,7 +37,7 @@ export async function updateAppointment(params: {
   appointmentId: number;
 }) {
   try {
-    const res = await instance.post<{ id?: number }>(`/api/ferti-smart/appointments/${params.appointmentId}`, params);
+    const res = await instance.patch<{ id?: number }>(`/api/ferti-smart/appointments/${params.appointmentId}`, params);
     return res.data;
   } catch (e) {
     console.log("--- updateAppointment error", e);

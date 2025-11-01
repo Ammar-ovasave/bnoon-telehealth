@@ -21,3 +21,14 @@ export async function POST(request: Request) {
     return Response.error();
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const payload = await request.json();
+    const res = await axios.patch(getRequestUrl(request.url), payload);
+    return Response.json(res.data);
+  } catch (e) {
+    console.log("--- post ferti smart error", e);
+    return Response.error();
+  }
+}

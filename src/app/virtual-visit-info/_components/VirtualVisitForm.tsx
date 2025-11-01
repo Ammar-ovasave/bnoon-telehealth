@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { toast } from "sonner";
-import { createAppointment } from "@/services/client";
+import { createAppointment, updatePatient } from "@/services/client";
 import useFertiSmartAppointmentStatuses from "@/hooks/useFertiSmartAppointmentStatuses";
 import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
@@ -66,7 +66,7 @@ interface FormErrors {
 
 export default function VirtualVisitForm() {
   const { data: currentUserData, fullName } = useCurrentUser();
-  const { data: patientData } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const { data: patientData, mutate: mutatePatient } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
   const [formData, setFormData] = useState<FormData>({
     fullName: fullName,
     email: currentUserData?.emailAddress ?? "",
@@ -154,23 +154,33 @@ export default function VirtualVisitForm() {
     }
     setLoading(true);
     try {
-      const res = await createAppointment({
-        email: formData.email,
-        statusId: status.id ?? 0,
-        branchId: branchesData?.[0].id ?? 0,
-        description: isVirtualVisit ? `Virtual Visit` : ``,
-        patientMrn: currentUserData.mrn ?? "",
-        serviceId: apiServicesData?.[0].id ?? 0,
-        resourceIds: [fertiSmartResources?.[0].id ?? 0],
-        startTime: selectedTimeSlot,
-        endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
-      });
-      if (!res?.id) {
-        console.log("could not create appointment", res);
+      const splitName = formData.fullName.split(" ");
+      const [createAppointmentResponse] = await Promise.all([
+        createAppointment({
+          email: formData.email,
+          statusId: status.id ?? 0,
+          branchId: branchesData?.[0].id ?? 0,
+          description: isVirtualVisit ? `Virtual Visit` : ``,
+          patientMrn: currentUserData.mrn ?? "",
+          serviceId: apiServicesData?.[0].id ?? 0,
+          resourceIds: [fertiSmartResources?.[0].id ?? 0],
+          startTime: selectedTimeSlot,
+          endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
+        }),
+        updatePatient({
+          mrn: currentUserData.mrn,
+          emailAddress: formData.email,
+          firstName: splitName[0],
+          lastName: splitName.slice(1).join(" "),
+        }),
+      ]);
+      if (!createAppointmentResponse?.id) {
+        console.log("could not create appointment", createAppointmentResponse);
         return toast.error("Something went wrong");
       }
+      mutatePatient(undefined);
       const newSearchParams = new URLSearchParams(window.location.search);
-      newSearchParams.append("appointmentId", res.id.toString());
+      newSearchParams.append("appointmentId", createAppointmentResponse.id.toString());
       router.replace(`/appointment-confirmation?${newSearchParams.toString()}`);
     } catch (e) {
       console.log("--- create appointment error", e);
@@ -183,7 +193,10 @@ export default function VirtualVisitForm() {
     branchesData,
     currentUserData?.mrn,
     fertiSmartResources,
+    formData.email,
+    formData.fullName,
     isVirtualVisit,
+    mutatePatient,
     router,
     selectedTimeSlot,
     statusesData,

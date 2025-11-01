@@ -33,7 +33,7 @@ export const PageContent: FC = () => {
 
   const idNumber = patientData?.identityId ?? "-";
 
-  const fullName = `${currentUserData?.firstName} ${currentUserData?.lastName}`;
+  const fullName = `${patientData?.firstName} ${patientData?.lastName}`;
 
   const selectedTimeSlot = useMemo(() => {
     if (!appointmentData?.time?.start) return "-";
@@ -45,9 +45,7 @@ export const PageContent: FC = () => {
     }
   }, [appointmentData?.time?.start]);
 
-  const confirmationNumber = useMemo(() => {
-    return appointmentData?.id;
-  }, [appointmentData?.id]);
+  const confirmationNumber = appointmentData?.id;
 
   const clinic = useMemo(() => clinicLocations.find((clinic) => clinic.id === selectedClinicLocation), [selectedClinicLocation]);
 

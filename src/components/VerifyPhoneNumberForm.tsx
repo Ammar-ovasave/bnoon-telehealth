@@ -11,7 +11,7 @@ import { createPatient, getPatientsByPhoneNumber, sendOTP, verifyOTP } from "@/s
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Spinner } from "./ui/spinner";
 
-const OTP_LENGTH = 6;
+const OTP_LENGTH = 4;
 
 export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPhoneNumberFormProps) {
   const [phoneNumber, setPhoneNumber] = useState<string>("");

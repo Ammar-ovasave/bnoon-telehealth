@@ -35,15 +35,15 @@ const AppointmentCall: FC = () => {
     }
   }, [localMicrophoneTrack, enableMic, user]);
 
+  const uid = user?.mrn ?? new Date().toISOString();
+
   const { localCameraTrack } = useLocalCameraTrack(isClient && enableCamera);
   const { token, appId } = useAgoraToken({
-    userId: user?.mrn ?? new Date().toISOString(),
+    userId: uid,
     appointmentId: appointmentId?.toString(),
   });
 
-  const uid = user?.mrn;
-
-  useJoin({ appid: appId ?? "", channel: appointmentId as string, token: token ?? "", uid }, !!token && !!appId && !!uid);
+  useJoin({ appid: appId ?? "", channel: appointmentId as string, token: token ?? "", uid: uid }, !!token && !!appId && !!uid);
 
   usePublish([localMicrophoneTrack, localCameraTrack]);
 

@@ -1,6 +1,4 @@
-import { AUTH_TOKEN_NAME } from "@/constants";
-import { verifyToken } from "@/lib/verifyToken";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "./_services";
 
 export async function GET() {
   try {
@@ -9,20 +7,5 @@ export async function GET() {
   } catch (error) {
     console.log("--- get current user error ", error);
     return Response.error();
-  }
-}
-
-export async function getCurrentUser() {
-  try {
-    const cookiesStore = await cookies();
-    const authToken = cookiesStore.get(AUTH_TOKEN_NAME);
-    const decodedToken = verifyToken({ secret: process.env.JWT_SECRET ?? "", token: authToken?.value ?? "" });
-    if (!decodedToken) {
-      return null;
-    }
-    return decodedToken;
-  } catch (error) {
-    console.log("--- get current user error ", error);
-    return null;
   }
 }

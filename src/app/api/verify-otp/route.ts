@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       lastName: patient.lastName,
       contactNumber: patient.contactNumber,
       emailAddress: patient.emailAddress,
-      branchId: patient.branchId,
+      branchId: patient.branch?.id,
     });
     const cookieStore = await cookies();
     cookieStore.set({ name: AUTH_TOKEN_NAME, value: authToken, httpOnly: true, secure: true });

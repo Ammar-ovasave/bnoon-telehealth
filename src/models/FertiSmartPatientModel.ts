@@ -14,6 +14,7 @@ export type FertiSmartPatientModel = {
   alternativeContactNumber?: string;
   registerDate?: string;
   emailAddress?: string;
+  branch?: { id?: number; name?: string };
   // nationalityId?: number;
   identityId?: string;
   // occupationStatusId?: number;

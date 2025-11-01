@@ -19,7 +19,7 @@ export default function InPersonAppointmentInfoPage() {
     fullName: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const handleBack = () => {
@@ -113,12 +113,8 @@ export default function InPersonAppointmentInfoPage() {
               <ArrowLeft /> Back
             </Button>
             <Link href={getNextPageUrl}>
-              <Button
-                disabled={!formData.fullName || isSubmitting}
-                size="lg"
-                className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
-              >
-                {isSubmitting ? "Saving..." : "Continue"} <ArrowRight />
+              <Button disabled={!formData.fullName} size="lg" className="px-8 py-3 text-lg font-semibold w-full md:w-auto">
+                {"Continue"} <ArrowRight />
               </Button>
             </Link>
           </div>

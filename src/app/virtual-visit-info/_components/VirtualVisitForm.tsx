@@ -116,11 +116,6 @@ export default function VirtualVisitForm() {
     }
   }, [formData.email, formData.fullName, formData.gender, formData.nationality, formData.idType, formData.idNumber]);
 
-  // const getNextPageUrl = useMemo(() => {
-  //   if (!validateForm) return "#";
-  //   return `/appointment-confirmation${window.location.search}`;
-  // }, [validateForm]);
-
   const { data: statusesData } = useFertiSmartAppointmentStatuses();
   const { data: branchesData } = useFertiSmartBranches();
   const { data: apiServicesData } = useFertiSmartAPIServices();

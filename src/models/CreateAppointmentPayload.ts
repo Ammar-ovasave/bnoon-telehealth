@@ -1,0 +1,11 @@
+export interface CreateAppointmentPayload {
+  patientMrn: string;
+  serviceId: number;
+  resourceIds: number[];
+  startTime: string;
+  endTime: string;
+  branchId: number;
+  statusId: number;
+  description: string;
+  email: string;
+}

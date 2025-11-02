@@ -3,7 +3,14 @@ import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import axios from "axios";
 
 const instance = axios.create({
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+instance.interceptors.request.use((config) => {
+  console.log("--- client request", config.url);
+  return config;
 });
 
 export async function updatePatient(params: {

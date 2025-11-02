@@ -1,9 +1,14 @@
 import { getRequestUrl } from "@/lib/getRequestUrl";
+import { cookies } from "next/headers";
 import axios from "@/services/axios";
 
 export async function GET(request: Request) {
   try {
-    const res = await axios.get(getRequestUrl(request.url));
+    const cookiesStore = await cookies();
+    const branchAPIURL = cookiesStore.get("branchAPIURL")?.value;
+    const res = await axios.get(
+      branchAPIURL ? `${branchAPIURL}${getRequestUrl({ urlStr: request.url })}` : getRequestUrl({ urlStr: request.url })
+    );
     return Response.json(res.data);
   } catch (e) {
     console.log("--- get ferti smart error", e);
@@ -13,8 +18,13 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const cookiesStore = await cookies();
     const payload = await request.json();
-    const res = await axios.post(getRequestUrl(request.url), payload);
+    const branchAPIURL = cookiesStore.get("branchAPIURL")?.value;
+    const res = await axios.post(
+      branchAPIURL ? `${branchAPIURL}${getRequestUrl({ urlStr: request.url })}` : getRequestUrl({ urlStr: request.url }),
+      payload
+    );
     return Response.json(res.data);
   } catch (e) {
     console.log("--- post ferti smart error", e);
@@ -24,8 +34,13 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    const cookiesStore = await cookies();
     const payload = await request.json();
-    const res = await axios.patch(getRequestUrl(request.url), payload);
+    const branchAPIURL = cookiesStore.get("branchAPIURL")?.value;
+    const res = await axios.patch(
+      branchAPIURL ? `${branchAPIURL}${getRequestUrl({ urlStr: request.url })}` : getRequestUrl({ urlStr: request.url }),
+      payload
+    );
     return Response.json(res.data);
   } catch (e) {
     console.log("--- post ferti smart error", e);

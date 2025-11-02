@@ -1,13 +1,16 @@
 import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
 import { getPatient, sendEmail, sendSMS } from "@/services/appointment-services";
 import axios from "@/services/axios";
+import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   try {
+    const cookiesStore = await cookies();
+    const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const payload: CreateAppointmentPayload = await request.json();
     const [createAppointmentResponse, patient] = await Promise.all([
       axios.post<{ id?: number }>("/appointments", payload),
-      getPatient({ mrn: payload.patientMrn }),
+      getPatient({ mrn: payload.patientMrn, baseAPIURL: baseAPIURL ?? null }),
     ]);
     if (!createAppointmentResponse.data.id) {
       console.log("--- create appointment error", createAppointmentResponse.data);
@@ -21,12 +24,14 @@ export async function POST(request: Request) {
     const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
     await Promise.all([
       sendEmail({
+        baseAPIURL: baseAPIURL ?? null,
         mrn: payload.patientMrn,
         email: payload.email,
         body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
         subject: `Appointment Confirmed ${createAppointmentResponse.data.id}`,
       }),
       sendSMS({
+        baseAPIURL: baseAPIURL ?? null,
         body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
         mobile: [patient.contactNumber ?? ""],
         mrn: patient.mrn ?? "",

@@ -1,14 +1,37 @@
 import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
+import { getPatient, sendEmail, sendSMS } from "@/services/appointment-services";
 import axios from "@/services/axios";
 
 export async function POST(request: Request) {
   try {
     const payload: CreateAppointmentPayload = await request.json();
-    const createAppointmentResponse = await axios.post<{ id?: number }>("/appointments", payload);
+    const [createAppointmentResponse, patient] = await Promise.all([
+      axios.post<{ id?: number }>("/appointments", payload),
+      getPatient({ mrn: payload.patientMrn }),
+    ]);
     if (!createAppointmentResponse.data.id) {
       console.log("--- create appointment error", createAppointmentResponse.data);
       return Response.error();
     }
+    if (!patient) {
+      console.log("--- create appointment get patient error", createAppointmentResponse.data);
+      return Response.error();
+    }
+    const url = new URL(request.url);
+    const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
+    await Promise.all([
+      sendEmail({
+        mrn: payload.patientMrn,
+        email: payload.email,
+        body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
+        subject: `Appointment Confirmed ${createAppointmentResponse.data.id}`,
+      }),
+      sendSMS({
+        body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
+        mobile: [patient.contactNumber ?? ""],
+        mrn: patient.mrn ?? "",
+      }),
+    ]);
     // await createGoogleMeet({
     //   appointmentId: createAppointmentResponse.data.id.toString(),
     //   endDate: payload.endTime,

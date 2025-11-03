@@ -38,7 +38,6 @@ export default function Home() {
                     {clinics.length} {clinics.length === 1 ? "location" : "locations"}
                   </span>
                 </div>
-
                 {/* Clinics Grid */}
                 <Suspense fallback={<LoadingPage />}>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

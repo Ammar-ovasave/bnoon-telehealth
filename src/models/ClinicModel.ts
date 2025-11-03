@@ -4,6 +4,7 @@ export interface ClinicLocation {
   city: string;
   address: string;
   doctors: string;
+  apiUrl: string;
   imageSrc: string;
   contactNumber: string;
   contactEmail: string;
@@ -20,6 +21,7 @@ export const clinicLocations: ClinicLocation[] = [
     imageSrc: "/images/bnoon-riyadh.jpg",
     contactEmail: "info@bnoon.sa",
     contactNumber: "+966114448080",
+    apiUrl: `https://unvaunted-weedily-jannie.ngrok-free.dev`,
   },
   {
     id: "riyadh-king-salman",
@@ -31,6 +33,7 @@ export const clinicLocations: ClinicLocation[] = [
     contactEmail: "info@bnoon.sa",
     contactNumber: "+966114448080",
     isCommingSoon: true,
+    apiUrl: `https://unvaunted-weedily-jannie.ngrok-free.dev`,
   },
   {
     id: "jeddah",
@@ -41,6 +44,7 @@ export const clinicLocations: ClinicLocation[] = [
     imageSrc: "/images/bnoon-jeddah.jpg",
     contactEmail: "info.jeddah@bnoon.sa",
     contactNumber: "+966126800800",
+    apiUrl: `https://undeclarable-kolby-overgraciously.ngrok-free.dev`,
   },
 ];
 

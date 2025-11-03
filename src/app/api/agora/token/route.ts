@@ -1,10 +1,12 @@
-import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import { RtcRole, RtcTokenBuilder } from "agora-token";
 import { differenceInSeconds } from "date-fns";
-import axios from "@/services/axios";
+import { getAppointment } from "@/services/appointment-services";
+import { cookies } from "next/headers";
 
 export async function GET(request: Request) {
   try {
+    const cookiesStore = await cookies();
+    const apiUrl = cookiesStore.get("branchAPIURL")?.value;
     const url = new URL(request.url);
     const appointmentId = url.searchParams.get("appointmentId");
     const userId = url.searchParams.get("userId");
@@ -12,7 +14,7 @@ export async function GET(request: Request) {
       console.log("get agora token error no appointment id or user id", url.toString());
       return Response.error();
     }
-    const appointment = await getAppointment({ appointmentId: appointmentId });
+    const appointment = await getAppointment({ appointmentId: appointmentId, baseAPIURL: apiUrl ?? undefined });
     if (!appointment?.id) {
       console.log("get agora token error no appointment");
       return Response.error();
@@ -39,15 +41,5 @@ export async function GET(request: Request) {
   } catch (error) {
     console.log("---- get agora token error", error);
     return Response.error();
-  }
-}
-
-async function getAppointment(params: { appointmentId: string }) {
-  try {
-    const res = await axios.get<FertiSmartAppointmentModel>(`/appointments/${params.appointmentId}`);
-    return res.data;
-  } catch (error) {
-    console.log("--- get appointment error ", error);
-    return null;
   }
 }

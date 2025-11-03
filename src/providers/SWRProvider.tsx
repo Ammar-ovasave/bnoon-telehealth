@@ -4,7 +4,14 @@ import { FC, PropsWithChildren } from "react";
 import { SWRConfig } from "swr";
 
 const instance = axios.create({
-  headers: { "Content-Type": "application/json", "x-api-key": "7g9ictK-GragXQD70hL1LBYRLPY33O4paVyyQxUQ" },
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+instance.interceptors.request.use((config) => {
+  console.log("--- swr config request", config.url);
+  return config;
 });
 
 const SWRProvider: FC<PropsWithChildren & { fallback?: { [key: string]: unknown } }> = ({ children, fallback }) => {

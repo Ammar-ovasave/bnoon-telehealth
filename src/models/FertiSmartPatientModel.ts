@@ -9,12 +9,15 @@ export type FertiSmartPatientModel = {
   maidenName?: string;
   arabicName?: string;
   dob?: string;
-  age?: number;
+  age?: string;
   contactNumber?: string;
   alternativeContactNumber?: string;
   registerDate?: string;
   emailAddress?: string;
+  sex?: 0 | 1;
+  identityIdType?: { id?: number; name?: string };
   branch?: { id?: number; name?: string };
+  nationality?: { id?: number; name?: string };
   // nationalityId?: number;
   identityId?: string;
   // occupationStatusId?: number;

@@ -7,8 +7,6 @@ export interface DoctorModel {
     clinic: boolean;
     virtual: boolean;
   };
-  firstAvailableSlot: string;
-  // rating: number;
   experience: string;
   languages: string[];
   branchId: string;
@@ -17,7 +15,7 @@ export interface DoctorModel {
 export const doctors: DoctorModel[] = [
   {
     id: "dr-abdalaziz-al-shahrani",
-    name: "Dr. Abdalaziz Al-Shahrani",
+    name: "Dr. Abdulaziz Alshahrani",
     specialty:
       "Group Medical Director Consultant, Reproductive Endorinology, Infertility (IVF) & Gynecological Laproscopic Surgery",
     photo: "/images/dr_ abdulaziz.jpg",
@@ -25,7 +23,6 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Today, 2:00 PM",
     experience: "12 years of experience",
     languages: ["Arabic", "English"],
     branchId: "riyadh-granada",
@@ -40,7 +37,6 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Tomorrow, 10:00 AM",
     experience: "15 years of experience",
     languages: ["Arabic", "English"],
     branchId: "jeddah",
@@ -54,21 +50,19 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Today, 4:30 PM",
     experience: "8 years of experience",
     languages: ["Arabic", "English"],
     branchId: "jeddah",
   },
   {
     id: "dr-asim-al-wuhaibi",
-    name: "Dr. Asim Al Wuhaibi",
+    name: "Dr. Asim Al Wohaibi",
     specialty: "Consultant, Reproductive Endorinology & Infertility (IVF)",
     photo: "/images/dr-asim.jpg",
     availability: {
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Monday, 9:00 AM",
     experience: "10 years of experience",
     languages: ["Arabic", "English"],
     branchId: "riyadh-granada",
@@ -82,7 +76,7 @@ export const doctors: DoctorModel[] = [
   //     clinic: true,
   //     virtual: true,
   //   },
-  //   firstAvailableSlot: "Today, 1:00 PM",
+  //
   //   experience: "14 years of experience",
   //   languages: ["Arabic", "English"],
   //   branchId: ''
@@ -96,7 +90,6 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "11 years of experience",
     languages: ["Arabic", "English"],
     branchId: "jeddah",
@@ -110,21 +103,20 @@ export const doctors: DoctorModel[] = [
   //     clinic: true,
   //     virtual: true,
   //   },
-  //   firstAvailableSlot: "Wednesday, 11:00 AM",
+  //
   //   experience: "8 years of experience",
   //   languages: ["Arabic", "English"],
   //   branchId: ''
   // },
   {
     id: "dr-dalia-adel",
-    name: "Dr. Dalia Adel",
+    name: "Dr. Dalia Adel Nour",
     specialty: "Consultant, Obstetrics, Gynecology & Infertility (IVF)",
     photo: "/images/dr-dalia.jpg",
     availability: {
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "6 years of experience",
     languages: ["Arabic", "English"],
     branchId: "riyadh-granada",
@@ -138,7 +130,6 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "7 years of experience",
     languages: ["Arabic", "English"],
     branchId: "jeddah",
@@ -152,7 +143,6 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "11 years of experience",
     languages: ["Arabic", "English"],
     branchId: "riyadh-granada",
@@ -166,7 +156,6 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "7 years of experience",
     languages: ["Arabic", "English"],
     branchId: "jeddah",
@@ -180,7 +169,6 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "9 years of experience",
     languages: ["Arabic", "English"],
     branchId: "jeddah",
@@ -194,7 +182,6 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "10 years of experience",
     languages: ["Arabic", "English"],
     branchId: "jeddah",

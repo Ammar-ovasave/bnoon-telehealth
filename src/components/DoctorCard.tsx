@@ -97,10 +97,10 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
           </div>
 
           {/* First Available Slot */}
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+          {/* <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <Clock className="h-4 w-4 text-green-500" />
             <span className="font-medium">{doctor.firstAvailableSlot}</span>
-          </div>
+          </div> */}
         </div>
       </CardContent>
     </Card>

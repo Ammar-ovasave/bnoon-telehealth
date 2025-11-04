@@ -41,7 +41,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
   return (
     <Card
       className={cn(
-        "cursor-pointer relative transition-all duration-300 hover:shadow-xl overflow-hidden h-full",
+        "cursor-pointer gap-0 relative transition-all duration-300 hover:shadow-xl overflow-hidden h-full",
         selectedDoctor === doctor.id ? "ring-2 ring-primary bg-blue-50 dark:bg-blue-950/20 shadow-lg" : "hover:shadow-lg"
       )}
       onClick={() => setSelectedDoctor(doctor.id)}
@@ -59,7 +59,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
 
       <CardHeader className="text-center">
         {/* Doctor Photo */}
-        <div className="relative w-24 h-24 mx-auto mb-4">
+        <div className="relative w-36 h-36 mx-auto mb-4">
           <Image
             src={doctor.photo}
             alt={`${doctor.name} photo`}
@@ -76,13 +76,20 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
         <CardDescription className="text-base text-primary font-semibold mb-2">{doctor.specialty}</CardDescription>
 
         {/* Rating */}
-        <div className="flex items-center justify-center gap-1 mb-3">
+        {/* <div className="flex items-center justify-center gap-1 mb-3">
           <span className="text-sm text-gray-500 dark:text-gray-400">({doctor.experience})</span>
-        </div>
+        </div> */}
       </CardHeader>
 
       <CardContent className="pt-0">
         <div className="space-y-3">
+          {/* Languages */}
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400">
+              <Award className="h-4 w-4" />
+              <span>{doctor.languages.join(", ")}</span>
+            </div>
+          </div>
           {/* Availability */}
           <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             {getAvailabilityIcon()}
@@ -93,14 +100,6 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
           <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <Clock className="h-4 w-4 text-green-500" />
             <span className="font-medium">{doctor.firstAvailableSlot}</span>
-          </div>
-
-          {/* Languages */}
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-              <Award className="h-3 w-3" />
-              <span>{doctor.languages.join(", ")}</span>
-            </div>
           </div>
         </div>
       </CardContent>

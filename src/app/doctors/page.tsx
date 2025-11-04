@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
-import { doctors } from "@/models/DoctorModel";
+import { doctors as fullDoctorsList } from "@/models/DoctorModel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Filter, MapPin, Video, Monitor } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,12 @@ export default function DoctorsListPage() {
     // }
   };
 
+  const doctors = useMemo(() => {
+    return fullDoctorsList.filter((item) => {
+      return item.branchId === searchParams.get("selectedClinicLocation");
+    });
+  }, [searchParams]);
+
   const filteredDoctors = useMemo(() => {
     if (availabilityFilter === "all") {
       return doctors;
@@ -49,7 +55,7 @@ export default function DoctorsListPage() {
           return true;
       }
     });
-  }, [availabilityFilter]);
+  }, [availabilityFilter, doctors]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">

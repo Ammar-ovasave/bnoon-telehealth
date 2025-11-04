@@ -39,7 +39,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const { data: resourcesData } = useFertiSmartResources();
 
   const resourceId = appointment.resources?.[0]?.id;
-  const resource = resourcesData?.find((resource) => resource.id === resourceId);
+  const resource = useMemo(() => resourcesData?.find((resource) => resource.id === resourceId), [resourceId, resourcesData]);
 
   const dateAndTime = useMemo(() => {
     if (!appointment.time?.start) return "-";

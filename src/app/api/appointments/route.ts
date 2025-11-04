@@ -1,16 +1,20 @@
 import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
-import { getPatient, sendEmail, sendSMS } from "@/services/appointment-services";
-import axios from "@/services/axios";
+import { getAppointmentServices, getPatient, getResource, sendEmail, sendSMS } from "@/services/appointment-services";
 import { cookies } from "next/headers";
+import { getConfirmAppointmentEmail } from "@/services/templates";
+import { format } from "date-fns";
+import axios from "@/services/axios";
 
 export async function POST(request: Request) {
   try {
     const cookiesStore = await cookies();
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const payload: CreateAppointmentPayload = await request.json();
-    const [createAppointmentResponse, patient] = await Promise.all([
+    const [createAppointmentResponse, patient, doctorResource, services] = await Promise.all([
       axios.post<{ id?: number }>(baseAPIURL ? `${baseAPIURL}/appointments` : "/appointments", payload),
       getPatient({ mrn: payload.patientMrn, baseAPIURL: baseAPIURL ?? null }),
+      getResource({ baseAPIURL: baseAPIURL ?? null, resourceId: payload.resourceIds[0].toString() }),
+      getAppointmentServices({ baseAPIURL: baseAPIURL ?? null, activeOnly: false }),
     ]);
     if (!createAppointmentResponse.data.id) {
       console.log("--- create appointment error", createAppointmentResponse.data);
@@ -20,15 +24,28 @@ export async function POST(request: Request) {
       console.log("--- create appointment get patient error", createAppointmentResponse.data);
       return Response.error();
     }
+    const service = services?.find((item) => item.id === payload.serviceId);
     const url = new URL(request.url);
     const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
+    const emailTemplate = await getConfirmAppointmentEmail({
+      appointmentDate: format(payload.startTime, "yyyy-MM-dd"),
+      appointmentLink: appointmentLink,
+      appointmentTime: format(payload.startTime, "hh:mm a"),
+      doctorName: doctorResource?.name ?? "",
+      location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
+      patientEmail: patient.emailAddress ?? "",
+      patientGender: patient.sex === 0 ? "female" : "male",
+      patientName: `${patient.firstName ?? ""} ${patient.lastName ?? ""}`.trim(),
+      serviceName: service?.name ?? "",
+    });
+    console.log("emailTemplate", emailTemplate);
     await Promise.all([
       payload.email
         ? sendEmail({
             baseAPIURL: baseAPIURL ?? null,
             mrn: payload.patientMrn,
             email: payload.email,
-            body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
+            body: emailTemplate ?? `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
             subject: `Appointment Confirmed ${createAppointmentResponse.data.id}`,
           })
         : Promise.resolve(null),

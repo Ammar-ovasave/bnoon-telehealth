@@ -178,7 +178,9 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               <MapPin className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Location</p>
-                <p className="font-medium text-gray-900 dark:text-white">{"Virtual Visit"}</p>
+                <p className="font-medium text-gray-900 dark:text-white">
+                  {appointment.description?.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic"}
+                </p>
               </div>
             </div>
           </div>

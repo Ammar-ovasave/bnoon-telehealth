@@ -7,5 +7,5 @@ export interface CreateAppointmentPayload {
   branchId: number;
   statusId: number;
   description: string;
-  email: string;
+  email: string | null;
 }

@@ -7,6 +7,7 @@ export interface FertiSmartAppointmentModel {
   time?: { start?: string; end?: string };
   patientMrn?: string;
   resources?: FSResourceModel[];
+  description?: string;
   branch?: FertiSmartBranchModel;
   status?: FertiSmartAppointmentStatusModel;
 }

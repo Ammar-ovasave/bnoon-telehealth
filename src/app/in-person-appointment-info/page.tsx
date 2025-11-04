@@ -1,69 +1,15 @@
 "use client";
-import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, User, MapPin } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-
-interface FormData {
-  fullName: string;
-}
-
-interface FormErrors {
-  fullName?: string;
-}
+import useCurrentUser from "@/hooks/useCurrentUser";
+import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
+import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
+import { Spinner } from "@/components/ui/spinner";
+import InPersonForm from "./_components/InPersonForm";
+import { MapPin } from "lucide-react";
 
 export default function InPersonAppointmentInfoPage() {
-  const [formData, setFormData] = useState<FormData>({
-    fullName: "",
-  });
-  const [errors, setErrors] = useState<FormErrors>({});
-  // const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
-
-  const handleBack = () => {
-    router.back();
-  };
-
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  const validateForm = useMemo((): boolean => {
-    const newErrors: FormErrors = {};
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
-    } else if (formData.fullName.trim().length < 2) {
-      newErrors.fullName = "Full name must be at least 2 characters";
-    }
-    // setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [formData.fullName]);
-
-  // const handleSubmit = async () => {
-  //   if (!validateForm()) {
-  //     return;
-  //   }
-
-  //   setIsSubmitting(true);
-  //   // Simulate API call
-  //   setTimeout(() => {
-  //     setIsSubmitting(false);
-  //     // Navigate to next page or show success
-  //     alert("Information saved successfully!");
-  //     // router.push("/next-page");
-  //   }, 1500);
-  // };
-
-  const getNextPageUrl = useMemo(() => {
-    if (!validateForm) return "#";
-    return `/appointment-confirmation${window.location.search}`;
-  }, [validateForm]);
+  const { isLoading, data: currentUserData } = useCurrentUser();
+  const { isLoading: loadingPatientData } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const { isLoading: loadingCountries } = useFertiSmartCountries();
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -82,43 +28,13 @@ export default function InPersonAppointmentInfoPage() {
         </div>
 
         {/* Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="space-y-6">
-            {/* Full Name */}
-            <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500" />
-                  Full Name *
-                </div>
-              </label>
-              <input
-                id="fullName"
-                type="text"
-                value={formData.fullName}
-                onChange={(e) => handleInputChange("fullName", e.target.value)}
-                placeholder="Enter your full name"
-                className={cn(
-                  "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:text-white",
-                  errors.fullName ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
-                )}
-              />
-              {errors.fullName && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.fullName}</p>}
-            </div>
+        {isLoading || loadingPatientData || loadingCountries ? (
+          <div className="flex justify-center">
+            <Spinner className="size-10" />
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
-            <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
-              <ArrowLeft /> Back
-            </Button>
-            <Link href={getNextPageUrl}>
-              <Button disabled={!formData.fullName} size="lg" className="px-8 py-3 text-lg font-semibold w-full md:w-auto">
-                {"Continue"} <ArrowRight />
-              </Button>
-            </Link>
-          </div>
-        </div>
+        ) : (
+          <InPersonForm />
+        )}
 
         {/* Visit Information */}
         <div className="mt-6 bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800">

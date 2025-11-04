@@ -23,13 +23,15 @@ export async function POST(request: Request) {
     const url = new URL(request.url);
     const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
     await Promise.all([
-      sendEmail({
-        baseAPIURL: baseAPIURL ?? null,
-        mrn: payload.patientMrn,
-        email: payload.email,
-        body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
-        subject: `Appointment Confirmed ${createAppointmentResponse.data.id}`,
-      }),
+      payload.email
+        ? sendEmail({
+            baseAPIURL: baseAPIURL ?? null,
+            mrn: payload.patientMrn,
+            email: payload.email,
+            body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
+            subject: `Appointment Confirmed ${createAppointmentResponse.data.id}`,
+          })
+        : Promise.resolve(null),
       sendSMS({
         baseAPIURL: baseAPIURL ?? null,
         body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,

@@ -11,17 +11,27 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { Spinner } from "@/components/ui/spinner";
+import { doctors } from "@/models/DoctorModel";
 
 export default function SelectDateAndTimePage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>();
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+  const selectedDoctorId = searchParams.get("selectedDoctor");
+
+  const selectedDoctor = useMemo(() => {
+    return doctors.find((doc) => {
+      return doc.id === selectedDoctorId;
+    });
+  }, [selectedDoctorId]);
+
   const { data: resourcesData, isLoading: loadingResources } = useFertiSmartResources();
 
   const selectedResource = useMemo(() => {
-    return resourcesData?.find((item) => item.name?.startsWith("Dr."));
-  }, [resourcesData]);
+    return resourcesData?.find((item) => item.name?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? ""));
+  }, [resourcesData, selectedDoctor?.name]);
 
   const { data: availabilityData, isLoading: loadingTimeslots } = useFertiSmartResourceAvailability({
     resourceId: selectedResource?.id?.toString(),
@@ -42,8 +52,6 @@ export default function SelectDateAndTimePage() {
     today.setHours(0, 0, 0, 0);
     return date < today;
   };
-
-  const searchParams = useSearchParams();
 
   const newUrlSearchParams = useMemo(() => {
     const params = new URLSearchParams(searchParams);

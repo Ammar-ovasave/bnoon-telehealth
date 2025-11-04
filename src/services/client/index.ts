@@ -9,7 +9,6 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-  console.log("--- client request", config.url);
   return config;
 });
 
@@ -24,6 +23,8 @@ export async function updatePatient(params: {
   contactNumber?: string;
   alternativeContactNumber?: string;
   emailAddress?: string;
+  nationality?: number;
+  identityId?: string;
 }) {
   try {
     const res = await instance.patch<{ id?: number }>(`/api/ferti-smart/patients/${params.mrn}`, params);

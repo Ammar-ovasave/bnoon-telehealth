@@ -14,27 +14,28 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { addMinutes } from "date-fns";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
+import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 
-const nationalities = [
-  "Saudi Arabia",
-  "United Arab Emirates",
-  "Kuwait",
-  "Qatar",
-  "Bahrain",
-  "Oman",
-  "Jordan",
-  "Lebanon",
-  "Egypt",
-  "Syria",
-  "Iraq",
-  "Morocco",
-  "Tunisia",
-  "Algeria",
-  "Sudan",
-  "Yemen",
-  "Palestine",
-  "Other",
-];
+// const nationalities = [
+//   "Saudi Arabia",
+//   "United Arab Emirates",
+//   "Kuwait",
+//   "Qatar",
+//   "Bahrain",
+//   "Oman",
+//   "Jordan",
+//   "Lebanon",
+//   "Egypt",
+//   "Syria",
+//   "Iraq",
+//   "Morocco",
+//   "Tunisia",
+//   "Algeria",
+//   "Sudan",
+//   "Yemen",
+//   "Palestine",
+//   "Other",
+// ];
 
 const genders = [
   { id: "male", label: "Male" },
@@ -66,14 +67,14 @@ interface FormErrors {
 
 export default function VirtualVisitForm() {
   const { data: currentUserData, fullName } = useCurrentUser();
+  const { nationalities, data: nationalitiesData } = useFertiSmartCountries();
   const { data: patientData, mutate: mutatePatient } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
   const [formData, setFormData] = useState<FormData>({
     fullName: fullName,
     email: currentUserData?.emailAddress ?? "",
-    // TODO: initialize nationality and gender
-    nationality: "",
-    gender: "",
-    idType: "",
+    nationality: nationalities?.find((item) => item === patientData?.nationality?.name) ?? "",
+    gender: patientData?.sex === 0 ? "female" : "male",
+    idType: patientData?.identityIdType?.name?.toLocaleLowerCase().includes("passport") ? "passport" : "nationalId",
     idNumber: patientData?.identityId ?? "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -167,6 +168,8 @@ export default function VirtualVisitForm() {
           emailAddress: formData.email,
           firstName: splitName[0],
           lastName: splitName.slice(1).join(" "),
+          nationality: nationalitiesData?.find((item) => item.name === formData.nationality)?.id,
+          identityId: formData.idNumber,
         }),
       ]);
       if (!createAppointmentResponse?.id) {
@@ -188,10 +191,10 @@ export default function VirtualVisitForm() {
     branchesData,
     currentUserData?.mrn,
     fertiSmartResources,
-    formData.email,
-    formData.fullName,
+    formData,
     isVirtualVisit,
     mutatePatient,
+    nationalitiesData,
     router,
     selectedTimeSlot,
     statusesData,
@@ -269,7 +272,7 @@ export default function VirtualVisitForm() {
               )}
             >
               <option value="">Select your nationality</option>
-              {nationalities.map((nationality) => (
+              {nationalities?.map((nationality) => (
                 <option key={nationality} value={nationality}>
                   {nationality}
                 </option>

@@ -4,10 +4,12 @@ import VirtualVisitForm from "./_components/VirtualVisitForm";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Spinner } from "@/components/ui/spinner";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
+import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 
 export default function VirtualVisitInfoPage() {
   const { isLoading, data: currentUserData } = useCurrentUser();
   const { isLoading: loadingPatientData } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const { isLoading: loadingCountries } = useFertiSmartCountries();
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -26,7 +28,7 @@ export default function VirtualVisitInfoPage() {
           </p>
         </div>
         {/* Form */}
-        {isLoading || loadingPatientData ? (
+        {isLoading || loadingPatientData || loadingCountries ? (
           <div className="flex justify-center">
             <Spinner className="size-10" />
           </div>

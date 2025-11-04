@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import useFertiSmartAppointment from "@/hooks/useFertiSmartAppointment";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import LoadingPage from "../loading";
+import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 
 export const PageContent: FC = () => {
   const searchParams = useSearchParams();
@@ -21,15 +22,21 @@ export const PageContent: FC = () => {
   const selectedDoctor = searchParams.get("selectedDoctor") || "-";
   const selectedService = searchParams.get("selectedService") || "-";
   const selectedClinicLocation = searchParams.get("selectedClinicLocation") || "-";
-  const nationality = searchParams.get("nationality") || "-";
-  const gender = searchParams.get("gender") || "-";
   const idType = searchParams.get("idType") || "-";
+
+  const { data: countriesData, isLoading: loadingCountries } = useFertiSmartCountries();
 
   const { data: appointmentData, isLoading: loadingAppointment } = useFertiSmartAppointment({ id: appointmentId ?? undefined });
 
   const { data: currentUserData, isLoading: loadingCurrentUser } = useCurrentUser();
 
   const { data: patientData, isLoading: loadingPatient } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const gender = patientData?.sex === 0 ? "Female" : "Male";
+
+  const patientCountry = useMemo(
+    () => countriesData?.find((item) => item.id === patientData?.nationality?.id),
+    [countriesData, patientData?.nationality?.id]
+  );
 
   const idNumber = patientData?.identityId ?? "-";
 
@@ -55,7 +62,7 @@ export const PageContent: FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
-      {loadingAppointment || loadingCurrentUser || loadingPatient ? (
+      {loadingAppointment || loadingCurrentUser || loadingPatient || loadingCountries ? (
         <LoadingPage />
       ) : (
         <div className="mx-auto px-4 py-8 max-w-4xl">
@@ -135,7 +142,7 @@ export const PageContent: FC = () => {
                     <Globe className="h-4 w-4" />
                     Nationality
                   </span>
-                  <span className="font-medium text-gray-900 dark:text-white">{nationality}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{patientCountry?.name ?? "-"}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">

@@ -92,6 +92,18 @@ export async function getResources({ baseAPIURL }: { baseAPIURL: string | null }
   }
 }
 
+export async function getResource(params: { resourceId: string; baseAPIURL: string | null }) {
+  try {
+    const res = await axios.get<FSResourceModel>(
+      params.baseAPIURL ? `${params.baseAPIURL}/resources/${params.resourceId}` : `/resources/${params.resourceId}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log("--- getResource error", e);
+    return null;
+  }
+}
+
 export async function getBranches({ baseAPIURL }: { baseAPIURL: string | null }) {
   try {
     const res = await axios.get<FertiSmartBranchModel[]>(baseAPIURL ? `${baseAPIURL}/branches` : `/branches`);

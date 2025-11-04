@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const payload: CreateAppointmentPayload = await request.json();
     const [createAppointmentResponse, patient] = await Promise.all([
-      axios.post<{ id?: number }>("/appointments", payload),
+      axios.post<{ id?: number }>(baseAPIURL ? `${baseAPIURL}/appointments` : "/appointments", payload),
       getPatient({ mrn: payload.patientMrn, baseAPIURL: baseAPIURL ?? null }),
     ]);
     if (!createAppointmentResponse.data.id) {

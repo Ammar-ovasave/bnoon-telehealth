@@ -10,6 +10,7 @@ import Image from "next/image";
 const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const newUrlSearchParams = useMemo(() => {
     const params = new URLSearchParams(searchParams);
     params.set("selectedClinicLocation", clinic.id);
@@ -19,7 +20,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
   return (
     <Card
       key={clinic.id}
-      className={`cursor-pointer gap-0 relative h-80 aspect-[0.8] transition-all duration-300 hover:shadow-xl overflow-hidden p-0`}
+      className={`cursor-pointer gap-0 relative h-80 w-full transition-all duration-300 hover:shadow-xl overflow-hidden p-0`}
       onClick={
         clinic.isCommingSoon
           ? undefined

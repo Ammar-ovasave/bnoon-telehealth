@@ -11,11 +11,12 @@ export interface DoctorModel {
   // rating: number;
   experience: string;
   languages: string[];
+  branchId: string;
 }
 
 export const doctors: DoctorModel[] = [
   {
-    id: "dr-sarah-ahmed",
+    id: "dr-abdalaziz-al-shahrani",
     name: "Dr. Abdalaziz Al-Shahrani",
     specialty:
       "Group Medical Director Consultant, Reproductive Endorinology, Infertility (IVF) & Gynecological Laproscopic Surgery",
@@ -27,9 +28,10 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Today, 2:00 PM",
     experience: "12 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "riyadh-granada",
   },
   {
-    id: "dr-mohammed-alrashid",
+    id: "dr-fawaz-edris",
     name: "Dr. Fawaz Edris",
     specialty:
       "Executive Director, Bnoon -Jeddah Consultant, Obstetrics, Gynecology, Maternal Fetal Medicine, Reproductive Endocrinology & Infertility",
@@ -41,9 +43,10 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Tomorrow, 10:00 AM",
     experience: "15 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "jeddah",
   },
   {
-    id: "dr-fatima-hassan",
+    id: "dr-mazin-bishara",
     name: "Dr. Mazin Bishara ",
     specialty: "Medical Director, Bnoon - Jeddah Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology & Infertility",
     photo: "/images/dr-mazin-bishra.jpg",
@@ -53,10 +56,11 @@ export const doctors: DoctorModel[] = [
     },
     firstAvailableSlot: "Today, 4:30 PM",
     experience: "8 years of experience",
-    languages: ["Arabic", "English", "French"],
+    languages: ["Arabic", "English"],
+    branchId: "jeddah",
   },
   {
-    id: "dr-omar-khalil",
+    id: "dr-asim-al-wuhaibi",
     name: "Dr. Asim Al Wuhaibi",
     specialty: "Consultant, Reproductive Endorinology & Infertility (IVF)",
     photo: "/images/dr-asim.jpg",
@@ -67,22 +71,24 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Monday, 9:00 AM",
     experience: "10 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "riyadh-granada",
   },
+  // {
+  //   id: "dr-layla-mansour",
+  //   name: "Dr. Hussein Sabban  ",
+  //   specialty: "Consultant, Obstetrics, Gynecology, Reproductive Endocrinology, & Infertility",
+  //   photo: "/images/dr-hussein-sabban.jpg",
+  //   availability: {
+  //     clinic: true,
+  //     virtual: true,
+  //   },
+  //   firstAvailableSlot: "Today, 1:00 PM",
+  //   experience: "14 years of experience",
+  //   languages: ["Arabic", "English"],
+  //   branchId: ''
+  // },
   {
-    id: "dr-layla-mansour",
-    name: "Dr. Hussein Sabban  ",
-    specialty: "Consultant, Obstetrics, Gynecology, Reproductive Endocrinology, & Infertility",
-    photo: "/images/dr-hussein-sabban.jpg",
-    availability: {
-      clinic: true,
-      virtual: true,
-    },
-    firstAvailableSlot: "Today, 1:00 PM",
-    experience: "14 years of experience",
-    languages: ["Arabic", "English"],
-  },
-  {
-    id: "dr-youssef-nasser",
+    id: "dr-ahmed-alshaikh",
     name: "Dr. Ahmed Alshaikh",
     specialty: "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology & Infertility",
     photo: "/images/dr-ahmed-bekar.jpg",
@@ -93,20 +99,22 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "11 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "jeddah",
   },
-  {
-    id: "dr-wajdi-al-omari",
-    name: "Dr. Wajdi Al Omari",
-    specialty: "Consultant, Reproductive Endorinology & Infertility (IVF)",
-    photo: "/images/dr-wajdi.jpg",
-    availability: {
-      clinic: true,
-      virtual: true,
-    },
-    firstAvailableSlot: "Wednesday, 11:00 AM",
-    experience: "8 years of experience",
-    languages: ["Arabic", "English"],
-  },
+  // {
+  //   id: "dr-wajdi-al-omari",
+  //   name: "Dr. Wajdi Al Omari",
+  //   specialty: "Consultant, Reproductive Endorinology & Infertility (IVF)",
+  //   photo: "/images/dr-wajdi.jpg",
+  //   availability: {
+  //     clinic: true,
+  //     virtual: true,
+  //   },
+  //   firstAvailableSlot: "Wednesday, 11:00 AM",
+  //   experience: "8 years of experience",
+  //   languages: ["Arabic", "English"],
+  //   branchId: ''
+  // },
   {
     id: "dr-dalia-adel",
     name: "Dr. Dalia Adel",
@@ -119,6 +127,7 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "6 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "riyadh-granada",
   },
   {
     id: "dr-ahmad-haroun",
@@ -132,6 +141,7 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "7 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "jeddah",
   },
   {
     id: "dr-moussa-el-naiemy",
@@ -145,10 +155,11 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "11 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "riyadh-granada",
   },
   {
     id: "dr-maya-albezreh",
-    name: "Dr. Maya  Albezreh",
+    name: "Dr. Maya Albezreh",
     specialty: "Consultant, Obstetrics, Gynecology & Infertility",
     photo: "/images/dr-maya-albezreh.jpg",
     availability: {
@@ -158,6 +169,7 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "7 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "jeddah",
   },
   {
     id: "dr-razan-ghaith",
@@ -171,6 +183,7 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "9 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "jeddah",
   },
   {
     id: "dr-maram-dadoua",
@@ -184,5 +197,6 @@ export const doctors: DoctorModel[] = [
     firstAvailableSlot: "Wednesday, 11:00 AM",
     experience: "10 years of experience",
     languages: ["Arabic", "English"],
+    branchId: "jeddah",
   },
 ];

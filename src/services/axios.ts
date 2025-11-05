@@ -9,7 +9,7 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-  console.log("--- server request", config.url);
+  // console.log("--- server request", config.url);
   return config;
 });
 

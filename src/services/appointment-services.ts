@@ -6,14 +6,20 @@ import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel"
 import axios from "./axios";
 
 export async function createPatientServer(params: {
+  baseAPIURL: string | null;
   patient: { firstName: string; lastName: string; sex?: 0 | 1; contactNumber: string; middleName?: string; dob?: string };
   branchId: number;
 }) {
   try {
-    const res = await axios.post<FertiSmartPatientModel>(`/patients`, params);
+    console.log("--- create patient server", params);
+    const res = await axios.post<FertiSmartPatientModel>(
+      params.baseAPIURL ? `${params.baseAPIURL}/patients` : `/patients`,
+      params
+    );
+    console.log("--- create patient server", res.data);
     return res.data;
   } catch (e) {
-    console.log("--- createPatient error", e);
+    console.log("--- createPatientServer error", e);
     return null;
   }
 }
@@ -89,7 +95,7 @@ export async function getPatient(params: { mrn: string; baseAPIURL: string | nul
     );
     return res.data;
   } catch (error) {
-    console.log("--- sendSMS error", error);
+    console.log("--- getPatient error", error);
     return null;
   }
 }
@@ -113,6 +119,18 @@ export async function getResources({ baseAPIURL }: { baseAPIURL: string | null }
     return res.data;
   } catch (e) {
     console.log("--- getResources error", e);
+    return null;
+  }
+}
+
+export async function getPatientsByPhoneNumber({ phoneNumber, baseAPIURL }: { phoneNumber: string; baseAPIURL: string | null }) {
+  try {
+    const res = await axios.get<FertiSmartPatientModel[]>(
+      baseAPIURL ? `${baseAPIURL}/patients?contactNumber=${phoneNumber}` : `/patients?contactNumber=${phoneNumber}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log("--- getPatientsByPhoneNumber error", e);
     return null;
   }
 }

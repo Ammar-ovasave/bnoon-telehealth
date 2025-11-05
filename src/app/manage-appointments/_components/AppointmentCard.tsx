@@ -5,6 +5,7 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { cn } from "@/lib/utils";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import { format, add } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { Calendar, CheckCircle, Clock, MapPin, Phone, RefreshCw, User, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
 import {
@@ -41,6 +42,17 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const resourceId = appointment.resources?.[0]?.id;
   const resource = useMemo(() => resourcesData?.find((resource) => resource.id === resourceId), [resourceId, resourcesData]);
 
+  // Get user's timezone and check if it's KSA
+  const userTimezone = useMemo(() => {
+    if (typeof window !== "undefined") {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+    return "UTC";
+  }, []);
+
+  const isKSA = userTimezone === "Asia/Riyadh";
+  const KSA_TIMEZONE = "Asia/Riyadh";
+
   const dateAndTime = useMemo(() => {
     if (!appointment.time?.start) return "-";
     try {
@@ -50,6 +62,16 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
       return "-";
     }
   }, [appointment.time?.start]);
+
+  const dateAndTimeKSA = useMemo(() => {
+    if (!appointment.time?.start || isKSA) return null;
+    try {
+      return formatInTimeZone(appointment.time?.start ?? "", KSA_TIMEZONE, "yyyy-MM-dd hh:mm a");
+    } catch (error) {
+      console.log("format appointmnt date and time KSA error", error);
+      return null;
+    }
+  }, [appointment.time?.start, isKSA]);
 
   const { data: patientData } = useFertiSmartPatient();
 
@@ -164,6 +186,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Date & Time</p>
                 <p className="font-medium text-gray-900 dark:text-white">{dateAndTime}</p>
+                {dateAndTimeKSA && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">KSA: {dateAndTimeKSA}</p>}
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -202,14 +225,18 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 patientData?.lastName ?? ""
               }`}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
-              <p className="font-medium text-gray-900 dark:text-white">{patientData?.emailAddress}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Nationality</p>
-              <p className="font-medium text-gray-900 dark:text-white">{nationality?.name ?? "-"}</p>
-            </div>
+            {patientData?.emailAddress && (
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
+                <p className="font-medium text-gray-900 dark:text-white">{patientData?.emailAddress}</p>
+              </div>
+            )}
+            {nationality?.name && (
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Nationality</p>
+                <p className="font-medium text-gray-900 dark:text-white">{nationality?.name ?? "-"}</p>
+              </div>
+            )}
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Gender</p>
               <p className="font-medium text-gray-900 dark:text-white">{"Female"}</p>
@@ -255,6 +282,19 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                   <p className="text-sm text-green-800 dark:text-green-200">
                     Selected: <span className="font-medium">{format(selectedRescheduleDate, "EEEE, MMMM do, yyyy")}</span>
                   </p>
+                  {!isKSA && (
+                    <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                      KSA:{" "}
+                      {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0
+                        ? formatInTimeZone(
+                            availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
+                              new Date().toISOString(),
+                            KSA_TIMEZONE,
+                            "EEEE, MMMM do, yyyy"
+                          )
+                        : formatInTimeZone(selectedRescheduleDate, KSA_TIMEZONE, "EEEE, MMMM do, yyyy")}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -285,7 +325,14 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                             : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
                         )}
                       >
-                        {format(slot.start ?? "", "hh:mm aa")}
+                        <div>
+                          {format(slot.start ?? "", "hh:mm aa")}
+                          {!isKSA && (
+                            <span className="text-xs block opacity-75 mt-0.5">
+                              ({formatInTimeZone(slot.start ?? new Date().toISOString(), KSA_TIMEZONE, "hh:mm aa")} KSA time)
+                            </span>
+                          )}
+                        </div>
                       </button>
                     ))
                   ) : (
@@ -295,6 +342,32 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                       a different date.
                     </p>
                   )}
+                </div>
+              )}
+              {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0 && (
+                <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
+                  <p className="text-sm text-primary dark:text-primary-200">
+                    Selected:{" "}
+                    <span className="font-medium">
+                      {format(
+                        availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
+                          new Date().toISOString(),
+                        "hh:mm aa"
+                      )}
+                    </span>
+                    {!isKSA && (
+                      <span className="text-xs ml-2 opacity-75">
+                        (
+                        {`${formatInTimeZone(
+                          availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
+                            new Date().toISOString(),
+                          KSA_TIMEZONE,
+                          "hh:mm aa"
+                        )} KSA time`}
+                        )
+                      </span>
+                    )}
+                  </p>
                 </div>
               )}
             </div>

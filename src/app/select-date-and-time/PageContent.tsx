@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { add, format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
@@ -62,6 +63,16 @@ export default function SelectDateAndTimePage() {
   }, [selectedDate, selectedTimeSlot, searchParams]);
 
   const { data: currentUserData, isLoading: loadingCurrentUser } = useCurrentUser();
+
+  const userTimezone = useMemo(() => {
+    if (typeof window !== "undefined") {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+    return "UTC";
+  }, []);
+
+  const isKSA = userTimezone === "Asia/Riyadh";
+  const KSA_TIMEZONE = "Asia/Riyadh";
 
   const getNextPageUrl = () => {
     if (!selectedDate || !selectedTimeSlot) return "#";
@@ -178,6 +189,17 @@ export default function SelectDateAndTimePage() {
                       "hh:mm aa"
                     )}
                   </span>
+                  {!isKSA && (
+                    <span className="text-xs ml-2 opacity-75">
+                      (
+                      {`${formatInTimeZone(
+                        availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
+                        KSA_TIMEZONE,
+                        "hh:mm aa"
+                      )} KSA time`}
+                      )
+                    </span>
+                  )}
                 </p>
               </div>
             )}
@@ -194,6 +216,18 @@ export default function SelectDateAndTimePage() {
                 <p className="font-medium text-gray-900 dark:text-white">
                   {selectedDate ? format(selectedDate, "EEEE, MMMM do, yyyy") : "Not selected"}
                 </p>
+                {selectedDate && !isKSA && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    KSA:{" "}
+                    {selectedTimeSlot && (availabilityData?.length ?? 0) > 0
+                      ? formatInTimeZone(
+                          availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
+                          KSA_TIMEZONE,
+                          "EEEE, MMMM do, yyyy"
+                        )
+                      : formatInTimeZone(selectedDate, KSA_TIMEZONE, "EEEE, MMMM do, yyyy")}
+                  </p>
+                )}
               </div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Time</p>
@@ -205,6 +239,16 @@ export default function SelectDateAndTimePage() {
                       )
                     : "Not selected"}
                 </p>
+                {selectedTimeSlot && (availabilityData?.length ?? 0) > 0 && !isKSA && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    KSA:{" "}
+                    {formatInTimeZone(
+                      availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
+                      KSA_TIMEZONE,
+                      "hh:mm aa"
+                    )}
+                  </p>
+                )}
               </div>
             </div>
           </div>

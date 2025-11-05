@@ -5,8 +5,10 @@ import { getCurrentUser } from "../../current-user/_services";
 export async function GET(request: Request, context: { params: Promise<{ appointmentId: string }> }) {
   try {
     const params = await context.params;
-    console.log("==== params", params);
     const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return Response.error();
+    }
     const cookiesStore = await cookies();
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const appointment = await getAppointment({ appointmentId: params.appointmentId, baseAPIURL: baseAPIURL });

@@ -1,9 +1,19 @@
 import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
-import { getAppointmentServices, getPatient, getResource, sendEmail, sendSMS } from "@/services/appointment-services";
+import {
+  createPatientServer,
+  getAppointmentServices,
+  getBranches,
+  getPatient,
+  getResource,
+  sendEmail,
+  sendSMS,
+} from "@/services/appointment-services";
 import { cookies } from "next/headers";
 import { getConfirmAppointmentEmail } from "@/services/templates";
 import { format } from "date-fns";
 import axios from "@/services/axios";
+import { signJwt } from "../verify-otp/route";
+import { AUTH_TOKEN_NAME } from "@/constants";
 
 export async function POST(request: Request) {
   try {
@@ -20,8 +30,19 @@ export async function POST(request: Request) {
       console.log("--- create appointment error", createAppointmentResponse.data);
       return Response.error();
     }
+    let patientToUse = patient;
     if (!patient) {
+      console.log("--- payload.patientMrn", payload.patientMrn);
+      const fertiSmartBranches = await getBranches({ baseAPIURL: baseAPIURL ?? null });
+      const newPatient = await createPatientServer({
+        branchId: fertiSmartBranches?.[0].id ?? 0,
+        patient: { contactNumber: payload.phoneNumber, firstName: payload.firstName, lastName: payload.lastName },
+      });
+      patientToUse = newPatient ?? patient;
       console.log("--- create appointment get patient error", createAppointmentResponse.data);
+    }
+    if (!patientToUse?.mrn) {
+      console.log("--- create appointment no patient to use", patientToUse);
       return Response.error();
     }
     const service = services?.find((item) => item.id === payload.serviceId);
@@ -33,9 +54,9 @@ export async function POST(request: Request) {
       appointmentTime: format(payload.startTime, "hh:mm a"),
       doctorName: doctorResource?.name ?? "",
       location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
-      patientEmail: patient.emailAddress ?? "",
-      patientGender: patient.sex === 0 ? "female" : "male",
-      patientName: `${patient.firstName ?? ""} ${patient.lastName ?? ""}`.trim(),
+      patientEmail: patientToUse.emailAddress ?? "",
+      patientGender: patientToUse.sex === 0 ? "female" : "male",
+      patientName: `${patientToUse.firstName ?? ""} ${patientToUse.lastName ?? ""}`.trim(),
       serviceName: service?.name ?? "",
     });
     console.log("emailTemplate", emailTemplate);
@@ -52,17 +73,20 @@ export async function POST(request: Request) {
       sendSMS({
         baseAPIURL: baseAPIURL ?? null,
         body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
-        mobile: [patient.contactNumber ?? ""],
-        mrn: patient.mrn ?? "",
+        mobile: [patientToUse.contactNumber ?? ""],
+        mrn: patientToUse.mrn ?? "",
       }),
     ]);
-    // await createGoogleMeet({
-    //   appointmentId: createAppointmentResponse.data.id.toString(),
-    //   endDate: payload.endTime,
-    //   serviceName: "Test",
-    //   startDate: payload.startTime,
-    //   userEmail: payload.email,
-    // });
+    const authToken = signJwt({
+      mrn: patientToUse.mrn,
+      firstName: patientToUse.firstName,
+      lastName: patientToUse.lastName,
+      contactNumber: patientToUse.contactNumber,
+      emailAddress: patientToUse.emailAddress,
+      branchId: patientToUse.branch?.id,
+    });
+    const cookieStore = await cookies();
+    cookieStore.set({ name: AUTH_TOKEN_NAME, value: authToken, httpOnly: true, secure: true });
     return Response.json(createAppointmentResponse.data);
   } catch (error) {
     console.log("--- create appointment error", error);

@@ -65,7 +65,7 @@ export async function createAppointment(params: CreateAppointmentPayload) {
     console.log("--- appointment response", res.data);
     return res.data;
   } catch (e) {
-    console.log("--- createPatient error", e);
+    console.log("--- createAppointment error", e);
     return null;
   }
 }

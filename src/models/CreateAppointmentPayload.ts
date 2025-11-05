@@ -8,4 +8,7 @@ export interface CreateAppointmentPayload {
   statusId: number;
   description: string;
   email: string | null;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
 }

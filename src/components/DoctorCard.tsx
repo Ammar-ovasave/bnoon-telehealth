@@ -3,7 +3,7 @@ import { FC } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { RadioGroupItem } from "@radix-ui/react-radio-group";
 import { cn } from "@/lib/utils";
-import { MapPin, Video, Clock, Award } from "lucide-react";
+import { MapPin, Video, Award } from "lucide-react";
 import Image from "next/image";
 
 interface DoctorCardProps {

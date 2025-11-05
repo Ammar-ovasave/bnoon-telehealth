@@ -7,8 +7,8 @@ import InPersonForm from "./_components/InPersonForm";
 import { MapPin } from "lucide-react";
 
 export default function InPersonAppointmentInfoPage() {
-  const { isLoading, data: currentUserData } = useCurrentUser();
-  const { isLoading: loadingPatientData } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const { isLoading } = useCurrentUser();
+  const { isLoading: loadingPatientData } = useFertiSmartPatient();
   const { isLoading: loadingCountries } = useFertiSmartCountries();
 
   return (

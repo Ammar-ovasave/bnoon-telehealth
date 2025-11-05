@@ -156,7 +156,7 @@ export default function SelectDateAndTimePage() {
                           : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
                       )}
                     >
-                      {format(slot.start ?? "", "hh:mm aa")}
+                      {format(slot.start ?? new Date().toISOString(), "hh:mm aa")}
                     </button>
                   ))
                 ) : (
@@ -173,7 +173,10 @@ export default function SelectDateAndTimePage() {
                 <p className="text-sm text-primary dark:text-primary-200">
                   Selected:{" "}
                   <span className="font-medium">
-                    {format(availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? "", "hh:mm aa")}
+                    {format(
+                      availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
+                      "hh:mm aa"
+                    )}
                   </span>
                 </p>
               </div>
@@ -196,7 +199,10 @@ export default function SelectDateAndTimePage() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">Time</p>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {selectedTimeSlot && (availabilityData?.length ?? 0) > 0
-                    ? format(availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? "", "hh:mm aa")
+                    ? format(
+                        availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
+                        "hh:mm aa"
+                      )
                     : "Not selected"}
                 </p>
               </div>

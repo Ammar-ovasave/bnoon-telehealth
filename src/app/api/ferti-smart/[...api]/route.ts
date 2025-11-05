@@ -18,8 +18,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const cookiesStore = await cookies();
-    const payload = await request.json();
+    const [cookiesStore, payload] = await Promise.all([cookies(), request.json()]);
     const branchAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const res = await axios.post(
       branchAPIURL ? `${branchAPIURL}${getRequestUrl({ urlStr: request.url })}` : getRequestUrl({ urlStr: request.url }),
@@ -34,8 +33,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const cookiesStore = await cookies();
-    const payload = await request.json();
+    const [cookiesStore, payload] = await Promise.all([cookies(), request.json()]);
     const branchAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const res = await axios.patch(
       branchAPIURL ? `${branchAPIURL}${getRequestUrl({ urlStr: request.url })}` : getRequestUrl({ urlStr: request.url }),

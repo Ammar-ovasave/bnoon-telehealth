@@ -5,6 +5,19 @@ import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import axios from "./axios";
 
+export async function createPatientServer(params: {
+  patient: { firstName: string; lastName: string; sex?: 0 | 1; contactNumber: string; middleName?: string; dob?: string };
+  branchId: number;
+}) {
+  try {
+    const res = await axios.post<FertiSmartPatientModel>(`/patients`, params);
+    return res.data;
+  } catch (e) {
+    console.log("--- createPatient error", e);
+    return null;
+  }
+}
+
 export async function getAppointment(params: { appointmentId: string; baseAPIURL?: string }) {
   try {
     const res = await axios.get<FertiSmartAppointmentModel>(

@@ -25,7 +25,7 @@ interface FormErrors {
 }
 
 export default function InPersonForm() {
-  const { data: currentUserData } = useCurrentUser();
+  const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
   const { mutate: mutatePatient, fullName } = useFertiSmartPatient();
   const [formData, setFormData] = useState<FormData>({
     fullName: fullName,
@@ -100,6 +100,9 @@ export default function InPersonForm() {
       const [createAppointmentResponse] = await Promise.all([
         createAppointment({
           email: null,
+          phoneNumber: currentUserData.contactNumber ?? "",
+          firstName: currentUserData.firstName ?? "",
+          lastName: currentUserData.lastName ?? "",
           statusId: status.id ?? 0,
           branchId: branchesData?.[0].id ?? 0,
           description: `In Clinic`,
@@ -120,6 +123,7 @@ export default function InPersonForm() {
         return toast.error("Something went wrong");
       }
       mutatePatient(undefined);
+      mutateCurrentUser(undefined);
       const newSearchParams = new URLSearchParams(window.location.search);
       newSearchParams.append("appointmentId", createAppointmentResponse.id.toString());
       router.replace(`/appointment-confirmation?${newSearchParams.toString()}`);
@@ -132,8 +136,12 @@ export default function InPersonForm() {
   }, [
     apiServicesData,
     branchesData,
+    currentUserData?.contactNumber,
+    currentUserData?.firstName,
+    currentUserData?.lastName,
     currentUserData?.mrn,
     formData.fullName,
+    mutateCurrentUser,
     mutatePatient,
     router,
     selectedResource?.id,

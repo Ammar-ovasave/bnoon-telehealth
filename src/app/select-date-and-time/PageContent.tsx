@@ -12,6 +12,7 @@ import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvai
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { Spinner } from "@/components/ui/spinner";
 import { doctors } from "@/models/DoctorModel";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 export default function SelectDateAndTimePage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -60,9 +61,20 @@ export default function SelectDateAndTimePage() {
     return params.toString();
   }, [selectedDate, selectedTimeSlot, searchParams]);
 
+  const { data: currentUserData, isLoading: loadingCurrentUser } = useCurrentUser();
+
   const getNextPageUrl = () => {
     if (!selectedDate || !selectedTimeSlot) return "#";
-    return `/verify-phone?${newUrlSearchParams.toString()}`;
+    if (currentUserData?.mrn) {
+      const selectedVisitType = searchParams.get("selectedVisitType");
+      if (selectedVisitType === "clinic") {
+        return `/in-person-appointment-info?${newUrlSearchParams}`;
+      } else {
+        return `/virtual-visit-info?${newUrlSearchParams}`;
+      }
+    } else {
+      return `/verify-phone?${newUrlSearchParams.toString()}`;
+    }
   };
 
   return (
@@ -128,7 +140,7 @@ export default function SelectDateAndTimePage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3 max-h-96 flex-1 overflow-y-auto">
-                {loadingTimeslots || loadingResources ? (
+                {loadingTimeslots || loadingResources || loadingCurrentUser ? (
                   <div className="col-span-2 flex justify-center">
                     <Spinner className="size-8" />
                   </div>

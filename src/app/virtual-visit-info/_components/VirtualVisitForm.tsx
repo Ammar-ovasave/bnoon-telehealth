@@ -17,6 +17,7 @@ import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import { doctors } from "@/models/DoctorModel";
 import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
+import { services } from "@/models/ServiceModel";
 
 const genders = [
   { id: "male", label: "Male" },
@@ -47,7 +48,7 @@ interface FormErrors {
 }
 
 export default function VirtualVisitForm() {
-  const { data: currentUserData } = useCurrentUser();
+  const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
   const { nationalities, data: nationalitiesData } = useFertiSmartCountries();
   const { data: patientData, mutate: mutatePatient, fullName } = useFertiSmartPatient();
   const [formData, setFormData] = useState<FormData>({
@@ -107,6 +108,14 @@ export default function VirtualVisitForm() {
   const isVirtualVisit = searchParams.get("selectedVisitType") === "virtual";
   const selectedTimeSlot = decodeURIComponent(searchParams.get("selectedTimeSlot") ?? "");
   const selectedDoctorId = decodeURIComponent(searchParams.get("selectedDoctor") ?? "");
+  const selectedServiceId = decodeURIComponent(searchParams.get("selectedService") ?? "");
+
+  const selectedFertiSmartService = useMemo(() => {
+    const serviceName = services.find((item) => item.id === selectedServiceId)?.title ?? "";
+    const fertiSmartService = apiServicesData?.find((item) => item.name?.toLocaleLowerCase().includes(serviceName));
+    if (fertiSmartService) return fertiSmartService;
+    return apiServicesData?.[0];
+  }, [apiServicesData, selectedServiceId]);
 
   const selectedDoctor = useMemo(() => {
     return doctors.find((doc) => doc.id === selectedDoctorId);
@@ -119,14 +128,6 @@ export default function VirtualVisitForm() {
   }, [fertiSmartResources, selectedDoctor?.name]);
 
   const { data: idTypeData } = useFertiSmartIDTypes();
-
-  // const passportIdType = useMemo(() => {
-  //   return idTypeData?.find((item) => item.name?.toLocaleLowerCase().includes("passport"));
-  // }, [idTypeData]);
-
-  // const nationalIdType = useMemo(() => {
-  //   return idTypeData?.find((item) => !item.name?.toLocaleLowerCase().includes("passport"));
-  // }, [idTypeData]);
 
   const handleFormSubmit = useCallback(async () => {
     if (validateForm) {
@@ -155,12 +156,15 @@ export default function VirtualVisitForm() {
       const splitName = formData.fullName.split(" ");
       const [createAppointmentResponse] = await Promise.all([
         createAppointment({
+          firstName: currentUserData.firstName ?? "",
+          lastName: currentUserData.lastName ?? "",
+          phoneNumber: currentUserData.contactNumber ?? "",
           email: formData.email,
           statusId: status.id ?? 0,
           branchId: branchesData?.[0].id ?? 0,
           description: isVirtualVisit ? `Virtual Visit` : ``,
           patientMrn: currentUserData.mrn ?? "",
-          serviceId: apiServicesData?.[0].id ?? 0,
+          serviceId: selectedFertiSmartService?.id ?? 0,
           resourceIds: [selectedResource?.id ?? 0],
           startTime: selectedTimeSlot,
           endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
@@ -180,6 +184,7 @@ export default function VirtualVisitForm() {
         return toast.error("Something went wrong");
       }
       mutatePatient(undefined);
+      mutateCurrentUser(undefined);
       const newSearchParams = new URLSearchParams(window.location.search);
       newSearchParams.append("appointmentId", createAppointmentResponse.id.toString());
       router.replace(`/appointment-confirmation?${newSearchParams.toString()}`);
@@ -190,8 +195,11 @@ export default function VirtualVisitForm() {
       setLoading(false);
     }
   }, [
-    apiServicesData,
+    apiServicesData?.length,
     branchesData,
+    currentUserData?.contactNumber,
+    currentUserData?.firstName,
+    currentUserData?.lastName,
     currentUserData?.mrn,
     formData.email,
     formData.fullName,
@@ -199,9 +207,11 @@ export default function VirtualVisitForm() {
     formData.idType,
     formData.nationality,
     isVirtualVisit,
+    mutateCurrentUser,
     mutatePatient,
     nationalitiesData,
     router,
+    selectedFertiSmartService?.id,
     selectedResource?.id,
     selectedTimeSlot,
     statusesData,

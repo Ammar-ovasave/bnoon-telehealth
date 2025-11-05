@@ -1,4 +1,5 @@
 import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
+import { CurrentUserType } from "@/models/CurrentUserType";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { SendOTPPayload } from "@/models/SendOTPPayload";
 import axios from "axios";
@@ -12,6 +13,16 @@ const instance = axios.create({
 instance.interceptors.request.use((config) => {
   return config;
 });
+
+export async function getCurrentUser() {
+  try {
+    const res = await instance.get<CurrentUserType>(`/api/current-user`);
+    return res.data;
+  } catch (e) {
+    console.log("--- get current user error ", e);
+    return null;
+  }
+}
 
 export async function updatePatient(params: {
   mrn: string;
@@ -76,7 +87,7 @@ export async function createPatient(params: {
   branchId: number;
 }) {
   try {
-    const res = await instance.post<FertiSmartPatientModel>(`/api/ferti-smart/patients`, params);
+    const res = await instance.post<FertiSmartPatientModel>(`/api/patients`, params);
     return res.data;
   } catch (e) {
     console.log("--- createPatient error", e);
@@ -120,7 +131,7 @@ export async function logout() {
 
 export async function getPatientsByPhoneNumber({ phoneNumber }: { phoneNumber: string }) {
   try {
-    const res = await instance.get<FertiSmartPatientModel[]>(`/api/ferti-smart/patients?contactNumber=${phoneNumber}`);
+    const res = await instance.get<{ mrn?: string }[]>(`/api/get-patients-by-phone-number?phoneNumber=${phoneNumber}`);
     return res.data;
   } catch (e) {
     console.log("--- getPatientsByPhoneNumber error", e);

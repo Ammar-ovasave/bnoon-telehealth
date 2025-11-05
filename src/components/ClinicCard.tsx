@@ -25,7 +25,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
         clinic.isCommingSoon
           ? undefined
           : async () => {
-              await setClinicBranch({ baseURL: clinic.apiUrl });
+              await setClinicBranch({ id: clinic.id });
               router.push(`/interest?${newUrlSearchParams.toString()}`);
             }
       }

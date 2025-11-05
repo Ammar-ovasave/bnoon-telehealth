@@ -9,6 +9,7 @@ import { FC, useMemo } from "react";
 import { doctors } from "@/models/DoctorModel";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import useFertiSmartAppointment from "@/hooks/useFertiSmartAppointment";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import LoadingPage from "../loading";
@@ -49,6 +50,17 @@ export const PageContent: FC = () => {
 
   const fullName = `${patientData?.firstName} ${patientData?.lastName}`;
 
+  // Get user's timezone and check if it's KSA
+  const userTimezone = useMemo(() => {
+    if (typeof window !== "undefined") {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+    return "UTC";
+  }, []);
+
+  const isKSA = userTimezone === "Asia/Riyadh";
+  const KSA_TIMEZONE = "Asia/Riyadh";
+
   const selectedTimeSlot = useMemo(() => {
     if (!appointmentData?.time?.start) return "-";
     try {
@@ -58,6 +70,16 @@ export const PageContent: FC = () => {
       return "-";
     }
   }, [appointmentData?.time?.start]);
+
+  const selectedTimeSlotKSA = useMemo(() => {
+    if (!appointmentData?.time?.start || isKSA) return null;
+    try {
+      return formatInTimeZone(appointmentData?.time?.start ?? "", KSA_TIMEZONE, "yyyy-MM-dd hh:mm a");
+    } catch (e) {
+      console.log("--- no KSA time slot found error", e);
+      return null;
+    }
+  }, [appointmentData?.time?.start, isKSA]);
 
   const confirmationNumber = appointmentData?.id;
 
@@ -102,7 +124,12 @@ export const PageContent: FC = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Date & Time</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{selectedTimeSlot}</span>
+                  <div className="text-right">
+                    <span className="font-medium text-gray-900 dark:text-white">{selectedTimeSlot}</span>
+                    {selectedTimeSlotKSA && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">KSA: {selectedTimeSlotKSA}</p>
+                    )}
+                  </div>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Visit Type</span>

@@ -65,7 +65,7 @@ async function verifyOTP({
     }
     return res.data;
   } catch (error) {
-    console.log("--- get patient by mrn error", error);
+    console.log("--- verifyOTP error", { mrn, code, purpose, baseAPIURL }, error);
     return null;
   }
 }

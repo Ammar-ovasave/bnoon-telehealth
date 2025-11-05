@@ -20,29 +20,33 @@ export async function POST(request: Request) {
     const cookiesStore = await cookies();
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const payload: CreateAppointmentPayload = await request.json();
-    const [createAppointmentResponse, patient, doctorResource, services] = await Promise.all([
-      axios.post<{ id?: number }>(baseAPIURL ? `${baseAPIURL}/appointments` : "/appointments", payload),
+    const [patient, doctorResource, services] = await Promise.all([
       getPatient({ mrn: payload.patientMrn, baseAPIURL: baseAPIURL ?? null }),
       getResource({ baseAPIURL: baseAPIURL ?? null, resourceId: payload.resourceIds[0].toString() }),
       getAppointmentServices({ baseAPIURL: baseAPIURL ?? null, activeOnly: false }),
     ]);
-    if (!createAppointmentResponse.data.id) {
-      console.log("--- create appointment error", createAppointmentResponse.data);
-      return Response.error();
-    }
     let patientToUse = patient;
     if (!patient) {
       console.log("--- payload.patientMrn", payload.patientMrn);
       const fertiSmartBranches = await getBranches({ baseAPIURL: baseAPIURL ?? null });
       const newPatient = await createPatientServer({
+        baseAPIURL: baseAPIURL ?? null,
         branchId: fertiSmartBranches?.[0].id ?? 0,
-        patient: { contactNumber: payload.phoneNumber, firstName: payload.firstName, lastName: payload.lastName },
+        patient: { contactNumber: payload.phoneNumber, firstName: payload.firstName || "-", lastName: payload.lastName || "-" },
       });
       patientToUse = newPatient ?? patient;
-      console.log("--- create appointment get patient error", createAppointmentResponse.data);
+      console.log("--- create appointment get patient error");
     }
     if (!patientToUse?.mrn) {
       console.log("--- create appointment no patient to use", patientToUse);
+      return Response.error();
+    }
+    const createAppointmentResponse = await axios.post<{ id?: number }>(
+      baseAPIURL ? `${baseAPIURL}/appointments` : "/appointments",
+      payload
+    );
+    if (!createAppointmentResponse.data.id) {
+      console.log("--- create appointment error", createAppointmentResponse.data);
       return Response.error();
     }
     const service = services?.find((item) => item.id === payload.serviceId);

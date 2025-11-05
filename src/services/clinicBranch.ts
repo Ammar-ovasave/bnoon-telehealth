@@ -1,8 +1,10 @@
 "use server";
 
+import { clinicLocations } from "@/models/ClinicModel";
 import { cookies } from "next/headers";
 
-export async function setClinicBranch(params: { baseURL: string }) {
+export async function setClinicBranch(params: { id: string }) {
   const cookieStore = await cookies();
-  cookieStore.set("branchAPIURL", params.baseURL);
+  const clinic = clinicLocations.find((clinic) => clinic.id === params.id);
+  cookieStore.set("branchAPIURL", clinic?.apiUrl ?? "");
 }

@@ -15,6 +15,7 @@ import { addMinutes } from "date-fns";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
+import { doctors } from "@/models/DoctorModel";
 
 // const nationalities = [
 //   "Saudi Arabia",
@@ -125,6 +126,17 @@ export default function VirtualVisitForm() {
   const searchParams = useSearchParams();
   const isVirtualVisit = searchParams.get("selectedVisitType") === "virtual";
   const selectedTimeSlot = decodeURIComponent(searchParams.get("selectedTimeSlot") ?? "");
+  const selectedDoctorId = decodeURIComponent(searchParams.get("selectedDoctor") ?? "");
+
+  const selectedDoctor = useMemo(() => {
+    return doctors.find((doc) => doc.id === selectedDoctorId);
+  }, [selectedDoctorId]);
+
+  const selectedResource = useMemo(() => {
+    return fertiSmartResources?.find((resource) => {
+      return resource.name?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? "");
+    });
+  }, [fertiSmartResources, selectedDoctor?.name]);
 
   const handleFormSubmit = useCallback(async () => {
     if (validateForm) {
@@ -159,7 +171,7 @@ export default function VirtualVisitForm() {
           description: isVirtualVisit ? `Virtual Visit` : ``,
           patientMrn: currentUserData.mrn ?? "",
           serviceId: apiServicesData?.[0].id ?? 0,
-          resourceIds: [fertiSmartResources?.[0].id ?? 0],
+          resourceIds: [selectedResource?.id ?? 0],
           startTime: selectedTimeSlot,
           endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
         }),
@@ -190,12 +202,15 @@ export default function VirtualVisitForm() {
     apiServicesData,
     branchesData,
     currentUserData?.mrn,
-    fertiSmartResources,
-    formData,
+    formData.email,
+    formData.fullName,
+    formData.idNumber,
+    formData.nationality,
     isVirtualVisit,
     mutatePatient,
     nationalitiesData,
     router,
+    selectedResource?.id,
     selectedTimeSlot,
     statusesData,
     validateForm,

@@ -14,6 +14,7 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { addMinutes } from "date-fns";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
+import { doctors } from "@/models/DoctorModel";
 
 interface FormData {
   fullName: string;
@@ -52,13 +53,24 @@ export default function InPersonForm() {
     }
   }, [formData.fullName]);
 
+  const searchParams = useSearchParams();
+  const selectedTimeSlot = decodeURIComponent(searchParams.get("selectedTimeSlot") ?? "");
+  const selectedDoctorId = decodeURIComponent(searchParams.get("selectedDoctor") ?? "");
+
   const { data: statusesData } = useFertiSmartAppointmentStatuses();
   const { data: branchesData } = useFertiSmartBranches();
   const { data: apiServicesData } = useFertiSmartAPIServices();
   const { data: fertiSmartResources } = useFertiSmartResources();
 
-  const searchParams = useSearchParams();
-  const selectedTimeSlot = decodeURIComponent(searchParams.get("selectedTimeSlot") ?? "");
+  const selectedDoctor = useMemo(() => {
+    return doctors.find((doc) => doc.id === selectedDoctorId);
+  }, [selectedDoctorId]);
+
+  const selectedResource = useMemo(() => {
+    return fertiSmartResources?.find((resource) => {
+      return resource.name?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? "");
+    });
+  }, [fertiSmartResources, selectedDoctor?.name]);
 
   const handleFormSubmit = useCallback(async () => {
     if (validateForm) {
@@ -93,7 +105,7 @@ export default function InPersonForm() {
           description: `In Clinic`,
           patientMrn: currentUserData.mrn ?? "",
           serviceId: apiServicesData?.[0].id ?? 0,
-          resourceIds: [fertiSmartResources?.[0].id ?? 0],
+          resourceIds: [selectedResource?.id ?? 0],
           startTime: selectedTimeSlot,
           endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
         }),
@@ -121,10 +133,10 @@ export default function InPersonForm() {
     apiServicesData,
     branchesData,
     currentUserData?.mrn,
-    fertiSmartResources,
     formData.fullName,
     mutatePatient,
     router,
+    selectedResource?.id,
     selectedTimeSlot,
     statusesData,
     validateForm,

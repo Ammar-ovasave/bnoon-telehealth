@@ -175,7 +175,7 @@ export default function VirtualVisitForm() {
           firstName: splitName[0],
           lastName: splitName.slice(1).join(" "),
           identityId: formData.idNumber,
-          nationality: nationalitiesData?.find((item) => item.name === formData.nationality)?.id,
+          nationalityId: nationalitiesData?.find((item) => item.name === formData.nationality)?.id,
           identityIdTypeId: Number(formData.idType),
         }),
       ]);

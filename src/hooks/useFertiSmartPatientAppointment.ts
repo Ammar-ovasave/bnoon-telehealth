@@ -1,10 +1,8 @@
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import useSWR from "swr";
 
-export default function useFertiSmartPatientAppointment({ mrn }: { mrn?: string }) {
-  const { data, error, isLoading, mutate } = useSWR<FertiSmartAppointmentModel[]>(
-    mrn ? `/api/ferti-smart/patients/${mrn}/appointments` : null
-  );
+export default function useFertiSmartPatientAppointment() {
+  const { data, error, isLoading, mutate } = useSWR<FertiSmartAppointmentModel[]>(`/api/get-patient-appointments`);
 
   return { data, error, isLoading, mutate };
 }

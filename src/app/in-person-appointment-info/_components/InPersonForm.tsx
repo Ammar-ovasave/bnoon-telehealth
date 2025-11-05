@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { toast } from "sonner";
-import { createAppointment, updatePatient } from "@/services/client";
+import { createAppointment, getCurrentUser, updatePatient } from "@/services/client";
 import useFertiSmartAppointmentStatuses from "@/hooks/useFertiSmartAppointmentStatuses";
 import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
@@ -112,16 +112,21 @@ export default function InPersonForm() {
           startTime: selectedTimeSlot,
           endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
         }),
-        updatePatient({
-          mrn: currentUserData.mrn,
-          firstName: splitName[0],
-          lastName: splitName.slice(1).join(" "),
-        }),
       ]);
+      const newCurrentUser = await getCurrentUser();
+      if (!newCurrentUser) {
+        console.log("no new current user");
+        return toast.error("Something went wrong");
+      }
       if (!createAppointmentResponse?.id) {
         console.log("could not create appointment", createAppointmentResponse);
         return toast.error("Something went wrong");
       }
+      await updatePatient({
+        mrn: currentUserData.mrn,
+        firstName: splitName[0],
+        lastName: splitName.slice(1).join(" "),
+      });
       mutatePatient(undefined);
       mutateCurrentUser(undefined);
       const newSearchParams = new URLSearchParams(window.location.search);

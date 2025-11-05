@@ -12,8 +12,8 @@ import { cookies } from "next/headers";
 import { getConfirmAppointmentEmail } from "@/services/templates";
 import { format } from "date-fns";
 import axios from "@/services/axios";
-import { signJwt } from "../verify-otp/route";
 import { AUTH_TOKEN_NAME } from "@/constants";
+import { signJwt } from "@/services/signJwt";
 
 export async function POST(request: Request) {
   try {

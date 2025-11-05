@@ -12,12 +12,12 @@ export default function useCurrentUser() {
   const fullName = useMemo(() => {
     let name = "";
     if (data?.firstName && data.firstName !== "-") {
-      name += data?.firstName;
+      name += ` ${data?.firstName}`;
     }
     if (data?.lastName && data.lastName !== "-") {
-      name += data?.lastName;
+      name += ` ${data?.lastName}`;
     }
-    return name;
+    return name.trim();
   }, [data?.firstName, data?.lastName]);
 
   return { data, error, isLoading, fullName, mutate };

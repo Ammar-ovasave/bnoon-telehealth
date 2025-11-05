@@ -2,8 +2,9 @@ import { cookies } from "next/headers";
 import { getAppointment } from "@/services/appointment-services";
 import { getCurrentUser } from "../../current-user/_services";
 
-export async function GET(request: Request, { params }: { params: { appointmentId: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ appointmentId: string }> }) {
   try {
+    const params = await context.params;
     console.log("==== params", params);
     const currentUser = await getCurrentUser();
     const cookiesStore = await cookies();

@@ -175,7 +175,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               {showOtpInput
-                ? "We've sent a verification code to your phone number. Please enter the 6-digit code below."
+                ? `We've sent a verification code to your phone number. Please enter the ${OTP_LENGTH}-digit code below.`
                 : "We'll send you a verification code to confirm your phone number. This helps us keep your account secure."}
             </p>
           </div>

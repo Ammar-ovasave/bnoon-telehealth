@@ -26,6 +26,7 @@ import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import Link from "next/link";
+import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -54,6 +55,14 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const { data: currentUserData } = useCurrentUser();
 
   const { data: patientData } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+
+  const { data: countriesData } = useFertiSmartCountries();
+
+  const nationality = useMemo(() => {
+    return countriesData?.find((country) => {
+      return country.id === patientData?.nationality?.id;
+    });
+  }, [countriesData, patientData?.nationality?.id]);
 
   const { data: availabilityData, isLoading: loadingTimeslots } = useFertiSmartResourceAvailability({
     resourceId: resourceId?.toString(),
@@ -192,17 +201,17 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
           <div className="space-y-3">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Full Name</p>
-              <p className="font-medium text-gray-900 dark:text-white">{`${currentUserData?.firstName ?? ""} ${
-                currentUserData?.lastName ?? ""
+              <p className="font-medium text-gray-900 dark:text-white">{`${patientData?.firstName ?? ""} ${
+                patientData?.lastName ?? ""
               }`}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
-              <p className="font-medium text-gray-900 dark:text-white">{currentUserData?.emailAddress}</p>
+              <p className="font-medium text-gray-900 dark:text-white">{patientData?.emailAddress}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Nationality</p>
-              <p className="font-medium text-gray-900 dark:text-white">{"-"}</p>
+              <p className="font-medium text-gray-900 dark:text-white">{nationality?.name ?? "-"}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Gender</p>

@@ -47,9 +47,9 @@ interface FormErrors {
 }
 
 export default function VirtualVisitForm() {
-  const { data: currentUserData, fullName } = useCurrentUser();
+  const { data: currentUserData } = useCurrentUser();
   const { nationalities, data: nationalitiesData } = useFertiSmartCountries();
-  const { data: patientData, mutate: mutatePatient } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const { data: patientData, mutate: mutatePatient, fullName } = useFertiSmartPatient();
   const [formData, setFormData] = useState<FormData>({
     fullName: fullName,
     email: currentUserData?.emailAddress ?? "",

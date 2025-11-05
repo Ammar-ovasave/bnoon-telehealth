@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import useCurrentUser from "@/hooks/useCurrentUser";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { cn } from "@/lib/utils";
@@ -52,9 +51,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
     }
   }, [appointment.time?.start]);
 
-  const { data: currentUserData } = useCurrentUser();
-
-  const { data: patientData } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const { data: patientData } = useFertiSmartPatient();
 
   const { data: countriesData } = useFertiSmartCountries();
 

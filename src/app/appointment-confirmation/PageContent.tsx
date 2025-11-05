@@ -29,7 +29,7 @@ export const PageContent: FC = () => {
 
   const { data: currentUserData, isLoading: loadingCurrentUser } = useCurrentUser();
 
-  const { data: patientData, isLoading: loadingPatient } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const { data: patientData, isLoading: loadingPatient } = useFertiSmartPatient();
   const gender = patientData?.sex === 0 ? "Female" : "Male";
 
   const idType = useMemo(() => {

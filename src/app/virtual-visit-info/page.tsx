@@ -1,15 +1,15 @@
 "use client";
 import { User } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import VirtualVisitForm from "./_components/VirtualVisitForm";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { Spinner } from "@/components/ui/spinner";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
 
 export default function VirtualVisitInfoPage() {
-  const { isLoading, data: currentUserData } = useCurrentUser();
-  const { isLoading: loadingPatientData } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const { isLoading } = useCurrentUser();
+  const { isLoading: loadingPatientData } = useFertiSmartPatient();
   const { isLoading: loadingCountries } = useFertiSmartCountries();
   const { isLoading: loadingIdTypes } = useFertiSmartIDTypes();
 

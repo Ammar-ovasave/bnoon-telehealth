@@ -17,6 +17,18 @@ export async function getAppointment(params: { appointmentId: string; baseAPIURL
   }
 }
 
+export async function getPatientAppointments(params: { mrn: string; baseAPIURL?: string }) {
+  try {
+    const res = await axios.get<FertiSmartAppointmentModel>(
+      params.baseAPIURL ? `${params.baseAPIURL}/patients/${params.mrn}/appointments` : `/patients/${params.mrn}/appointments`
+    );
+    return res.data;
+  } catch (error) {
+    console.log("--- get getPatientAppointments error ", error);
+    return null;
+  }
+}
+
 export async function sendEmail(params: {
   email: string;
   subject: string;
@@ -87,7 +99,7 @@ export async function getResources({ baseAPIURL }: { baseAPIURL: string | null }
     const res = await axios.get<FSResourceModel[]>(baseAPIURL ? `${baseAPIURL}/resources` : `/resources`);
     return res.data;
   } catch (e) {
-    console.log("--- getAppointmentServices error", e);
+    console.log("--- getResources error", e);
     return null;
   }
 }
@@ -109,7 +121,7 @@ export async function getBranches({ baseAPIURL }: { baseAPIURL: string | null })
     const res = await axios.get<FertiSmartBranchModel[]>(baseAPIURL ? `${baseAPIURL}/branches` : `/branches`);
     return res.data;
   } catch (e) {
-    console.log("--- getAppointmentServices error", e);
+    console.log("--- getBranches error", e);
     return null;
   }
 }

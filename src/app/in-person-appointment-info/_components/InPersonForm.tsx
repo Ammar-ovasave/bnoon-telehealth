@@ -25,8 +25,8 @@ interface FormErrors {
 }
 
 export default function InPersonForm() {
-  const { data: currentUserData, fullName } = useCurrentUser();
-  const { mutate: mutatePatient } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
+  const { data: currentUserData } = useCurrentUser();
+  const { mutate: mutatePatient, fullName } = useFertiSmartPatient();
   const [formData, setFormData] = useState<FormData>({
     fullName: fullName,
   });

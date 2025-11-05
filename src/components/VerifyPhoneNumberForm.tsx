@@ -86,12 +86,12 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
       purpose: purpose,
       ttlMinutes: 10 * 60,
     });
-    if (!sendOTPResponse?.code) {
+    if (!sendOTPResponse?.length) {
       setIsLoading(false);
       return toast.error("Faild to send OTP");
     }
     // console.log("sendOTPResponse", sendOTPResponse);
-    sessionStorage.setItem("otp", sendOTPResponse.code);
+    // sessionStorage.setItem("otp", sendOTPResponse.code);
     sessionStorage.setItem("mrn", mrnToUse);
     sessionStorage.setItem("purpose", purpose);
     setIsLoading(false);
@@ -105,7 +105,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
     }
     setIsLoading(true);
     const response = await verifyOTP({
-      code: sessionStorage.getItem("otp") ?? "", // otp,
+      code: otp,
       mrn: sessionStorage.getItem("mrn") ?? "",
       purpose: sessionStorage.getItem("purpose") ?? "",
     });

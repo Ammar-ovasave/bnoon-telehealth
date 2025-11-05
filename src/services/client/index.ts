@@ -1,5 +1,6 @@
 import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
+import { SendOTPPayload } from "@/models/SendOTPPayload";
 import axios from "axios";
 
 const instance = axios.create({
@@ -24,7 +25,7 @@ export async function updatePatient(params: {
   alternativeContactNumber?: string;
   emailAddress?: string;
   identityIdTypeId?: number;
-  nationality?: number;
+  nationalityId?: number;
   identityId?: string;
 }) {
   try {
@@ -83,13 +84,11 @@ export async function createPatient(params: {
   }
 }
 
-export async function sendOTP(params: { mrn: string; purpose: string; ttlMinutes: number; maxAttempts: number; channel: "sms" }) {
+export async function sendOTP(params: SendOTPPayload) {
   try {
     const res = await instance.post<{
-      id: number;
-      code: string;
-      expiresAtUtc: string;
-    }>(`/api/ferti-smart/patients/${params.mrn}/otps`, params);
+      length?: number;
+    }>(`/api/send-otp`, params);
     return res.data;
   } catch (e) {
     console.log("--- sendOTP error", e);

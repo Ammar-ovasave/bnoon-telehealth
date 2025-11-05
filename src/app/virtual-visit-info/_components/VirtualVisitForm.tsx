@@ -16,44 +16,24 @@ import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import { doctors } from "@/models/DoctorModel";
-
-// const nationalities = [
-//   "Saudi Arabia",
-//   "United Arab Emirates",
-//   "Kuwait",
-//   "Qatar",
-//   "Bahrain",
-//   "Oman",
-//   "Jordan",
-//   "Lebanon",
-//   "Egypt",
-//   "Syria",
-//   "Iraq",
-//   "Morocco",
-//   "Tunisia",
-//   "Algeria",
-//   "Sudan",
-//   "Yemen",
-//   "Palestine",
-//   "Other",
-// ];
+import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
 
 const genders = [
   { id: "male", label: "Male" },
   { id: "female", label: "Female" },
 ];
 
-const idTypes = [
-  { id: "passport", label: "Passport" },
-  { id: "nationalId", label: "National ID" },
-];
+// const idTypes = [
+//   { id: "passport", label: "Passport" },
+//   { id: "nationalId", label: "National ID" },
+// ];
 
 interface FormData {
   fullName: string;
   email: string;
   nationality: string;
   gender: string;
-  idType: string;
+  idType?: string;
   idNumber: string;
 }
 
@@ -75,7 +55,7 @@ export default function VirtualVisitForm() {
     email: currentUserData?.emailAddress ?? "",
     nationality: nationalities?.find((item) => item === patientData?.nationality?.name) ?? "",
     gender: patientData?.sex === 0 ? "female" : "male",
-    idType: patientData?.identityIdType?.name?.toLocaleLowerCase().includes("passport") ? "passport" : "nationalId",
+    idType: patientData?.identityIdType?.id?.toString(),
     idNumber: patientData?.identityId ?? "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -138,6 +118,16 @@ export default function VirtualVisitForm() {
     });
   }, [fertiSmartResources, selectedDoctor?.name]);
 
+  const { data: idTypeData } = useFertiSmartIDTypes();
+
+  // const passportIdType = useMemo(() => {
+  //   return idTypeData?.find((item) => item.name?.toLocaleLowerCase().includes("passport"));
+  // }, [idTypeData]);
+
+  // const nationalIdType = useMemo(() => {
+  //   return idTypeData?.find((item) => !item.name?.toLocaleLowerCase().includes("passport"));
+  // }, [idTypeData]);
+
   const handleFormSubmit = useCallback(async () => {
     if (validateForm) {
       console.log("invalid data");
@@ -180,8 +170,9 @@ export default function VirtualVisitForm() {
           emailAddress: formData.email,
           firstName: splitName[0],
           lastName: splitName.slice(1).join(" "),
-          nationality: nationalitiesData?.find((item) => item.name === formData.nationality)?.id,
           identityId: formData.idNumber,
+          nationality: nationalitiesData?.find((item) => item.name === formData.nationality)?.id,
+          identityIdTypeId: Number(formData.idType),
         }),
       ]);
       if (!createAppointmentResponse?.id) {
@@ -205,6 +196,7 @@ export default function VirtualVisitForm() {
     formData.email,
     formData.fullName,
     formData.idNumber,
+    formData.idType,
     formData.nationality,
     isVirtualVisit,
     mutatePatient,
@@ -335,23 +327,29 @@ export default function VirtualVisitForm() {
                 ID Type *
               </div>
             </label>
-            <div className="grid grid-cols-2 gap-3">
-              {idTypes.map((idType) => (
+            <div
+              className={cn(
+                "grid grid-cols-2 gap-3",
+                idTypeData?.length === 3 && "grid-cols-3",
+                idTypeData?.length === 4 && "grid-cols-4"
+              )}
+            >
+              {idTypeData?.map((idType) => (
                 <button
                   key={idType.id}
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    handleInputChange("idType", idType.id);
+                    handleInputChange("idType", idType.id?.toString() ?? "");
                   }}
                   className={cn(
                     "p-3 rounded-md border text-sm font-medium transition-all duration-200",
-                    formData.idType === idType.id
+                    formData.idType === idType.id?.toString()
                       ? "bg-primary text-white border-primary shadow-md"
                       : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 dark:hover:bg-purple-900/20 hover:border-primary"
                   )}
                 >
-                  {idType.label}
+                  {idType.name}
                 </button>
               ))}
             </div>

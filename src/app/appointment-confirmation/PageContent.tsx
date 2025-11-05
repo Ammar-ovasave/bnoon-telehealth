@@ -22,7 +22,6 @@ export const PageContent: FC = () => {
   const selectedDoctor = searchParams.get("selectedDoctor") || "-";
   const selectedService = searchParams.get("selectedService") || "-";
   const selectedClinicLocation = searchParams.get("selectedClinicLocation") || "-";
-  const idType = searchParams.get("idType") || "-";
 
   const { data: countriesData, isLoading: loadingCountries } = useFertiSmartCountries();
 
@@ -32,6 +31,14 @@ export const PageContent: FC = () => {
 
   const { data: patientData, isLoading: loadingPatient } = useFertiSmartPatient({ mrn: currentUserData?.mrn });
   const gender = patientData?.sex === 0 ? "Female" : "Male";
+
+  const idType = useMemo(() => {
+    return patientData?.identityIdType?.name;
+    // if (patientData?.identityIdType?.name?.toLocaleLowerCase()?.includes("passport")) {
+    //   return "Passport";
+    // }
+    // return "National ID";
+  }, [patientData?.identityIdType?.name]);
 
   const patientCountry = useMemo(
     () => countriesData?.find((item) => item.id === patientData?.nationality?.id),
@@ -137,13 +144,15 @@ export const PageContent: FC = () => {
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">{currentUserData?.contactNumber}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    Nationality
-                  </span>
-                  <span className="font-medium text-gray-900 dark:text-white">{patientCountry?.name ?? "-"}</span>
-                </div>
+                {patientCountry?.name && (
+                  <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
+                      Nationality
+                    </span>
+                    <span className="font-medium text-gray-900 dark:text-white">{patientCountry?.name ?? "-"}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                     <Users className="h-4 w-4" />
@@ -151,13 +160,15 @@ export const PageContent: FC = () => {
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">{gender}</span>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                    <CreditCard className="h-4 w-4" />
-                    {idType}
-                  </span>
-                  <span className="font-medium text-gray-900 dark:text-white">{idNumber}</span>
-                </div>
+                {idType || idNumber ? (
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      {idType}
+                    </span>
+                    <span className="font-medium text-gray-900 dark:text-white">{idNumber}</span>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>

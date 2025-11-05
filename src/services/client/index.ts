@@ -23,12 +23,13 @@ export async function updatePatient(params: {
   contactNumber?: string;
   alternativeContactNumber?: string;
   emailAddress?: string;
+  identityIdTypeId?: number;
   nationality?: number;
   identityId?: string;
 }) {
   try {
+    console.log("--- update patient", params);
     const res = await instance.patch<{ id?: number }>(`/api/ferti-smart/patients/${params.mrn}`, params);
-    console.log("update patient response", res.data);
     return res.data;
   } catch (error) {
     console.log("--- updatePatient error", error);

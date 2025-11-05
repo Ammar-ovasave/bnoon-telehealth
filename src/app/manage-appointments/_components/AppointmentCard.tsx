@@ -218,7 +218,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               <p className="font-medium text-gray-900 dark:text-white">{"Female"}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">-</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{patientData?.identityIdType?.name}</p>
               <p className="font-medium text-gray-900 dark:text-white">{patientData?.identityId ?? "-"}</p>
             </div>
           </div>

@@ -18,6 +18,7 @@ import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import { doctors } from "@/models/DoctorModel";
 import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
 import { services } from "@/models/ServiceModel";
+import { containsArabic } from "@/services/containsArabic";
 
 const genders = [
   { id: "male", label: "Male" },
@@ -51,10 +52,6 @@ export default function VirtualVisitForm() {
   const { data: currentUserData, mutate: mutateCurrentUser, fullName: currentUserFullName } = useCurrentUser();
   const { nationalities, data: nationalitiesData } = useFertiSmartCountries();
   const { data: patientData, mutate: mutatePatient, fullName } = useFertiSmartPatient();
-  console.log("fullName", fullName);
-  console.log("-currentUserData?.emailAddress", currentUserData?.emailAddress);
-  console.log("nationalities", nationalities?.length);
-  console.log("patientData", patientData);
   const [formData, setFormData] = useState<FormData>({
     fullName: fullName || currentUserFullName || "",
     email: currentUserData?.emailAddress || currentUserData?.emailAddress || "",
@@ -186,6 +183,7 @@ export default function VirtualVisitForm() {
         return toast.error("Something went wrong");
       }
       await updatePatient({
+        arabicName: containsArabic(formData.fullName) ? formData.fullName : undefined,
         mrn: newCurrentUser?.mrn ?? "",
         emailAddress: formData.email,
         firstName: splitName[0],

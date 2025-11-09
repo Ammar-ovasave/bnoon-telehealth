@@ -42,7 +42,6 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const resourceId = appointment.resources?.[0]?.id;
   const resource = useMemo(() => resourcesData?.find((resource) => resource.id === resourceId), [resourceId, resourcesData]);
 
-  // Get user's timezone and check if it's KSA
   const userTimezone = useMemo(() => {
     if (typeof window !== "undefined") {
       return Intl.DateTimeFormat().resolvedOptions().timeZone;

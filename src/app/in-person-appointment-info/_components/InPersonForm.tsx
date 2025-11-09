@@ -15,6 +15,7 @@ import { addMinutes } from "date-fns";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import { doctors } from "@/models/DoctorModel";
+import { containsArabic } from "@/services/containsArabic";
 
 interface FormData {
   fullName: string;
@@ -123,6 +124,7 @@ export default function InPersonForm() {
         return toast.error("Something went wrong");
       }
       await updatePatient({
+        arabicName: containsArabic(formData.fullName) ? formData.fullName : undefined,
         mrn: currentUserData.mrn,
         firstName: splitName[0],
         lastName: splitName.slice(1).join(" "),

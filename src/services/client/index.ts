@@ -2,6 +2,7 @@ import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
 import { CurrentUserType } from "@/models/CurrentUserType";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { SendOTPPayload } from "@/models/SendOTPPayload";
+import { SwitchBranchPayload } from "@/models/SwitchBranchPayload";
 import { UpdatePatientPayload } from "@/models/UpdatePatientPayload";
 import axios from "axios";
 
@@ -27,7 +28,6 @@ export async function getCurrentUser() {
 
 export async function updatePatient(params: UpdatePatientPayload) {
   try {
-    console.log("--- update patient", params);
     const res = await instance.patch<{ id?: number }>(`/api/patients/${params.mrn}`, params);
     return res.data;
   } catch (error) {
@@ -123,5 +123,15 @@ export async function getPatientsByPhoneNumber({ phoneNumber }: { phoneNumber: s
   } catch (e) {
     console.log("--- getPatientsByPhoneNumber error", e);
     return null;
+  }
+}
+
+export async function switchBranch(payload: SwitchBranchPayload) {
+  try {
+    const res = await instance.post(`/api/switch-branch`, payload);
+    return res.data;
+  } catch (e) {
+    console.log("--- switchBranch error", e);
+    return false;
   }
 }

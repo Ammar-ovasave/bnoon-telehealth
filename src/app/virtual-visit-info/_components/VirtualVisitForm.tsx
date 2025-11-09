@@ -48,14 +48,20 @@ interface FormErrors {
 }
 
 export default function VirtualVisitForm() {
-  const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
+  const { data: currentUserData, mutate: mutateCurrentUser, fullName: currentUserFullName } = useCurrentUser();
   const { nationalities, data: nationalitiesData } = useFertiSmartCountries();
   const { data: patientData, mutate: mutatePatient, fullName } = useFertiSmartPatient();
+  console.log("fullName", fullName);
+  console.log("-currentUserData?.emailAddress", currentUserData?.emailAddress);
+  console.log("nationalities", nationalities?.length);
+  console.log("patientData", patientData);
   const [formData, setFormData] = useState<FormData>({
-    fullName: fullName,
-    email: currentUserData?.emailAddress ?? "",
-    nationality: nationalities?.find((item) => item === patientData?.nationality?.name) ?? "",
-    gender: patientData?.sex === 0 ? "female" : "male",
+    fullName: fullName || currentUserFullName || "",
+    email: currentUserData?.emailAddress || currentUserData?.emailAddress || "",
+    nationality: patientData?.nationality?.name
+      ? nationalities?.find((item) => item === patientData?.nationality?.name) ?? ""
+      : "",
+    gender: patientData?.sex === 1 ? "male" : "female",
     idType: patientData?.identityIdType?.id?.toString(),
     idNumber: patientData?.identityId ?? "",
   });
@@ -111,7 +117,7 @@ export default function VirtualVisitForm() {
   const selectedServiceId = decodeURIComponent(searchParams.get("selectedService") ?? "");
 
   const selectedFertiSmartService = useMemo(() => {
-    const serviceName = services.find((item) => item.id === selectedServiceId)?.title ?? "";
+    const serviceName = services.find((item) => item.id === selectedServiceId)?.title.toLocaleLowerCase() ?? "";
     const fertiSmartService = apiServicesData?.find((item) => item.name?.toLocaleLowerCase().includes(serviceName));
     if (fertiSmartService) return fertiSmartService;
     return apiServicesData?.[0];
@@ -188,8 +194,8 @@ export default function VirtualVisitForm() {
         nationalityId: nationalitiesData?.find((item) => item.name === formData.nationality)?.id,
         identityIdTypeId: Number(formData.idType),
       });
-      mutatePatient(undefined);
       mutateCurrentUser(undefined);
+      mutatePatient(undefined);
       const newSearchParams = new URLSearchParams(window.location.search);
       newSearchParams.append("appointmentId", createAppointmentResponse.id.toString());
       router.replace(`/appointment-confirmation?${newSearchParams.toString()}`);

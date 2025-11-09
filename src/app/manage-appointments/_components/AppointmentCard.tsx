@@ -132,11 +132,11 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   return (
     <div
       key={appointment.id}
-      className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+      className="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 shadow-sm border border-gray-200 dark:border-gray-700"
     >
       {/* Appointment Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-        <div className="flex items-center gap-3 mb-2 md:mb-0">
+        <div className="flex flex-col md:flex-row items-center gap-3 mb-2 md:mb-0">
           <div
             className={cn(
               "px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2",
@@ -148,7 +148,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
           </div>
           <span className="text-sm text-gray-500 dark:text-gray-400">Confirmation: {appointment.id}</span>
         </div>
-        <div className="flex gap-2 mt-2 md:mt-0">
+        <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
           {appointment.status?.name !== "Cancelled" && (
             <>
               <Link href={`/video-call/${appointment.id}/prepare`}>

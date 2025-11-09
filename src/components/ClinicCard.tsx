@@ -6,10 +6,12 @@ import { MapPin } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setClinicBranch } from "@/services/clinicBranch";
 import Image from "next/image";
+import useCurrentBranch from "@/hooks/useCurrentBranch";
 
 const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { mutate } = useCurrentBranch();
 
   const newUrlSearchParams = useMemo(() => {
     const params = new URLSearchParams(searchParams);
@@ -26,6 +28,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
           ? undefined
           : async () => {
               await setClinicBranch({ id: clinic.id });
+              mutate(undefined);
               router.push(`/interest?${newUrlSearchParams.toString()}`);
             }
       }

@@ -8,3 +8,8 @@ export async function setClinicBranch(params: { id: string }) {
   const clinic = clinicLocations.find((clinic) => clinic.id === params.id);
   cookieStore.set("branchAPIURL", clinic?.apiUrl ?? "");
 }
+
+export async function getClinicBranch() {
+  const cookieStore = await cookies();
+  return cookieStore.get("branchAPIURL");
+}

@@ -19,8 +19,8 @@ export default function ManageAppointmentsPage() {
               <CalendarDays className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Manage Appointments</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <h1 className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Manage Appointments</h1>
+          <p className="md:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             View, reschedule, or cancel your appointments. All your upcoming and past appointments are listed below.
           </p>
         </div>

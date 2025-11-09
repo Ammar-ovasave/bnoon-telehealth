@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
+import { getCurrentUser } from "./api/current-user/_services";
 import localFont from "next/font/local";
 import SWRProvider from "@/providers/SWRProvider";
 import NavHeader from "@/components/NavHeader";
 import "./globals.css";
-import { getCurrentUser } from "./api/current-user/_services";
 
 export const metadata: Metadata = {
   title: "Bnoon",

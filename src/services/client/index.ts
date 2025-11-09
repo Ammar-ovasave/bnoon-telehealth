@@ -2,6 +2,7 @@ import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
 import { CurrentUserType } from "@/models/CurrentUserType";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { SendOTPPayload } from "@/models/SendOTPPayload";
+import { UpdatePatientPayload } from "@/models/UpdatePatientPayload";
 import axios from "axios";
 
 const instance = axios.create({
@@ -24,24 +25,10 @@ export async function getCurrentUser() {
   }
 }
 
-export async function updatePatient(params: {
-  mrn: string;
-  firstName?: string;
-  middleName?: string;
-  lastName?: string;
-  maidenName?: string;
-  arabicName?: string;
-  dob?: string;
-  contactNumber?: string;
-  alternativeContactNumber?: string;
-  emailAddress?: string;
-  identityIdTypeId?: number;
-  nationalityId?: number;
-  identityId?: string;
-}) {
+export async function updatePatient(params: UpdatePatientPayload) {
   try {
     console.log("--- update patient", params);
-    const res = await instance.patch<{ id?: number }>(`/api/ferti-smart/patients/${params.mrn}`, params);
+    const res = await instance.patch<{ id?: number }>(`/api/patients/${params.mrn}`, params);
     return res.data;
   } catch (error) {
     console.log("--- updatePatient error", error);

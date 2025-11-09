@@ -6,6 +6,9 @@ export async function getCurrentUser() {
   try {
     const cookiesStore = await cookies();
     const authToken = cookiesStore.get(AUTH_TOKEN_NAME);
+    if (!authToken?.value) {
+      return null;
+    }
     const decodedToken = verifyToken({ secret: process.env.JWT_SECRET ?? "", token: authToken?.value ?? "" });
     if (!decodedToken) {
       return null;

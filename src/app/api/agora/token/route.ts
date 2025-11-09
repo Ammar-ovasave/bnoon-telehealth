@@ -1,5 +1,5 @@
 import { RtcRole, RtcTokenBuilder } from "agora-token";
-import { differenceInSeconds } from "date-fns";
+import { addHours, differenceInSeconds } from "date-fns";
 import { getAppointment } from "@/services/appointment-services";
 import { cookies } from "next/headers";
 
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
       console.log("get agora token error no appointment");
       return Response.error();
     }
-    const serviceEnd = new Date(appointment?.time?.end ?? "");
+    const serviceEnd = addHours(new Date(appointment?.time?.end ?? ""), 5);
     const appId = process.env.AGORA_APP_ID ?? "";
     const appCertificate = process.env.AGORA_APP_CERTIFICATE ?? "";
     const channelName = appointment.id.toString();

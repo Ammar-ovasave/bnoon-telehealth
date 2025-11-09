@@ -6,6 +6,9 @@ import Link from "next/link";
 import { FC, useCallback, useState } from "react";
 import { logout } from "@/services/client";
 import { Spinner } from "./ui/spinner";
+import { useRouter } from "next/navigation";
+import useCurrentBranch from "@/hooks/useCurrentBranch";
+import { Badge } from "./ui/badge";
 
 function NavHeader() {
   const { data: currentUserData, isLoading } = useCurrentUser();
@@ -24,6 +27,7 @@ function NavHeader() {
           </li>
         )}
       </ul>
+      <BranchName />
       {!isLoading && currentUserData?.mrn ? (
         <LogoutButton />
       ) : (
@@ -35,16 +39,26 @@ function NavHeader() {
   );
 }
 
+const BranchName: FC = () => {
+  const { data } = useCurrentBranch();
+
+  if (!data?.branch?.name) return null;
+
+  return <Badge className="hidden sm:block">{data?.branch?.name}</Badge>;
+};
+
 const LogoutButton: FC = () => {
   const [loading, setLoading] = useState(false);
   const { mutate } = useCurrentUser();
+  const router = useRouter();
 
   const handleClick = useCallback(async () => {
     setLoading(true);
     await logout();
     setLoading(false);
     mutate(undefined);
-  }, [mutate]);
+    router.replace("/");
+  }, [mutate, router]);
 
   return (
     <Button onClick={handleClick} variant={"link"} disabled={loading}>

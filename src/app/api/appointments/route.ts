@@ -41,6 +41,7 @@ export async function POST(request: Request) {
       console.log("--- create appointment no patient to use", patientToUse);
       return Response.error();
     }
+    payload.patientMrn = patientToUse.mrn;
     const createAppointmentResponse = await axios.post<{ id?: number }>(
       baseAPIURL ? `${baseAPIURL}/appointments` : "/appointments",
       payload
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
     }
     const service = services?.find((item) => item.id === payload.serviceId);
     const url = new URL(request.url);
+    // TODO: update appointment description with the appointment link
     const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
     const emailTemplate = await getConfirmAppointmentEmail({
       appointmentDate: format(payload.startTime, "yyyy-MM-dd"),

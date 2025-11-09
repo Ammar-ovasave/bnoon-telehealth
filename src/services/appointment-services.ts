@@ -156,3 +156,21 @@ export async function getBranches({ baseAPIURL }: { baseAPIURL: string | null })
     return null;
   }
 }
+
+export async function getPatientsByPhoneNumberServer({
+  phoneNumber,
+  baseAPIURL,
+}: {
+  phoneNumber: string;
+  baseAPIURL: string | null;
+}) {
+  try {
+    const res = await axios.get<FertiSmartPatientModel[]>(
+      baseAPIURL ? `${baseAPIURL}/patients?contactNumber=${phoneNumber}` : `/patients?contactNumber=${phoneNumber}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log("--- getPatientsByPhoneNumber error", e);
+    return null;
+  }
+}

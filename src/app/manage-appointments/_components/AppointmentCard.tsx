@@ -27,6 +27,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import Link from "next/link";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
+import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
 
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -36,6 +37,12 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const [selectedRescheduleTimeSlot, setSelectedRescheduleTimeSlot] = useState<string>();
   const [isRescheduling, setIsRescheduling] = useState(false);
   const { mutate: mutateCurrentUserAppointments } = useCurrentUserAppointments();
+
+  const { data: apiServicesData } = useFertiSmartAPIServices();
+
+  const service = useMemo(() => {
+    return apiServicesData?.find((item) => item.id === appointment.service?.id);
+  }, [apiServicesData, appointment.service?.id]);
 
   const { data: resourcesData } = useFertiSmartResources();
 
@@ -199,7 +206,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               <Calendar className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Service</p>
-                <p className="font-medium text-gray-900 dark:text-white">{"-"}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{service?.name ?? "-"}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">

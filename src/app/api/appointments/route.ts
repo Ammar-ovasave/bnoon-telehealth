@@ -7,6 +7,7 @@ import {
   getResource,
   sendEmail,
   sendSMS,
+  updateAppointmentServer,
 } from "@/services/appointment-services";
 import { cookies } from "next/headers";
 import { getConfirmAppointmentEmail } from "@/services/templates";
@@ -67,6 +68,11 @@ export async function POST(request: Request) {
     });
     console.log("emailTemplate", emailTemplate);
     await Promise.all([
+      updateAppointmentServer({
+        baseAPIURL: baseAPIURL,
+        appointmentId: createAppointmentResponse.data.id,
+        description: `${payload.description} - ${appointmentLink}`,
+      }),
       payload.email
         ? sendEmail({
             baseAPIURL: baseAPIURL ?? null,

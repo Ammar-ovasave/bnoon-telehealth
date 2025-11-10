@@ -4,21 +4,27 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { doctors as fullDoctorsList } from "@/models/DoctorModel";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Filter, MapPin, Video, Monitor } from "lucide-react";
+import { ArrowLeft, Filter, MapPin, Video } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import DoctorCard from "@/components/DoctorCard";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
-import { Spinner } from "@/components/ui/spinner";
-
-type AvailabilityFilter = "all" | "clinic" | "virtual" | "both";
+import { AvailabilityFilter } from "@/models/VisitTypeModel";
 
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
-  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>(
-    (searchParams.get("selectedVisitType") as AvailabilityFilter) ?? "all"
-  );
+  // const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>(
+  //   (searchParams.get("selectedVisitType") as AvailabilityFilter) ?? "all"
+  // );
+  const availabilityFilter = (searchParams.get("selectedVisitType") as AvailabilityFilter) || "all";
   const router = useRouter();
+
+  const setAvailabilityFilter = (value: AvailabilityFilter) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("selectedVisitType", value);
+    router.replace(`${window.location.pathname}?${newSearchParams.toString()}`, { scroll: false });
+  };
 
   const handleBack = () => {
     router.back();
@@ -26,15 +32,9 @@ export default function DoctorsListPage() {
 
   const handleDoctorChange = (doctor: string) => {
     setSelectedDoctor(doctor);
-    // Auto-navigate to next page when doctor is selected
     const searchParams = new URLSearchParams(window.location.search);
     searchParams.set("selectedDoctor", doctor);
-    // Determine next page based on availability filter
     router.push(`/select-date-and-time?${searchParams.toString()}`);
-    // if (availabilityFilter === "clinic" || availabilityFilter === "virtual") {
-    // } else {
-    //   router.push(`/select-visit-type?${searchParams.toString()}&selectedDoctor=${doctor}`);
-    // }
   };
 
   const { data: resourcesData, isLoading: isLoadingResources } = useFertiSmartResources();
@@ -50,9 +50,9 @@ export default function DoctorsListPage() {
   }, [resourcesData, searchParams]);
 
   const filteredDoctors = useMemo(() => {
-    if (availabilityFilter === "all") {
-      return doctors;
-    }
+    // if (availabilityFilter === "all") {
+    //   return doctors;
+    // }
     return doctors.filter((doctor) => {
       switch (availabilityFilter) {
         case "clinic":
@@ -91,8 +91,8 @@ export default function DoctorsListPage() {
               </div>
 
               <div className="flex gap-3">
-                <Button
-                  variant={availabilityFilter === "all" ? "default" : "outline"}
+                {/* <Button
+                  variant={"outline"}
                   size="sm"
                   onClick={() => setAvailabilityFilter("all")}
                   className={cn(
@@ -102,7 +102,7 @@ export default function DoctorsListPage() {
                 >
                   <span className="hidden sm:inline">All Doctors</span>
                   <span className="sm:hidden">All</span>
-                </Button>
+                </Button> */}
                 <Button
                   variant={availabilityFilter === "clinic" ? "default" : "outline"}
                   size="sm"
@@ -132,7 +132,7 @@ export default function DoctorsListPage() {
 
               <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
                 Showing {filteredDoctors.length} doctor{filteredDoctors.length !== 1 ? "s" : ""}
-                {availabilityFilter !== "all" && ` with ${availabilityFilter} availability`}
+                {` with ${availabilityFilter} availability`}
               </div>
             </div>
           </div>
@@ -160,10 +160,6 @@ export default function DoctorsListPage() {
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
                     No doctors match your current filter criteria. Try adjusting your availability filter.
                   </p>
-                  <Button variant="outline" onClick={() => setAvailabilityFilter("all")} className="flex items-center gap-2">
-                    <Monitor className="h-4 w-4" />
-                    Show All Doctors
-                  </Button>
                 </div>
               </div>
             )}

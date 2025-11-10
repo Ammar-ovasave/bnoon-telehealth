@@ -3,6 +3,7 @@ import { CurrentUserType } from "@/models/CurrentUserType";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { SendOTPPayload } from "@/models/SendOTPPayload";
 import { SwitchBranchPayload } from "@/models/SwitchBranchPayload";
+import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
 import { UpdatePatientPayload } from "@/models/UpdatePatientPayload";
 import axios from "axios";
 
@@ -36,14 +37,7 @@ export async function updatePatient(params: UpdatePatientPayload) {
   }
 }
 
-export async function updateAppointment(params: {
-  startTime?: string;
-  endTime?: string;
-  resourceIds?: number[];
-  branchId?: number;
-  statusId?: number;
-  appointmentId: number;
-}) {
+export async function updateAppointment(params: UpdateAppointmentPayload) {
   try {
     const res = await instance.patch<{ id?: number }>(`/api/ferti-smart/appointments/${params.appointmentId}`, params);
     return res.data;

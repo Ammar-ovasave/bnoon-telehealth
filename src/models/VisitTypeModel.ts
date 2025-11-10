@@ -1,5 +1,7 @@
+export type AvailabilityFilter = "clinic" | "virtual";
+
 export interface VisitType {
-  id: string;
+  id: AvailabilityFilter;
   title: string;
   description: string;
   icon: string;

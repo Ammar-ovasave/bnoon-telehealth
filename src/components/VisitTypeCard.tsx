@@ -8,8 +8,6 @@ import Link from "next/link";
 
 interface VisitTypeCardProps {
   visitType: VisitType;
-  // selectedVisitType: string;
-  // setSelectedVisitType: (visitType: string) => void;
 }
 
 const VisitTypeCard: FC<VisitTypeCardProps> = ({ visitType }) => {

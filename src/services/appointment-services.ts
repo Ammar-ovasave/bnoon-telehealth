@@ -4,6 +4,7 @@ import { FertiSmartBranchModel } from "@/models/FertiSmartBranchModel";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import axios from "./axios";
+import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
 
 export async function createPatientServer(params: {
   baseAPIURL: string | null;
@@ -171,6 +172,18 @@ export async function getPatientsByPhoneNumberServer({
     return res.data;
   } catch (e) {
     console.log("--- getPatientsByPhoneNumber error", e);
+    return null;
+  }
+}
+
+export async function updateAppointmentServer(params: UpdateAppointmentPayload & { baseAPIURL?: string }) {
+  try {
+    const res = await axios.get<FertiSmartPatientModel[]>(
+      params.baseAPIURL ? `${params.baseAPIURL}/appointments/${params.appointmentId}` : `/appointments/${params.appointmentId}`
+    );
+    return res.data;
+  } catch (e) {
+    console.log("--- updateAppointment error", e);
     return null;
   }
 }

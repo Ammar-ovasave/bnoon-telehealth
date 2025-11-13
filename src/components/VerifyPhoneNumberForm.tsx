@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { createPatient, getPatientsByPhoneNumber, sendOTP, verifyOTP } from "@/services/client";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { Spinner } from "./ui/spinner";
+import useTimer from "@/hooks/useTimer";
+import { differenceInSeconds } from "date-fns";
 
 const OTP_LENGTH = 4;
 
@@ -92,6 +94,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
     }
     // console.log("sendOTPResponse", sendOTPResponse);
     // sessionStorage.setItem("otp", sendOTPResponse.code);
+    localStorage.setItem("otpSentAt", new Date().toISOString());
     sessionStorage.setItem("mrn", mrnToUse);
     sessionStorage.setItem("purpose", purpose);
     setIsLoading(false);
@@ -154,6 +157,22 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
+
+  const lastSentOTPAt = typeof window !== "undefined" ? localStorage.getItem("otpSentAt") : null;
+
+  const secondsSinceLastSend = lastSentOTPAt ? differenceInSeconds(new Date(), new Date(lastSentOTPAt)) : Infinity;
+  const totalTimer = 60 * 2;
+  const initialTime = Math.max(0, totalTimer - secondsSinceLastSend);
+
+  const { remainingTime } = useTimer({ timeInSeconds: initialTime });
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const isTimerActive = remainingTime > 0 && lastSentOTPAt !== null;
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -245,13 +264,21 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                   />
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Enter your phone number without the country code</p>
+                {isTimerActive && (
+                  <div className="mt-4 p-3 bg-primary/10 border border-primary rounded-md">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
+                      Please wait <span className="font-mono font-semibold text-primary">{formatTime(remainingTime)}</span> before
+                      requesting a new code
+                    </p>
+                  </div>
+                )}
                 <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
                   <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
                     <ArrowLeft /> Back
                   </Button>
                   <Button
                     onClick={handleSendOtp}
-                    disabled={!phoneNumber || phoneNumber.length < 7 || isLoading}
+                    disabled={!phoneNumber || phoneNumber.length < 7 || isLoading || isTimerActive}
                     size="lg"
                     className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
                   >
@@ -284,7 +311,14 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                   </InputOTP>
                 </div>
                 <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
-                  <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
+                  <Button
+                    onClick={() => {
+                      setShowOtpInput(false);
+                    }}
+                    variant="outline"
+                    size="lg"
+                    className="px-6 py-3 w-full md:w-auto"
+                  >
                     <ArrowLeft /> Back
                   </Button>
                   <Button

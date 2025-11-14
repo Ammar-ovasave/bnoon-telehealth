@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     );
     return Response.json(res.data);
   } catch (e) {
-    console.log("--- get ferti smart error", e);
+    console.log("--- get ferti smart error", request.url, e);
     return Response.error();
   }
 }

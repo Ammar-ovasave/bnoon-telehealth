@@ -209,6 +209,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                   <div className="relative" ref={dropdownRef}>
                     <button
                       type="button"
+                      disabled={true}
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                       className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors min-w-[120px]"
                     >

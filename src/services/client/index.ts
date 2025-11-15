@@ -39,7 +39,7 @@ export async function updatePatient(params: UpdatePatientPayload) {
 
 export async function updateAppointment(params: UpdateAppointmentPayload) {
   try {
-    const res = await instance.patch<{ id?: number }>(`/api/ferti-smart/appointments/${params.appointmentId}`, params);
+    const res = await instance.patch<{ id?: number }>(`/api/appointments/${params.appointmentId}`, params);
     return res.data;
   } catch (e) {
     console.log("--- updateAppointment error", e);
@@ -47,8 +47,14 @@ export async function updateAppointment(params: UpdateAppointmentPayload) {
   }
 }
 
-export async function cancelAppointment(appointmentId: number) {
-  return await updateAppointment({ appointmentId, statusId: 6 });
+export async function cancelAppointment({
+  appointmentId,
+  cancelledStatusId,
+}: {
+  appointmentId: number;
+  cancelledStatusId: number;
+}) {
+  return await updateAppointment({ appointmentId, statusId: cancelledStatusId, type: "cancel" });
 }
 
 export async function createAppointment(params: CreateAppointmentPayload) {

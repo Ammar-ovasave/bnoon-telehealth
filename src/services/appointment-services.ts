@@ -74,18 +74,29 @@ export async function sendEmail(params: {
   }
 }
 
-export async function sendSMS(params: { mobile: string[]; body: string; mrn: string; baseAPIURL: string | null }) {
+export async function sendSMS(params: { mobileNumber: string; message: string }) {
   try {
-    const res = await axios.post<{
-      smsEnabled?: string;
-      queued?: string;
-      message?: string;
-    }>(params.baseAPIURL ? `${params.baseAPIURL}/messages/smses` : `/messages/smses`, params);
-    console.log("send sms response", res.data);
-    return res.data;
+    const res = await axios.get<{
+      id: number;
+      code: string;
+      expiresAtUtc: string;
+    }>(`https://sms.connectsaudi.com/sendurl.aspx`, {
+      params: {
+        user: "bnoontrc",
+        pwd: "Nrtz605643Rr",
+        senderid: "BNOON",
+        CountryCode: "966",
+        mobileno: params.mobileNumber.replaceAll("+966", "").replaceAll("+971", ""),
+        msgtext: params.message,
+      },
+    });
+    if (res.status >= 300) {
+      return false;
+    }
+    return true;
   } catch (error) {
     console.log("--- sendSMS error", error);
-    return null;
+    return false;
   }
 }
 
@@ -178,8 +189,9 @@ export async function getPatientsByPhoneNumberServer({
 
 export async function updateAppointmentServer(params: UpdateAppointmentPayload & { baseAPIURL?: string }) {
   try {
-    const res = await axios.get<FertiSmartPatientModel[]>(
-      params.baseAPIURL ? `${params.baseAPIURL}/appointments/${params.appointmentId}` : `/appointments/${params.appointmentId}`
+    const res = await axios.patch(
+      params.baseAPIURL ? `${params.baseAPIURL}/appointments/${params.appointmentId}` : `/appointments/${params.appointmentId}`,
+      params
     );
     return res.data;
   } catch (e) {

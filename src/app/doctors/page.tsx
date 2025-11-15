@@ -1,29 +1,28 @@
 "use client";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { RadioGroup } from "@/components/ui/radio-group";
 import { doctors as fullDoctorsList } from "@/models/DoctorModel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Filter, MapPin, Video } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import DoctorCard from "@/components/DoctorCard";
+import AvailabilityPicker, { AvailabilityOption } from "@/components/AvailabilityPicker";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { AvailabilityFilter } from "@/models/VisitTypeModel";
 
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
-  // const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>(
-  //   (searchParams.get("selectedVisitType") as AvailabilityFilter) ?? "all"
-  // );
-  const availabilityFilter = (searchParams.get("selectedVisitType") as AvailabilityFilter) || "all";
+  // const availabilityFilter: AvailabilityFilter = (searchParams.get("selectedVisitType") as AvailabilityFilter) || "clinic";
+  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>();
   const router = useRouter();
 
-  const setAvailabilityFilter = (value: AvailabilityFilter) => {
+  const handleSetAvailabilityFilter = (value: AvailabilityFilter) => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set("selectedVisitType", value);
     router.replace(`${window.location.pathname}?${newSearchParams.toString()}`, { scroll: false });
+    setAvailabilityFilter(value);
   };
 
   const handleBack = () => {
@@ -42,7 +41,11 @@ export default function DoctorsListPage() {
   const doctors = useMemo(() => {
     return fullDoctorsList
       .filter((item) => {
-        return item.branchId === searchParams.get("selectedClinicLocation");
+        const matchBranch = item.branchId === searchParams.get("selectedClinicLocation");
+        if (searchParams.get("selectedService")) {
+          return matchBranch && item.services.some((service) => service === searchParams.get("selectedService"));
+        }
+        return matchBranch;
       })
       .filter((item) => {
         return resourcesData?.some((resource) => resource.name?.toLocaleLowerCase().includes(item.name.toLocaleLowerCase()));
@@ -53,6 +56,7 @@ export default function DoctorsListPage() {
     // if (availabilityFilter === "all") {
     //   return doctors;
     // }
+    if (!availabilityFilter) return [];
     return doctors.filter((doctor) => {
       switch (availabilityFilter) {
         case "clinic":
@@ -65,6 +69,21 @@ export default function DoctorsListPage() {
     });
   }, [availabilityFilter, doctors]);
 
+  const availabilityOptions: AvailabilityOption[] = [
+    {
+      value: "clinic",
+      title: "In-Clinic Appointment",
+      description: "Visit the clinic for hands-on care and in-person diagnostics.",
+      icon: MapPin,
+    },
+    {
+      value: "virtual",
+      title: "Virtual Visit",
+      description: "Connect from anywhere for consultations, follow-ups, and more.",
+      icon: Video,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
       {isLoadingResources ? (
@@ -72,7 +91,7 @@ export default function DoctorsListPage() {
           <Spinner className="size-18" />
         </div>
       ) : (
-        <div className="container mx-auto px-4 py-8 max-w-6xl pb-30">
+        <div className="mx-auto px-4 py-8 max-w-5xl pb-30">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Your Doctor</h1>
@@ -91,35 +110,23 @@ export default function DoctorsListPage() {
               </div>
 
               <div className="flex gap-3">
-                {/* <Button
-                  variant={"outline"}
-                  size="sm"
-                  onClick={() => setAvailabilityFilter("all")}
-                  className={cn(
-                    "flex items-center justify-center gap-2",
-                    availabilityFilter === "all" && "bg-primary text-primary-foreground"
-                  )}
-                >
-                  <span className="hidden sm:inline">All Doctors</span>
-                  <span className="sm:hidden">All</span>
-                </Button> */}
                 <Button
                   variant={availabilityFilter === "clinic" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setAvailabilityFilter("clinic")}
+                  onClick={() => handleSetAvailabilityFilter("clinic")}
                   className={cn(
                     "flex items-center justify-center gap-2",
                     availabilityFilter === "clinic" && "bg-primary text-primary-foreground"
                   )}
                 >
                   <MapPin className="h-4 w-4" />
-                  <span>On Clinic</span>
+                  <span>In Clinic</span>
                 </Button>
 
                 <Button
                   variant={availabilityFilter === "virtual" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setAvailabilityFilter("virtual")}
+                  onClick={() => handleSetAvailabilityFilter("virtual")}
                   className={cn(
                     "flex items-center justify-center gap-2",
                     availabilityFilter === "virtual" && "bg-primary text-primary-foreground"
@@ -130,28 +137,40 @@ export default function DoctorsListPage() {
                 </Button>
               </div>
 
-              <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-                Showing {filteredDoctors.length} doctor{filteredDoctors.length !== 1 ? "s" : ""}
-                {` with ${availabilityFilter} availability`}
-              </div>
+              {availabilityFilter ? (
+                <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
+                  Showing {filteredDoctors.length} doctor{filteredDoctors.length !== 1 ? "s" : ""}
+                  {` with ${availabilityFilter} availability`}
+                </div>
+              ) : (
+                <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
+                  Select whether you would like to schedule a Virtual Visit or In Clinic Visit
+                </div>
+              )}
             </div>
           </div>
 
           {/* Doctor Selection */}
           <div>
-            {filteredDoctors.length > 0 ? (
-              <RadioGroup value={selectedDoctor} onValueChange={setSelectedDoctor}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredDoctors.map((doctor) => (
-                    <DoctorCard
-                      key={doctor.id}
-                      doctor={doctor}
-                      selectedDoctor={selectedDoctor}
-                      setSelectedDoctor={handleDoctorChange}
-                    />
-                  ))}
-                </div>
-              </RadioGroup>
+            {!availabilityFilter ? (
+              <AvailabilityPicker
+                options={availabilityOptions}
+                onSelect={handleSetAvailabilityFilter}
+                eyebrow="Choose how you’d like your appointment"
+                title="Pick a visit type"
+                description="Select in-clinic or virtual care to see doctors who are available for your preferred appointment type."
+              />
+            ) : filteredDoctors.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredDoctors.map((doctor) => (
+                  <DoctorCard
+                    key={doctor.id}
+                    doctor={doctor}
+                    selectedDoctor={selectedDoctor}
+                    setSelectedDoctor={handleDoctorChange}
+                  />
+                ))}
+              </div>
             ) : (
               <div className="text-center py-12">
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-sm border border-gray-200 dark:border-gray-700">

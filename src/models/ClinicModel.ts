@@ -1,5 +1,7 @@
+export type ClinicBranchID = "riyadh-granada" | "riyadh-king-salman" | "jeddah" | "al-ahsa";
+
 export interface ClinicLocation {
-  id: string;
+  id: ClinicBranchID;
   name: string;
   city: string;
   address: string;
@@ -14,9 +16,9 @@ export interface ClinicLocation {
 export const clinicLocations: ClinicLocation[] = [
   {
     id: "riyadh-granada",
-    name: "Bnoon Riyadh - Granada",
+    name: "Bnoon Riyadh",
     city: "Riyadh",
-    address: "Granada District, Riyadh, Saudi Arabia",
+    address: "Granada District",
     doctors: "15 specialists",
     imageSrc: "/images/bnoon-riyadh.jpg",
     contactEmail: "info@bnoon.sa",
@@ -25,9 +27,9 @@ export const clinicLocations: ClinicLocation[] = [
   },
   {
     id: "riyadh-king-salman",
-    name: "Bnoon Riyadh - King Salman Road",
+    name: "Bnoon – Riyadh",
     city: "Riyadh",
-    address: "King Salman Road, Riyadh, Saudi Arabia",
+    address: "King Salman Road",
     doctors: "18 specialists",
     imageSrc: "/images/bnoon-north-riiyadh.jpg",
     contactEmail: "info@bnoon.sa",
@@ -37,13 +39,25 @@ export const clinicLocations: ClinicLocation[] = [
   },
   {
     id: "jeddah",
-    name: "Bnoon Jeddah",
+    name: "Bnoon – Jeddah",
     city: "Jeddah",
-    address: "Jeddah, Saudi Arabia",
+    address: "Alshatae District",
     doctors: "12 specialists",
     imageSrc: "/images/bnoon-jeddah.jpg",
     contactEmail: "info.jeddah@bnoon.sa",
     contactNumber: "+966126800800",
+    apiUrl: `https://undeclarable-kolby-overgraciously.ngrok-free.dev`,
+  },
+  {
+    id: "al-ahsa",
+    name: "Bnoon – Al Ahsa",
+    city: "Al Ahsa",
+    address: "Almoosa Specialist Hospital, North Tower, Floor 12",
+    doctors: "12 specialists",
+    imageSrc: "/images/almoosa.png",
+    contactEmail: "info.jeddah@bnoon.sa",
+    contactNumber: "+966126800800",
+    isCommingSoon: true,
     apiUrl: `https://undeclarable-kolby-overgraciously.ngrok-free.dev`,
   },
 ];

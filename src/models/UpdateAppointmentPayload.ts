@@ -6,4 +6,5 @@ export type UpdateAppointmentPayload = {
   statusId?: number;
   appointmentId: number;
   description?: string;
+  type: "cancel" | "reschedule" | null;
 };

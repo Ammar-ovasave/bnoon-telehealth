@@ -53,7 +53,6 @@ export async function POST(request: Request) {
     }
     const service = services?.find((item) => item.id === payload.serviceId);
     const url = new URL(request.url);
-    // TODO: update appointment description with the appointment link
     const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
     const emailTemplate = await getConfirmAppointmentEmail({
       appointmentDate: format(payload.startTime, "yyyy-MM-dd"),
@@ -69,6 +68,7 @@ export async function POST(request: Request) {
     console.log("emailTemplate", emailTemplate);
     await Promise.all([
       updateAppointmentServer({
+        type: null,
         baseAPIURL: baseAPIURL,
         appointmentId: createAppointmentResponse.data.id,
         description: `${payload.description} - ${appointmentLink}`,
@@ -83,10 +83,13 @@ export async function POST(request: Request) {
           })
         : Promise.resolve(null),
       sendSMS({
-        baseAPIURL: baseAPIURL ?? null,
-        body: `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
-        mobile: [patientToUse.contactNumber ?? ""],
-        mrn: patientToUse.mrn ?? "",
+        message: `السلام عليكم: ${patientToUse.firstName ?? ""} ${patientToUse.lastName ?? ""} رقم الملف  : ${
+          patientToUse.mrn
+        } موعدك ${doctorResource?.name ?? ""} يوم ${format(payload.startTime, "dd-MM-yyyy")} ${format(
+          payload.startTime,
+          "hh:mm a"
+        )} . مركز بنون الطبي  للأستفسار:  00966114448080 \n\n${appointmentLink}`,
+        mobileNumber: patientToUse.contactNumber ?? "",
       }),
     ]);
     const authToken = signJwt({

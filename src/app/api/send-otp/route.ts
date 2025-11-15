@@ -1,8 +1,7 @@
 import { SendOTPPayload } from "@/models/SendOTPPayload";
-import { getPatient } from "@/services/appointment-services";
+import { getPatient, sendSMS } from "@/services/appointment-services";
 import { add } from "date-fns";
 import { cookies } from "next/headers";
-import axios from "@/services/axios";
 
 export async function POST(request: Request) {
   try {
@@ -31,28 +30,10 @@ async function sendOTP(params: SendOTPPayload & { baseAPIURL?: string; mobileNum
     const code = `${Math.round(Math.random() * 9)}${Math.round(Math.random() * 9)}${Math.round(Math.random() * 9)}${Math.round(
       Math.random() * 9
     )}`;
-    const res = await axios.get<{
-      id: number;
-      code: string;
-      expiresAtUtc: string;
-    }>(`https://sms.connectsaudi.com/sendurl.aspx`, {
-      params: {
-        user: "bnoontrc",
-        pwd: "Nrtz605643Rr",
-        senderid: "BNOON",
-        CountryCode: "966",
-        mobileno: params.mobileNumber.replaceAll("+966", "").replaceAll("+971", ""),
-        msgtext: code,
-      },
-    });
-    if (res.status >= 300) {
+    const res = await sendSMS({ mobileNumber: params.mobileNumber, message: `Your Bnoon OTP: ${code}` });
+    if (!res) {
       return null;
     }
-    // const res = await axios.post<{
-    //   id: number;
-    //   code: string;
-    //   expiresAtUtc: string;
-    // }>(params.baseAPIURL ? `${params.baseAPIURL}/patients/${params.mrn}/otps` : `/patients/${params.mrn}/otps`, params);
     return { id: params.mrn, code: code };
   } catch (e) {
     console.log("--- sendOTP error", e);

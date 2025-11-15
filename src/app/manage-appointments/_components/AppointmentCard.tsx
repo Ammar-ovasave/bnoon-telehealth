@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
+import useFertiSmartAppointmentStatuses from "@/hooks/useFertiSmartAppointmentStatuses";
 
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -117,6 +118,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
         appointmentId: appointment.id,
         startTime: selectedSlot.start,
         endTime: selectedSlot.end,
+        type: "reschedule",
       });
 
       mutateCurrentUserAppointments(undefined);
@@ -134,6 +136,12 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const handleCancel = () => {
     setShowCancelConfirm(true);
   };
+
+  const { data: appointmentStatusData, isLoading: loadingAppointmentStatus } = useFertiSmartAppointmentStatuses();
+
+  const cancelledAppointmentStatusId = useMemo(() => {
+    return appointmentStatusData?.find((status) => status.name?.toLocaleLowerCase().includes("cancel"))?.id;
+  }, [appointmentStatusData]);
 
   return (
     <div
@@ -262,122 +270,128 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
             <AlertDialogTitle>Reschedule Appointment</AlertDialogTitle>
             <AlertDialogDescription>Choose your preferred date and time for this appointment.</AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-4">
-            {/* Date Selection */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Date</h3>
-              <div className="flex justify-center">
-                <CalendarComponent
-                  mode="single"
-                  selected={selectedRescheduleDate}
-                  onSelect={(value) => {
-                    setSelectedRescheduleDate(value);
-                    setSelectedRescheduleTimeSlot(undefined);
-                  }}
-                  disabled={isDateDisabled}
-                  className="rounded-md border"
-                  classNames={{
-                    day: "hover:bg-green-50 dark:hover:bg-green-900/20",
-                    day_selected: "bg-green-600 text-white hover:bg-green-700",
-                    day_today: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
-                  }}
-                />
+          {loadingAppointmentStatus ? (
+            <div className="p-4 flex justify-center items-center">
+              <Spinner />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-4">
+              {/* Date Selection */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Date</h3>
+                <div className="flex justify-center">
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedRescheduleDate}
+                    onSelect={(value) => {
+                      setSelectedRescheduleDate(value);
+                      setSelectedRescheduleTimeSlot(undefined);
+                    }}
+                    disabled={isDateDisabled}
+                    className="rounded-md border"
+                    classNames={{
+                      day: "hover:bg-green-50 dark:hover:bg-green-900/20",
+                      day_selected: "bg-green-600 text-white hover:bg-green-700",
+                      day_today: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
+                    }}
+                  />
+                </div>
+                {selectedRescheduleDate && (
+                  <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
+                    <p className="text-sm text-green-800 dark:text-green-200">
+                      Selected: <span className="font-medium">{format(selectedRescheduleDate, "EEEE, MMMM do, yyyy")}</span>
+                    </p>
+                    {!isKSA && (
+                      <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                        KSA:{" "}
+                        {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0
+                          ? formatInTimeZone(
+                              availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
+                                new Date().toISOString(),
+                              KSA_TIMEZONE,
+                              "EEEE, MMMM do, yyyy"
+                            )
+                          : formatInTimeZone(selectedRescheduleDate, KSA_TIMEZONE, "EEEE, MMMM do, yyyy")}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
-              {selectedRescheduleDate && (
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
-                  <p className="text-sm text-green-800 dark:text-green-200">
-                    Selected: <span className="font-medium">{format(selectedRescheduleDate, "EEEE, MMMM do, yyyy")}</span>
-                  </p>
-                  {!isKSA && (
-                    <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                      KSA:{" "}
-                      {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0
-                        ? formatInTimeZone(
+
+              {/* Time Selection */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Time</h3>
+                {!selectedRescheduleDate ? (
+                  <div className="text-center py-8">
+                    <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-500 dark:text-gray-400">Please select a date first to view available time slots</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+                    {loadingTimeslots ? (
+                      <div className="col-span-2 flex justify-center">
+                        <Spinner className="size-8" />
+                      </div>
+                    ) : (availabilityData?.length ?? 0) > 0 ? (
+                      availabilityData?.map((slot) => (
+                        <button
+                          key={slot.start}
+                          onClick={() => setSelectedRescheduleTimeSlot(slot.start ?? "")}
+                          className={cn(
+                            "p-3 rounded-md border text-sm font-medium transition-all duration-200 cursor-pointer",
+                            selectedRescheduleTimeSlot === slot.start
+                              ? "bg-primary text-white border-primary shadow-md"
+                              : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
+                          )}
+                        >
+                          <div>
+                            {format(slot.start ?? "", "hh:mm aa")}
+                            {!isKSA && (
+                              <span className="text-xs block opacity-75 mt-0.5">
+                                ({formatInTimeZone(slot.start ?? new Date().toISOString(), KSA_TIMEZONE, "hh:mm aa")} KSA time)
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-gray-500 dark:text-gray-400 text-center col-span-2">
+                        No availability on{" "}
+                        {selectedRescheduleDate ? format(selectedRescheduleDate, "yyyy-MM-dd") : "the selected date"}. Please
+                        select a different date.
+                      </p>
+                    )}
+                  </div>
+                )}
+                {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0 && (
+                  <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
+                    <p className="text-sm text-primary dark:text-primary-200">
+                      Selected:{" "}
+                      <span className="font-medium">
+                        {format(
+                          availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
+                            new Date().toISOString(),
+                          "hh:mm aa"
+                        )}
+                      </span>
+                      {!isKSA && (
+                        <span className="text-xs ml-2 opacity-75">
+                          (
+                          {`${formatInTimeZone(
                             availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
                               new Date().toISOString(),
                             KSA_TIMEZONE,
-                            "EEEE, MMMM do, yyyy"
+                            "hh:mm aa"
+                          )} KSA time`}
                           )
-                        : formatInTimeZone(selectedRescheduleDate, KSA_TIMEZONE, "EEEE, MMMM do, yyyy")}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Time Selection */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Time</h3>
-              {!selectedRescheduleDate ? (
-                <div className="text-center py-8">
-                  <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500 dark:text-gray-400">Please select a date first to view available time slots</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
-                  {loadingTimeslots ? (
-                    <div className="col-span-2 flex justify-center">
-                      <Spinner className="size-8" />
-                    </div>
-                  ) : (availabilityData?.length ?? 0) > 0 ? (
-                    availabilityData?.map((slot) => (
-                      <button
-                        key={slot.start}
-                        onClick={() => setSelectedRescheduleTimeSlot(slot.start ?? "")}
-                        className={cn(
-                          "p-3 rounded-md border text-sm font-medium transition-all duration-200 cursor-pointer",
-                          selectedRescheduleTimeSlot === slot.start
-                            ? "bg-primary text-white border-primary shadow-md"
-                            : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
-                        )}
-                      >
-                        <div>
-                          {format(slot.start ?? "", "hh:mm aa")}
-                          {!isKSA && (
-                            <span className="text-xs block opacity-75 mt-0.5">
-                              ({formatInTimeZone(slot.start ?? new Date().toISOString(), KSA_TIMEZONE, "hh:mm aa")} KSA time)
-                            </span>
-                          )}
-                        </div>
-                      </button>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 dark:text-gray-400 text-center col-span-2">
-                      No availability on{" "}
-                      {selectedRescheduleDate ? format(selectedRescheduleDate, "yyyy-MM-dd") : "the selected date"}. Please select
-                      a different date.
-                    </p>
-                  )}
-                </div>
-              )}
-              {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0 && (
-                <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
-                  <p className="text-sm text-primary dark:text-primary-200">
-                    Selected:{" "}
-                    <span className="font-medium">
-                      {format(
-                        availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
-                          new Date().toISOString(),
-                        "hh:mm aa"
+                        </span>
                       )}
-                    </span>
-                    {!isKSA && (
-                      <span className="text-xs ml-2 opacity-75">
-                        (
-                        {`${formatInTimeZone(
-                          availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
-                            new Date().toISOString(),
-                          KSA_TIMEZONE,
-                          "hh:mm aa"
-                        )} KSA time`}
-                        )
-                      </span>
-                    )}
-                  </p>
-                </div>
-              )}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isRescheduling}>Cancel</AlertDialogCancel>
             <AlertDialogAction
@@ -408,7 +422,10 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 try {
                   setIsCancelling(true);
                   if (!appointment.id) return;
-                  await cancelAppointment(appointment.id);
+                  await cancelAppointment({
+                    appointmentId: appointment.id,
+                    cancelledStatusId: cancelledAppointmentStatusId ?? 0,
+                  });
                   mutateCurrentUserAppointments(undefined);
                 } finally {
                   setIsCancelling(false);

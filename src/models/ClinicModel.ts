@@ -16,7 +16,7 @@ export interface ClinicLocation {
 export const clinicLocations: ClinicLocation[] = [
   {
     id: "riyadh-granada",
-    name: "Bnoon Riyadh",
+    name: "Bnoon - Riyadh",
     city: "Riyadh",
     address: "Granada District",
     doctors: "15 specialists",

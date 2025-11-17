@@ -25,9 +25,8 @@ function getAPIKey({ url }: { url: string }) {
 
 instance.interceptors.request.use((config) => {
   const apiKey = getAPIKey({ url: config.url ?? "" });
-  console.log("--- server request", apiKey, config.url, config.baseURL);
+  // console.log("--- server request", apiKey, config.url, config.baseURL);
   config.headers["x-api-key"] = apiKey;
-  // config.headers.set("x-api-key", apiKey ?? "https://unvaunted-weedily-jannie.ngrok-free.dev");
   return config;
 });
 

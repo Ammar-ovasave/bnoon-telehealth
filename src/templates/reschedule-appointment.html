@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Appointment Confirmation</title>
+    <title>Appointment Rescheduled</title>
     <!--[if mso]>
       <style type="text/css">
         body,
@@ -32,13 +32,64 @@
             <!-- Header -->
             <tr>
               <td style="background-color: #004e78; padding: 30px; text-align: center; border-radius: 8px 8px 0 0">
-                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold">Appointment Confirmed</h1>
+                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold">Appointment Rescheduled</h1>
               </td>
             </tr>
 
-            <!-- Appointment Details Section -->
+            <!-- Message Section -->
+            <tr>
+              <td style="padding: 30px 30px 20px">
+                <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">Dear {{patientName}},</p>
+                <p style="margin: 15px 0 0; color: #333333; font-size: 16px; line-height: 24px">
+                  Your appointment has been successfully rescheduled. Please find the updated details below.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Previous Appointment Details Section -->
+            <tr>
+              <td style="padding: 0 30px 20px">
+                <h2 style="margin: 0 0 15px; color: #333333; font-size: 18px; font-weight: 600">Previous Appointment</h2>
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  width="100%"
+                  style="background-color: #f8f9fa; border-radius: 6px; padding: 20px"
+                >
+                  <tr>
+                    <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Date & Time (KSA Time)</td>
+                        </tr>
+                        <tr>
+                          <td style="color: #666666; font-size: 16px; font-weight: 600">{{oldDate}} at {{oldTime}} KSA</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 12px 0">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Doctor</td>
+                        </tr>
+                        <tr>
+                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{doctorName}}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- New Appointment Details Section -->
             <tr>
               <td style="padding: 0 30px 30px">
+                <h2 style="margin: 0 0 15px; color: #333333; font-size: 18px; font-weight: 600">New Appointment Details</h2>
                 <table
                   role="presentation"
                   cellspacing="0"
@@ -55,9 +106,7 @@
                           <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Date & Time (KSA Time)</td>
                         </tr>
                         <tr>
-                          <td style="color: #004e78; font-size: 16px; font-weight: bold">
-                            {{appointmentDate}} at {{appointmentTime}} KSA
-                          </td>
+                          <td style="color: #004e78; font-size: 16px; font-weight: bold">{{newDate}} at {{newTime}} KSA</td>
                         </tr>
                       </table>
                     </td>
@@ -100,57 +149,6 @@
                         </tr>
                         <tr>
                           <td style="color: #333333; font-size: 16px; font-weight: 600">{{location}}</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <!-- Patient Information Section -->
-            <tr>
-              <td style="padding: 0 30px 30px">
-                <h2 style="margin: 0 0 15px; color: #333333; font-size: 18px; font-weight: 600">Patient Information</h2>
-                <table
-                  role="presentation"
-                  cellspacing="0"
-                  cellpadding="0"
-                  border="0"
-                  width="100%"
-                  style="background-color: #f8f9fa; border-radius: 6px; padding: 20px"
-                >
-                  <!-- Patient Name -->
-                  <tr>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; width: 120px">Name:</td>
-                          <td style="color: #333333; font-size: 14px; font-weight: 600">{{patientName}}</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
-                  <!-- Patient Email -->
-                  <tr>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; width: 120px">Email:</td>
-                          <td style="color: #333333; font-size: 14px">{{patientEmail}}</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
-                  <!-- Patient Gender -->
-                  <tr>
-                    <td style="padding: 8px 0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; width: 120px">Gender:</td>
-                          <td style="color: #333333; font-size: 14px">{{patientGender}}</td>
                         </tr>
                       </table>
                     </td>

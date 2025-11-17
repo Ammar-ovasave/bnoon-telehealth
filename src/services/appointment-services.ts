@@ -4,6 +4,7 @@ import { FertiSmartBranchModel } from "@/models/FertiSmartBranchModel";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
+import nodemailer from "nodemailer";
 import axios from "./axios";
 
 export async function createPatientServer(params: {
@@ -49,6 +50,16 @@ export async function getPatientAppointments(params: { mrn: string; baseAPIURL?:
   }
 }
 
+const transporter = nodemailer.createTransport({
+  host: "smtp-mail.outlook.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: "noreply@bnoon.sa",
+    pass: "Welcome@bnoon$",
+  },
+});
+
 export async function sendEmail(params: {
   email: string;
   subject: string;
@@ -57,17 +68,23 @@ export async function sendEmail(params: {
   baseAPIURL: string | null;
 }) {
   try {
-    const res = await axios.post<{
-      emailEnabled?: boolean;
-      enqueued?: boolean;
-      emailId?: string;
-      subject?: string;
-      body?: string;
-      email?: string;
-      mrn?: string;
-    }>(params.baseAPIURL ? `${params.baseAPIURL}/messages/emails` : `/messages/emails`, params);
-    console.log("send email response", res.data);
-    return res.data;
+    const res = await transporter.sendMail({
+      from: "noreply@bnoon.sa",
+      to: params.email,
+      subject: params.subject,
+      html: params.body,
+    });
+    // const res = await axios.post<{
+    //   emailEnabled?: boolean;
+    //   enqueued?: boolean;
+    //   emailId?: string;
+    //   subject?: string;
+    //   body?: string;
+    //   email?: string;
+    //   mrn?: string;
+    // }>(params.baseAPIURL ? `${params.baseAPIURL}/messages/emails` : `/messages/emails`, params);
+    console.log("send email response", res);
+    return res.response;
   } catch (error) {
     console.log("--- sendEmail error", error);
     return null;
@@ -114,10 +131,9 @@ export async function getPatient(params: { mrn: string; baseAPIURL: string | nul
 
 export async function getAppointmentServices({ activeOnly, baseAPIURL }: { activeOnly?: boolean; baseAPIURL: string | null }) {
   try {
-    const res = await axios.get<AppointmentServiceModel[]>(
-      baseAPIURL ? `${baseAPIURL}/appointment-services` : `/appointment-services`,
-      { params: { activeOnly } }
-    );
+    const res = await axios.get<AppointmentServiceModel[]>(baseAPIURL ? `${baseAPIURL}/api-services` : `/api-services`, {
+      params: { activeOnly },
+    });
     return res.data;
   } catch (e) {
     console.log("--- getAppointmentServices error", e);
@@ -196,6 +212,18 @@ export async function updateAppointmentServer(params: UpdateAppointmentPayload &
     return res.data;
   } catch (e) {
     console.log("--- updateAppointment error", e);
+    return null;
+  }
+}
+
+export async function getSMSTemplates(params: { baseAPIURL?: string }) {
+  try {
+    const res = await axios.get<{ new: string; updated: string; cancelled: string }>(
+      params.baseAPIURL ? `${params.baseAPIURL}/messages/smses/templates` : `/messages/smses/templates`
+    );
+    return res.data;
+  } catch (e) {
+    console.log("--- getSMSTemplates error", e);
     return null;
   }
 }

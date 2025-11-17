@@ -5,6 +5,7 @@ import {
   getBranches,
   getPatient,
   getResource,
+  getSMSTemplates,
   sendEmail,
   sendSMS,
   updateAppointmentServer,
@@ -12,9 +13,12 @@ import {
 import { cookies } from "next/headers";
 import { getConfirmAppointmentEmail } from "@/services/templates";
 import { format } from "date-fns";
-import axios from "@/services/axios";
+import { formatInTimeZone } from "date-fns-tz";
 import { AUTH_TOKEN_NAME } from "@/constants";
 import { signJwt } from "@/services/signJwt";
+import axios from "@/services/axios";
+
+const KSA_TIMEZONE = "Asia/Riyadh";
 
 export async function POST(request: Request) {
   try {
@@ -55,9 +59,9 @@ export async function POST(request: Request) {
     const url = new URL(request.url);
     const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
     const emailTemplate = await getConfirmAppointmentEmail({
-      appointmentDate: format(payload.startTime, "yyyy-MM-dd"),
+      appointmentDate: formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy"),
       appointmentLink: appointmentLink,
-      appointmentTime: format(payload.startTime, "hh:mm a"),
+      appointmentTime: formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a"),
       doctorName: doctorResource?.linkedUserFullName ?? "",
       location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
       patientEmail: patientToUse.emailAddress ?? "",
@@ -82,13 +86,13 @@ export async function POST(request: Request) {
             subject: `Appointment Confirmed ${createAppointmentResponse.data.id}`,
           })
         : Promise.resolve(null),
-      sendSMS({
-        message: `السلام عليكم: ${patientToUse.firstName ?? ""} ${patientToUse.lastName ?? ""} رقم الملف  : ${
-          patientToUse.mrn
-        } موعدك ${doctorResource?.linkedUserFullName ?? ""} يوم ${format(payload.startTime, "dd-MM-yyyy")} ${format(
-          payload.startTime,
-          "hh:mm a"
-        )} . مركز بنون الطبي  للأستفسار:  00966114448080 \n\n${appointmentLink}`,
+      sendNewAppointmentSMS({
+        fullName: `${patientToUse.firstName ?? ""} ${patientToUse.lastName ?? ""}`.trim(),
+        mrn: patientToUse.mrn ?? "",
+        doctorName: doctorResource?.linkedUserFullName ?? "",
+        appointmentDate: format(payload.startTime, "dd-MM-yyyy"),
+        appointmentTime: format(payload.startTime, "hh:mm a"),
+        appointmentLink: appointmentLink,
         mobileNumber: patientToUse.contactNumber ?? "",
       }),
     ]);
@@ -109,70 +113,37 @@ export async function POST(request: Request) {
   }
 }
 
-// function getCalendarClient() {
-//   try {
-//     const auth = new google.auth.GoogleAuth({
-//       keyFile: "bnoon-476311-149de792a5ff.json",
-//       scopes: ["https://www.googleapis.com/auth/calendar", "https://www.googleapis.com/auth/calendar.events"],
-//     });
-//     const calendar = google.calendar({ version: "v3", auth });
-//     return { calendar, auth };
-//   } catch (error) {
-//     console.log("--- getCalendarClient error", error);
-//     return null;
-//   }
-// }
-
-// async function createGoogleMeet({
-//   userEmail,
-//   endDate,
-//   startDate,
-//   serviceName,
-//   appointmentId,
-// }: {
-//   appointmentId: string;
-//   serviceName: string;
-//   userEmail: string;
-//   startDate: string;
-//   endDate: string;
-// }) {
-//   try {
-//     const result = getCalendarClient();
-//     if (!result) return null;
-//     const { auth, calendar } = result;
-//     if (!calendar) {
-//       return null;
-//     }
-//     const response = await calendar.events.insert({
-//       calendarId: "primary",
-//       auth: auth,
-//       requestBody: {
-//         summary: serviceName,
-//         description: "Teleconsultation",
-//         start: {
-//           dateTime: startDate,
-//           timeZone: "Asia/Dubai",
-//         },
-//         end: {
-//           dateTime: endDate,
-//           timeZone: "Asia/Dubai",
-//         },
-//         attendees: [{ email: userEmail }],
-//         anyoneCanAddSelf: true,
-//         conferenceData: {
-//           createRequest: {
-//             requestId: appointmentId,
-//             conferenceSolutionKey: { type: "hangoutsMeet" },
-//           },
-//         },
-//       },
-//       conferenceDataVersion: 1,
-//       sendUpdates: "all",
-//     });
-//     console.log("✅ Event created:");
-//     console.log("Meeting Link:", JSON.stringify(response));
-//   } catch (error) {
-//     console.log("--- create google meet error", error);
-//     return null;
-//   }
-// }
+async function sendNewAppointmentSMS(params: {
+  fullName: string;
+  mrn: string;
+  doctorName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  appointmentLink: string;
+  mobileNumber: string;
+}) {
+  try {
+    const cookiesStore = await cookies();
+    const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
+    const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
+    if (!templates?.new) {
+      return null;
+    }
+    const textContent = templates.new
+      .replace(/[%PATIENT_NAME%]/gi, params.fullName)
+      .replace(/[%DATE%]/gi, params.appointmentDate)
+      .replace(/[%TIME%]/gi, params.appointmentTime)
+      .replace(/[%PATIENT_MRN%]/gi, params.mrn);
+    const messageWithLink = textContent.includes(params.appointmentLink)
+      ? textContent
+      : `${textContent}\n\n${params.appointmentLink}`;
+    const success = await sendSMS({
+      mobileNumber: params.mobileNumber,
+      message: messageWithLink,
+    });
+    return success;
+  } catch (error) {
+    console.log("--- sendNewAppointmentSMS error", error);
+    return null;
+  }
+}

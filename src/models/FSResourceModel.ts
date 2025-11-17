@@ -1,6 +1,6 @@
 export interface FSResourceModel {
   id?: number;
-  name?: string;
+  linkedUserFullName?: string;
   branch?: FSBranchModel;
   linkedUserId?: number;
   commonResource?: boolean;

@@ -5,7 +5,6 @@ import { doctors as fullDoctorsList } from "@/models/DoctorModel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Filter, MapPin, Video } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
 import DoctorCard from "@/components/DoctorCard";
 import AvailabilityPicker, { AvailabilityOption } from "@/components/AvailabilityPicker";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
@@ -48,14 +47,13 @@ export default function DoctorsListPage() {
         return matchBranch;
       })
       .filter((item) => {
-        return resourcesData?.some((resource) => resource.name?.toLocaleLowerCase().includes(item.name.toLocaleLowerCase()));
+        return resourcesData?.some((resource) =>
+          resource.linkedUserFullName?.toLocaleLowerCase().includes(item.name.toLocaleLowerCase())
+        );
       });
   }, [resourcesData, searchParams]);
 
   const filteredDoctors = useMemo(() => {
-    // if (availabilityFilter === "all") {
-    //   return doctors;
-    // }
     if (!availabilityFilter) return [];
     return doctors.filter((doctor) => {
       switch (availabilityFilter) {
@@ -92,7 +90,6 @@ export default function DoctorsListPage() {
         </div>
       ) : (
         <div className="mx-auto px-4 py-8 max-w-5xl pb-30">
-          {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Your Doctor</h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -100,57 +97,6 @@ export default function DoctorsListPage() {
               care.
             </p>
           </div>
-
-          {/* Filter Section */}
-          <div className="mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-2 mb-4">
-                <Filter className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Filter by Availability</h3>
-              </div>
-
-              <div className="flex gap-3">
-                <Button
-                  variant={availabilityFilter === "clinic" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleSetAvailabilityFilter("clinic")}
-                  className={cn(
-                    "flex items-center justify-center gap-2",
-                    availabilityFilter === "clinic" && "bg-primary text-primary-foreground"
-                  )}
-                >
-                  <MapPin className="h-4 w-4" />
-                  <span>In Clinic</span>
-                </Button>
-
-                <Button
-                  variant={availabilityFilter === "virtual" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => handleSetAvailabilityFilter("virtual")}
-                  className={cn(
-                    "flex items-center justify-center gap-2",
-                    availabilityFilter === "virtual" && "bg-primary text-primary-foreground"
-                  )}
-                >
-                  <Video className="h-4 w-4" />
-                  <span>Virtual Visit</span>
-                </Button>
-              </div>
-
-              {availabilityFilter ? (
-                <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-                  Showing {filteredDoctors.length} doctor{filteredDoctors.length !== 1 ? "s" : ""}
-                  {` with ${availabilityFilter} availability`}
-                </div>
-              ) : (
-                <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
-                  Select whether you would like to schedule a Virtual Visit or In Clinic Visit
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Doctor Selection */}
           <div>
             {!availabilityFilter ? (
               <AvailabilityPicker
@@ -183,8 +129,6 @@ export default function DoctorsListPage() {
               </div>
             )}
           </div>
-
-          {/* Back Button */}
           <div className="mt-8 text-center">
             <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3">
               <ArrowLeft /> Back to Service Selection

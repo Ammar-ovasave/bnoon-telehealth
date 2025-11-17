@@ -161,7 +161,7 @@ export const doctors: DoctorModel[] = [
   {
     id: "dr-moussa-el-naiemy",
     services: ["male-andrology"],
-    name: "Dr. Moussa El Naiemy",
+    name: "Dr.Mousa AlNamee",
     specialty: "Consultant, Urology, Andrology & Male Infertility",
     availability: {
       clinic: true,

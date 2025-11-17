@@ -1,12 +1,12 @@
 "use client";
 import { services } from "@/models/ServiceModel";
 import { FC } from "react";
-import ServiceCard from "@/components/ServiceCard";
-import useAppointmentServices from "@/hooks/useAppointmentServices";
 import { Spinner } from "@/components/ui/spinner";
+import ServiceCard from "@/components/ServiceCard";
+import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
 
 export const PageContent: FC = () => {
-  const { isLoading } = useAppointmentServices({});
+  const { isLoading, data: servicesData } = useFertiSmartAPIServices();
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -23,10 +23,16 @@ export const PageContent: FC = () => {
             <Spinner className="size-10" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {services.map((service) => (
-              <ServiceCard key={service.id} service={service} />
-            ))}
+          <div className="flex flex-wrap justify-center gap-6">
+            {services
+              .filter((service) => {
+                return servicesData?.some((s) => s.name?.toLocaleLowerCase().includes(service.title.toLocaleLowerCase()));
+              })
+              .map((service) => (
+                <div key={service.id} className="w-full sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-3rem)/3)]">
+                  <ServiceCard service={service} />
+                </div>
+              ))}
           </div>
         )}
       </div>

@@ -8,8 +8,26 @@ const instance = axios.create({
   },
 });
 
+const mapAPIKeys: { [url: string]: string } = {
+  "https://unvaunted-weedily-jannie.ngrok-free.dev": "3m-6g7STlEVBTjCGK_dKP3bsbpu2qPqothaQZJOc",
+  "https://undeclarable-kolby-overgraciously.ngrok-free.dev": "-2VY--ga7Nm3RqxkKrj6IJUynVv0w1acifsgB9Cw",
+};
+
+function getAPIKey({ url }: { url: string }) {
+  try {
+    const urlObj = new URL(url);
+    return mapAPIKeys[urlObj.origin] ?? Object.values(mapAPIKeys)[0];
+  } catch (e) {
+    console.log("--- getAPIKey error", e);
+    return Object.values(mapAPIKeys)[0];
+  }
+}
+
 instance.interceptors.request.use((config) => {
-  // console.log("--- server request", config.url);
+  const apiKey = getAPIKey({ url: config.url ?? "" });
+  console.log("--- server request", apiKey, config.url, config.baseURL);
+  config.headers["x-api-key"] = apiKey;
+  // config.headers.set("x-api-key", apiKey ?? "https://unvaunted-weedily-jannie.ngrok-free.dev");
   return config;
 });
 

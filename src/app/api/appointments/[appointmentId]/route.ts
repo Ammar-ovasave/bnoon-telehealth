@@ -54,10 +54,10 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         message: `عزيزي ${patientFullName} ، موعدك في ${format(appointment.time?.start ?? "", "dd-MM-yyyy")} ${format(
           appointment.time?.start ?? "",
           "hh:mm a"
-        )} مع ${appointment.resources?.[0].name} قد تغير، موعدك الجديد في ${format(
+        )} مع ${appointment.resources?.[0].linkedUserFullName} قد تغير، موعدك الجديد في ${format(
           payload.startTime ?? "",
           "dd-MM-yyyy"
-        )} ${format(payload.startTime ?? "", "hh:mm a")} مع ${appointment.resources?.[0].name}. رقم ملفك : ${
+        )} ${format(payload.startTime ?? "", "hh:mm a")} مع ${appointment.resources?.[0].linkedUserFullName}. رقم ملفك : ${
           currentUser.mrn
         } ، مركز بنون الطبي. لمزيد من المعلومات الرجاء الإتصال على : 00966114448080 \n\n ${appointmentLink}`,
       });
@@ -67,10 +67,10 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         message: `عزيزي ${patientFullName} ، موعدك في ${format(appointment.time?.start ?? "", "dd-MM-yyyy")} ${format(
           appointment.time?.start ?? "",
           "hh:mm a"
-        )} مع ${appointment.resources?.[0].name} قد تغير، موعدك الجديد في ${format(
+        )} مع ${appointment.resources?.[0].linkedUserFullName} قد تغير، موعدك الجديد في ${format(
           appointment.time?.start ?? "",
           "dd-MM-yyyy"
-        )} ${format(appointment.time?.start ?? "", "hh:mm a")} مع ${appointment.resources?.[0].name}. رقم ملفك : ${
+        )} ${format(appointment.time?.start ?? "", "hh:mm a")} مع ${appointment.resources?.[0].linkedUserFullName}. رقم ملفك : ${
           currentUser.mrn
         } ، مركز بنون الطبي. لمزيد من المعلومات الرجاء الإتصال على : 00966114448080`,
       });

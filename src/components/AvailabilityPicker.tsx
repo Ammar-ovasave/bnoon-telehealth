@@ -34,7 +34,6 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
             "Select in-clinic or virtual care to see doctors who are available for your preferred appointment type."}
         </p>
       </div>
-
       <div className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-2">
         {options.map((option) => (
           <button
@@ -55,9 +54,8 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
               </div>
             </div>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 flex-1">{option.description}</p>
-            <div className="flex items-center justify-between text-sm font-medium text-primary">
+            <div className="flex items-center justify-between text-sm font-bold bg-primary px-4 py-2 rounded-md text-white w-fit">
               <span>Select {option.value === "clinic" ? "an in-person" : "a virtual"} visit</span>
-              <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
             </div>
           </button>
         ))}

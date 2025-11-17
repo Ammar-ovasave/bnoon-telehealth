@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       appointmentDate: format(payload.startTime, "yyyy-MM-dd"),
       appointmentLink: appointmentLink,
       appointmentTime: format(payload.startTime, "hh:mm a"),
-      doctorName: doctorResource?.name ?? "",
+      doctorName: doctorResource?.linkedUserFullName ?? "",
       location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
       patientEmail: patientToUse.emailAddress ?? "",
       patientGender: patientToUse.sex === 0 ? "female" : "male",
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
       sendSMS({
         message: `السلام عليكم: ${patientToUse.firstName ?? ""} ${patientToUse.lastName ?? ""} رقم الملف  : ${
           patientToUse.mrn
-        } موعدك ${doctorResource?.name ?? ""} يوم ${format(payload.startTime, "dd-MM-yyyy")} ${format(
+        } موعدك ${doctorResource?.linkedUserFullName ?? ""} يوم ${format(payload.startTime, "dd-MM-yyyy")} ${format(
           payload.startTime,
           "hh:mm a"
         )} . مركز بنون الطبي  للأستفسار:  00966114448080 \n\n${appointmentLink}`,

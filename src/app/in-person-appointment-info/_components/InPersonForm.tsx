@@ -69,7 +69,7 @@ export default function InPersonForm() {
 
   const selectedResource = useMemo(() => {
     return fertiSmartResources?.find((resource) => {
-      return resource.name?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? "");
+      return resource.linkedUserFullName?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? "");
     });
   }, [fertiSmartResources, selectedDoctor?.name]);
 

@@ -2,17 +2,17 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, MapPin, Video } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { add, format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import useFertiSmartResources from "@/hooks/useFertiSmartResources";
-import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { Spinner } from "@/components/ui/spinner";
 import { doctors } from "@/models/DoctorModel";
+import Link from "next/link";
+import useFertiSmartResources from "@/hooks/useFertiSmartResources";
+import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 export default function SelectDateAndTimePage() {
@@ -22,6 +22,7 @@ export default function SelectDateAndTimePage() {
 
   const searchParams = useSearchParams();
   const selectedDoctorId = searchParams.get("selectedDoctor");
+  const selectedVisitType = searchParams.get("selectedVisitType") as "clinic" | "virtual" | null;
 
   const selectedDoctor = useMemo(() => {
     return doctors.find((doc) => {
@@ -32,7 +33,9 @@ export default function SelectDateAndTimePage() {
   const { data: resourcesData, isLoading: loadingResources } = useFertiSmartResources();
 
   const selectedResource = useMemo(() => {
-    return resourcesData?.find((item) => item.name?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? ""));
+    return resourcesData?.find((item) =>
+      item.linkedUserFullName?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? "")
+    );
   }, [resourcesData, selectedDoctor?.name]);
 
   const { data: availabilityData, isLoading: loadingTimeslots } = useFertiSmartResourceAvailability({
@@ -77,7 +80,6 @@ export default function SelectDateAndTimePage() {
   const getNextPageUrl = () => {
     if (!selectedDate || !selectedTimeSlot) return "#";
     if (currentUserData?.mrn) {
-      const selectedVisitType = searchParams.get("selectedVisitType");
       if (selectedVisitType === "clinic") {
         return `/in-person-appointment-info?${newUrlSearchParams}`;
       } else {
@@ -93,14 +95,31 @@ export default function SelectDateAndTimePage() {
       <div className="container mx-auto px-4 py-8 max-w-6xl pb-40">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
-              <CalendarIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
-            </div>
-          </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Date & Time</h1>
+          {selectedVisitType && (
+            <div className="flex justify-center mb-4">
+              <div
+                className={cn(
+                  "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm",
+                  selectedVisitType === "clinic" ? "bg-primary/10 text-primary" : "bg-primary/10 text-primary"
+                )}
+              >
+                {selectedVisitType === "clinic" ? (
+                  <>
+                    <MapPin className="h-4 w-4" />
+                    <span>In-Clinic Appointment</span>
+                  </>
+                ) : (
+                  <>
+                    <Video className="h-4 w-4" />
+                    <span>Virtual Visit</span>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Choose your preferred appointment date and time. Available slots are highlighted in green.
+            Choose your preferred appointment date and time.
           </p>
         </div>
 
@@ -125,6 +144,8 @@ export default function SelectDateAndTimePage() {
                   day: "hover:bg-green-50 dark:hover:bg-green-900/20",
                   day_selected: "bg-green-600 text-white hover:bg-green-700",
                   day_today: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
+                  button_next: "bg-primary cursor-pointer text-white p-1 rounded-sm",
+                  button_previous: "bg-primary cursor-pointer text-white p-1 rounded-sm",
                 }}
               />
             </div>
@@ -150,7 +171,7 @@ export default function SelectDateAndTimePage() {
                 <p className="text-gray-500 dark:text-gray-400">Please select a date first to view available time slots</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3 max-h-96 flex-1 overflow-y-auto">
+              <div className="grid grid-cols-2 gap-3 max-h-96 flex-1 overflow-y-auto p-4">
                 {loadingTimeslots || loadingResources || loadingCurrentUser ? (
                   <div className="col-span-2 flex justify-center">
                     <Spinner className="size-8" />
@@ -161,13 +182,16 @@ export default function SelectDateAndTimePage() {
                       key={slot.start}
                       onClick={() => handleTimeSlotSelect(slot.start ?? "")}
                       className={cn(
-                        "p-3 rounded-md border text-sm font-medium transition-all duration-200 cursor-pointer",
+                        "p-3 rounded-md relative border text-sm font-medium transition-all duration-200 cursor-pointer",
                         selectedTimeSlot === slot.start
                           ? "bg-primary text-white border-primary shadow-md"
                           : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
                       )}
                     >
                       {format(slot.start ?? new Date().toISOString(), "hh:mm aa")}
+                      <div className="absolute top-[-6px] rounded-full p-1 right-[-6px] bg-primary text-white">
+                        {selectedVisitType === "clinic" ? <MapPin className="h-3 w-3" /> : <Video className="h-3 w-3" />}
+                      </div>
                     </button>
                   ))
                 ) : (
@@ -205,12 +229,28 @@ export default function SelectDateAndTimePage() {
             )}
           </div>
         </div>
-
-        {/* Summary Card */}
         {(selectedDate || selectedTimeSlot) && (
           <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Appointment Summary</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {selectedVisitType && (
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Visit Type</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {selectedVisitType === "clinic" ? (
+                      <>
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <p className="font-medium text-gray-900 dark:text-white">In-Clinic Appointment</p>
+                      </>
+                    ) : (
+                      <>
+                        <Video className="h-4 w-4 text-primary" />
+                        <p className="font-medium text-gray-900 dark:text-white">Virtual Visit</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Date</p>
                 <p className="font-medium text-gray-900 dark:text-white">

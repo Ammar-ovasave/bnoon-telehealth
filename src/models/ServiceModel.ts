@@ -34,7 +34,7 @@ export const services: Service[] = [
   // },
   {
     id: "pregnancy-followup",
-    title: "Pregnancy Followup",
+    title: "Gynecology and Maternity Services",
     description: "Comprehensive prenatal care and monitoring throughout your pregnancy journey.",
     icon: "🤰🏻",
   },

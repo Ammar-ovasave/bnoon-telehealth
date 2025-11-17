@@ -207,7 +207,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               <User className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Doctor</p>
-                <p className="font-medium text-gray-900 dark:text-white">{resource?.name}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{resource?.linkedUserFullName}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">

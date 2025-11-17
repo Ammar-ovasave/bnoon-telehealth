@@ -3,8 +3,8 @@ import { FSResourceModel } from "@/models/FSResourceModel";
 import { FertiSmartBranchModel } from "@/models/FertiSmartBranchModel";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
-import axios from "./axios";
 import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
+import axios from "./axios";
 
 export async function createPatientServer(params: {
   baseAPIURL: string | null;

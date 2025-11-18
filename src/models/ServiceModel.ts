@@ -11,19 +11,22 @@ export const services: Service[] = [
   {
     id: "having-child",
     title: "Having a Child",
-    description: "Comprehensive fertility care and family planning services to help you start or expand your family.",
+    description:
+      "Start your parenthood journey with Bnoon to help you start or grow your family whether you’re facing primary or secondary infertility, seeking family balancing, or exploring ART to prevent genetic conditions.",
     icon: "👩🏻‍🍼",
   },
   {
     id: "general-fertility",
     title: "General Fertility Consultation",
-    description: "Expert consultation and evaluation of your reproductive health and fertility status.",
+    description:
+      "Expert consultation and evaluation of reproductive health to personalized treatments for women and men. Our specialists provide advanced, supportive care every step of the way.",
     icon: "🩺",
   },
   {
     id: "fertility-preservation",
     title: "Fertility Preservation",
-    description: "Advanced fertility preservation options to protect your reproductive health for the future.",
+    description:
+      "State-of-the-art fertility preservation solutions powered by advanced technology and comprehensive packages — helping you safeguard your reproductive health for the future.",
     icon: "🔒",
   },
   // {
@@ -35,13 +38,15 @@ export const services: Service[] = [
   {
     id: "pregnancy-followup",
     title: "Gynecology and Maternity Services",
-    description: "Comprehensive prenatal care and monitoring throughout your pregnancy journey.",
+    description:
+      "Comprehensive women’s health and pregnancy care — from puberty to post-menopause. Our gynecologists offer personalized support, from prenatal and postnatal care to managing PCOS, endometriosis, menopause, and more.",
     icon: "🤰🏻",
   },
   {
     id: "male-andrology",
     title: "Andrology and Male Problems",
-    description: "Specialized care for male reproductive health issues and fertility concerns.",
+    description:
+      "Specialized care for male infertility and urological conditions. Our expert andrologists diagnose and treat issues such as low sperm count, hormonal imbalance, and erectile dysfunction to support fertility and overall male reproductive health.",
     icon: "👨🏻‍⚕️",
   },
   // {

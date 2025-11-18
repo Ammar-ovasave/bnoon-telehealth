@@ -28,10 +28,10 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
           "cursor-pointer relative gap-0 justify-center transition-all duration-300 hover:shadow-xl overflow-hidden h-full"
         )}
       >
-        <CardHeader className="text-center px-4">
-          <div className="text-4xl mb-3">{service.icon}</div>
+        <CardHeader className="text-center px-4 gap-0">
+          <div className="text-4xl mb-0">{service.icon}</div>
           <CardTitle className="text-lg font-bold text-gray-900 dark:text-white mb-2">{service.title}</CardTitle>
-          <CardDescription className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+          <CardDescription className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
             {service.description}
           </CardDescription>
         </CardHeader>

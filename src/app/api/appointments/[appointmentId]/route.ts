@@ -150,15 +150,16 @@ async function sendUpdatedAppointmentSMS(params: {
       return null;
     }
     const textContent = templates.updated
-      .replace(/[%PATIENT_NAME%]/gi, params.fullName)
-      .replace(/[%OLD_DATE%]/gi, params.oldDate)
-      .replace(/[%OLD_TIME%]/gi, params.oldTime)
-      .replace(/[%NEW_DATE%]/gi, params.newDate)
-      .replace(/[%DATE%]/gi, params.newDate)
-      .replace(/[%TIME%]/gi, params.newTime)
-      .replace(/[%NEW_TIME%]/gi, params.newTime)
-      .replace(/[%DOCTOR_NAME%]/gi, params.doctorName)
-      .replace(/[%PATIENT_MRN%]/gi, params.mrn);
+      .replace(/{{PATIENT_NAME}}/gi, params.fullName)
+      .replace(/{{DATE_OLD}}/gi, params.oldDate)
+      .replace(/{{TIME_OLD}}/gi, params.oldTime)
+      .replace(/{{NEW_DATE}}/gi, params.newDate)
+      .replace(/{{DATE}}/gi, params.newDate)
+      .replace(/{{TIME}}/gi, params.newTime)
+      .replace(/{{NEW_TIME}}/gi, params.newTime)
+      .replace(/{{RESOURCE_NAME_OLD}}/gi, params.doctorName)
+      .replace(/{{RESOURCE_NAME}}/gi, params.doctorName)
+      .replace(/{{PATIENT_MRN}}/gi, params.mrn);
     const messageWithLink = textContent.includes(params.appointmentLink)
       ? textContent
       : `${textContent}\n\n${params.appointmentLink}`;
@@ -189,11 +190,11 @@ async function sendCancelledAppointmentSMS(params: {
       return null;
     }
     const textContent = templates.cancelled
-      .replace(/[%PATIENT_NAME%]/gi, params.fullName)
-      .replace(/[%DATE%]/gi, params.appointmentDate)
-      .replace(/[%TIME%]/gi, params.appointmentTime)
-      .replace(/[%DOCTOR_NAME%]/gi, params.doctorName)
-      .replace(/[%PATIENT_MRN%]/gi, params.mrn);
+      .replace(/{{PATIENT_NAME}}/gi, params.fullName)
+      .replace(/{{DATE}}/gi, params.appointmentDate)
+      .replace(/{{TIME}}/gi, params.appointmentTime)
+      .replace(/{{RESOURCE_NAME}}/gi, params.doctorName)
+      .replace(/{{PATIENT_MRN}}/gi, params.mrn);
     const success = await sendSMS({
       mobileNumber: params.mobileNumber,
       message: textContent,

@@ -11,6 +11,7 @@ export interface ClinicLocation {
   contactNumber: string;
   contactEmail: string;
   isCommingSoon?: boolean;
+  hideComingSoonBadge?: boolean;
 }
 
 export const clinicLocations: ClinicLocation[] = [
@@ -54,10 +55,11 @@ export const clinicLocations: ClinicLocation[] = [
     city: "Al Ahsa",
     address: "Almoosa Specialist Hospital, North Tower, Floor 12",
     doctors: "12 specialists",
-    imageSrc: "/images/almoosa.png",
+    imageSrc: "/images/alahsa.jpg",
     contactEmail: "info.jeddah@bnoon.sa",
     contactNumber: "+966126800800",
     isCommingSoon: true,
+    hideComingSoonBadge: true,
     apiUrl: `https://undeclarable-kolby-overgraciously.ngrok-free.dev`,
   },
 ];

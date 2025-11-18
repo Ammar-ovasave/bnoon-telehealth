@@ -182,7 +182,7 @@ export default function SelectDateAndTimePage() {
                       key={slot.start}
                       onClick={() => handleTimeSlotSelect(slot.start ?? "")}
                       className={cn(
-                        "p-3 rounded-md relative border text-sm font-medium transition-all duration-200 cursor-pointer",
+                        "p-3 rounded-md max-h-[48px] relative border text-sm font-medium transition-all duration-200 cursor-pointer",
                         selectedTimeSlot === slot.start
                           ? "bg-primary text-white border-primary shadow-md"
                           : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"

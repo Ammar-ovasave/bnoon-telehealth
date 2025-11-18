@@ -66,7 +66,7 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-mazin-bishara",
-    name: "Dr. Mazin Bishara ",
+    name: "Dr. Mazen Beshara",
     specialty:
       "Medical Director, Bnoon - Jeddah Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery",
     photo: "/images/dr-mazin-bishra.jpg",
@@ -156,7 +156,7 @@ export const doctors: DoctorModel[] = [
     },
     languages: ["Arabic", "English"],
     branchId: "jeddah",
-    services: ["pregnancy-followup"],
+    services: ["male-andrology"],
   },
   {
     id: "dr-moussa-el-naiemy",

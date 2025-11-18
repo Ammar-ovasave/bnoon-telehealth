@@ -58,10 +58,12 @@ export async function POST(request: Request) {
     const service = services?.find((item) => item.id === payload.serviceId);
     const url = new URL(request.url);
     const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
+    const appointmentDate = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy");
+    const appointmentTime = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a");
     const emailTemplate = await getConfirmAppointmentEmail({
-      appointmentDate: formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy"),
+      appointmentDate: appointmentDate,
       appointmentLink: appointmentLink,
-      appointmentTime: formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a"),
+      appointmentTime: appointmentTime,
       doctorName: doctorResource?.linkedUserFullName ?? "",
       location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
       patientEmail: patientToUse.emailAddress ?? "",
@@ -90,8 +92,8 @@ export async function POST(request: Request) {
         fullName: `${patientToUse.firstName ?? ""} ${patientToUse.lastName ?? ""}`.trim(),
         mrn: patientToUse.mrn ?? "",
         doctorName: doctorResource?.linkedUserFullName ?? "",
-        appointmentDate: format(payload.startTime, "dd-MM-yyyy"),
-        appointmentTime: format(payload.startTime, "hh:mm a"),
+        appointmentDate: appointmentDate,
+        appointmentTime: appointmentTime,
         appointmentLink: appointmentLink,
         mobileNumber: patientToUse.contactNumber ?? "",
       }),

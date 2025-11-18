@@ -130,10 +130,11 @@ async function sendNewAppointmentSMS(params: {
       return null;
     }
     const textContent = templates.new
-      .replace(/[%PATIENT_NAME%]/gi, params.fullName)
-      .replace(/[%DATE%]/gi, params.appointmentDate)
-      .replace(/[%TIME%]/gi, params.appointmentTime)
-      .replace(/[%PATIENT_MRN%]/gi, params.mrn);
+      .replace(/{{PATIENT_NAME}}/g, params.fullName)
+      .replace(/{{DATE}}/g, params.appointmentDate)
+      .replace(/{{RESOURCE_NAME}}/g, params.doctorName)
+      .replace(/{{TIME}}/g, params.appointmentTime)
+      .replace(/{{PATIENT_MRN}}/g, params.mrn);
     const messageWithLink = textContent.includes(params.appointmentLink)
       ? textContent
       : `${textContent}\n\n${params.appointmentLink}`;

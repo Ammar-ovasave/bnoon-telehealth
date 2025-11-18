@@ -26,10 +26,11 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Clinic Location</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Your Nearest Bnoon Clinic</h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Choose your preferred Bnoon clinic location for your virtual visit. All locations offer the same high-quality
-            services.
+            <strong>Bnoon</strong> brings advanced care closer to you — with trusted doctors, innovative technologies, and a
+            commitment to compassionate, personalized care; dedicated to setting new benchmarks in fertility and women’s health
+            care.
           </p>
         </div>
         {/* Mobile */}

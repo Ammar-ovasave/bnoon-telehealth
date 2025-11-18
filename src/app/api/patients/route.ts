@@ -1,6 +1,6 @@
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
-import axios from "@/services/axios";
 import { cookies } from "next/headers";
+import axios from "@/services/axios";
 
 export async function POST(request: Request) {
   try {

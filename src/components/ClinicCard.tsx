@@ -50,17 +50,19 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
               <span className="text-white">{clinic.address}</span>
             </CardDescription>
           </CardHeader>
-          <Button
-            onClick={handleSelectClinic}
-            disabled={clinic.isCommingSoon || loadingSwitchBranch}
-            className="w-full bg-white text-black hover:bg-white/90 font-semibold"
-            size="lg"
-          >
-            {clinic.isCommingSoon ? "Coming Soon" : "Select Clinic"}
-          </Button>
-          {clinic.isCommingSoon && (
+          {clinic.hideComingSoonBadge ? null : (
+            <Button
+              onClick={handleSelectClinic}
+              disabled={clinic.isCommingSoon || loadingSwitchBranch}
+              className="w-full bg-white text-black hover:bg-white/90 font-semibold"
+              size="lg"
+            >
+              {clinic.isCommingSoon ? "Opening Soon" : "Select Clinic"}
+            </Button>
+          )}
+          {clinic.isCommingSoon && !clinic.hideComingSoonBadge && (
             <p className="text-white text-sm absolute top-2 z-20 right-2 bg-white/20 rounded-sm px-2 backdrop-blur-2xl">
-              Comming Soon
+              Opening Soon
             </p>
           )}
         </div>

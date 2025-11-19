@@ -25,8 +25,8 @@ export default function VirtualVisitInfoPage() {
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Personal Information</h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Please provide your personal information to complete your virtual visit booking. This information helps us provide you
-            with the best possible care.
+            Please provide your personal information to complete your visit booking. This information helps us provide you with
+            the best possible care.
           </p>
         </div>
         {/* Form */}

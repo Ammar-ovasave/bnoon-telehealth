@@ -20,7 +20,6 @@ export const PageContent: FC = () => {
 
   const appointmentId = searchParams.get("appointmentId");
   const selectedVisitType = searchParams.get("selectedVisitType") || "-";
-  console.log("selectedVisitType", selectedVisitType);
   const selectedDoctor = searchParams.get("selectedDoctor") || "-";
   const selectedService = searchParams.get("selectedService") || "-";
   const selectedClinicLocation = searchParams.get("selectedClinicLocation") || "-";
@@ -101,10 +100,10 @@ export const PageContent: FC = () => {
                 <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Appointment Confirmed!</h1>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Your Appointment is Confirmed!</h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Your appointment has been successfully booked and confirmed. You will receive a confirmation email shortly with all
-              the details.
+              Your appointment has been successfully booked and confirmed. You will receive a confirmation email or SMS shortly
+              with all the details.
             </p>
             <div className="mt-4 bg-primary/10 rounded-lg p-4 border border-primary">
               <p className="text-primary font-medium">
@@ -203,9 +202,12 @@ export const PageContent: FC = () => {
           <div className="mt-8 bg-primary/10 rounded-lg p-6 border border-primary">
             <h3 className="text-lg font-semibold text-primary dark:text-primary mb-3">{"What's Next?"}</h3>
             <div className="space-y-2 text-primary">
-              <p>• You will receive a confirmation email with your appointment details</p>
-              <p>• {`For virtual visits, you'll receive a meeting link with the confirmation email`}</p>
-              <p>• For in-person visits, please arrive 10 minutes early at the clinic location</p>
+              <p>• You will receive a confirmation email or SMS with your appointment details.</p>
+              <p>• {`For virtual visits, you'll receive a meeting link with the confirmation email.`}</p>
+              <p>
+                • For in-person visits, please arrive 10 minutes early at the clinic location. Please bring your ID, passport copy
+                and previous medical reports, if any.
+              </p>
             </div>
           </div>
 

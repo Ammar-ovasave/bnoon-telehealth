@@ -80,7 +80,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
     }
   }, [appointment.time?.start, isKSA]);
 
-  const { data: patientData } = useFertiSmartPatient();
+  const { data: patientData, fullName } = useFertiSmartPatient();
 
   const { data: countriesData } = useFertiSmartCountries();
 
@@ -235,14 +235,23 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
           <div className="space-y-3">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Full Name</p>
-              <p className="font-medium text-gray-900 dark:text-white">{`${patientData?.firstName ?? ""} ${
-                patientData?.lastName ?? ""
-              }`}</p>
+              <p className="font-medium text-gray-900 dark:text-white">{fullName}</p>
             </div>
             {patientData?.emailAddress && (
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
                 <p className="font-medium text-gray-900 dark:text-white">{patientData?.emailAddress}</p>
+              </div>
+            )}
+            {patientData?.contactNumber && (
+              <div className="">
+                <p className="text-sm text-gray-600 dark:text-gray-400">Phone Number</p>
+                <p className="font-medium text-gray-900 dark:text-white">{patientData.contactNumber}</p>
+                {patientData?.alternativeContactNumber && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Alternative: {patientData.alternativeContactNumber}
+                  </p>
+                )}
               </div>
             )}
             {nationality?.name && (
@@ -448,11 +457,11 @@ interface AppointmentCardProps {
 
 const getAppointmentStatusColor = (status: string) => {
   switch (status) {
-    case "upcoming":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
-    case "completed":
-      return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
-    case "cancelled":
+    case "Approved/Confirmed":
+      return "bg-primary/10 text-primary";
+    case "Approved/Confirmed":
+      return "bg-primary/10 text-primary";
+    case "Cancelled":
       return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
     default:
       return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";

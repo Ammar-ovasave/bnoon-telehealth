@@ -12,7 +12,6 @@ import {
 } from "@/services/appointment-services";
 import { cookies } from "next/headers";
 import { getConfirmAppointmentEmail } from "@/services/templates";
-import { format } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { AUTH_TOKEN_NAME } from "@/constants";
 import { signJwt } from "@/services/signJwt";
@@ -99,12 +98,13 @@ export async function POST(request: Request) {
       }),
     ]);
     const authToken = signJwt({
-      mrn: patientToUse.mrn,
-      firstName: patientToUse.firstName,
-      lastName: patientToUse.lastName,
-      contactNumber: patientToUse.contactNumber,
-      emailAddress: patientToUse.emailAddress,
-      branchId: patientToUse.branch?.id,
+      mrn: patientToUse.mrn ?? "",
+      firstName: patientToUse.firstName ?? "",
+      middleName: patientToUse.middleName ?? "",
+      lastName: patientToUse.lastName ?? "",
+      contactNumber: patientToUse.contactNumber ?? "",
+      emailAddress: patientToUse.emailAddress ?? "",
+      branchId: patientToUse.branch?.id ?? 0,
     });
     const cookieStore = await cookies();
     cookieStore.set({ name: AUTH_TOKEN_NAME, value: authToken, httpOnly: true, secure: true });

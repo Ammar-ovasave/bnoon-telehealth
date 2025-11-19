@@ -47,12 +47,13 @@ export async function POST(request: Request) {
       patientFromNewBranch = newPatient;
     }
     const authToken = signJwt({
-      mrn: patientFromNewBranch.mrn,
-      firstName: patientFromNewBranch.firstName,
-      lastName: patientFromNewBranch.lastName,
-      contactNumber: patientFromNewBranch.contactNumber,
-      emailAddress: patientFromNewBranch.emailAddress,
-      branchId: patientFromNewBranch.branch?.id,
+      mrn: patientFromNewBranch.mrn ?? "",
+      firstName: patientFromNewBranch.firstName ?? "",
+      middleName: patientFromNewBranch.middleName ?? "",
+      lastName: patientFromNewBranch.lastName ?? "",
+      contactNumber: patientFromNewBranch.contactNumber ?? "",
+      emailAddress: patientFromNewBranch.emailAddress ?? "",
+      branchId: patientFromNewBranch.branch?.id ?? 0,
     });
     cookieStore.set({ name: AUTH_TOKEN_NAME, value: authToken, httpOnly: true, secure: true });
     cookieStore.set("branchAPIURL", newBaseAPIURL);

@@ -22,11 +22,12 @@ export async function PATCH(request: Request) {
     }
     const authToken = signJwt({
       mrn: patient.mrn,
-      firstName: patient.firstName,
-      lastName: patient.lastName,
-      contactNumber: patient.contactNumber,
-      emailAddress: patient.emailAddress,
-      branchId: patient.branch?.id,
+      firstName: patient.firstName ?? "",
+      middleName: patient.middleName ?? "",
+      lastName: patient.lastName ?? "",
+      contactNumber: patient.contactNumber ?? "",
+      emailAddress: patient.emailAddress ?? "",
+      branchId: patient.branch?.id ?? 0,
     });
     cookiesStore.set({ name: AUTH_TOKEN_NAME, value: authToken, httpOnly: true, secure: true });
     return Response.json(res);

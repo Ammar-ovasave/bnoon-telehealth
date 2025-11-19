@@ -10,11 +10,14 @@ export default function useFertiSmartPatient() {
     if (data?.firstName && data.firstName !== "-") {
       name += ` ${data?.firstName}`;
     }
+    if (data?.middleName && data.middleName !== "-") {
+      name += ` ${data.middleName}`;
+    }
     if (data?.lastName && data.lastName !== "-") {
       name += ` ${data?.lastName}`;
     }
     return name.trim();
-  }, [data?.firstName, data?.lastName]);
+  }, [data?.firstName, data?.lastName, data?.middleName]);
 
   return { data, error, isLoading, fullName, mutate };
 }

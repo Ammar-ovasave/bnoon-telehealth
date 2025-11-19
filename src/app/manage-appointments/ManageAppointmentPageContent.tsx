@@ -20,9 +20,9 @@ export default function ManageAppointmentPageContent() {
               <CalendarDays className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">Manage Appointments</h1>
+          <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">Manage Your Appointment</h1>
           <p className="mx-auto max-w-3xl text-gray-600 dark:text-gray-300 md:text-lg">
-            View, reschedule, or cancel your appointments. All your upcoming and past appointments are listed below.
+            View, reschedule, or cancel your appointments.
           </p>
         </div>
         <ClinicBranchSelect className="mb-10" />

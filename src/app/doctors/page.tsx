@@ -70,14 +70,14 @@ export default function DoctorsListPage() {
   const availabilityOptions: AvailabilityOption[] = [
     {
       value: "clinic",
-      title: "In-Clinic Appointment",
-      description: "Visit the clinic for hands-on care and in-person diagnostics.",
+      title: "Clinic Visit",
+      description: "Visit our clinic for an in-person consultation and comprehensive examination.",
       icon: MapPin,
     },
     {
       value: "virtual",
       title: "Virtual Visit",
-      description: "Connect from anywhere for consultations, follow-ups, and more.",
+      description: "Consult with your doctor from the comfort of your home via video call.",
       icon: Video,
     },
   ];
@@ -102,9 +102,8 @@ export default function DoctorsListPage() {
               <AvailabilityPicker
                 options={availabilityOptions}
                 onSelect={handleSetAvailabilityFilter}
-                eyebrow="Choose how you’d like your appointment"
-                title="Pick a visit type"
-                description="Select in-clinic or virtual care to see doctors who are available for your preferred appointment type."
+                title="Select Visit Type"
+                description="Choose how you'd like to have your consultation - whether visiting us at the clinic or remotely through a virtual consultation. Both options provide excellent care tailored to your needs."
               />
             ) : filteredDoctors.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

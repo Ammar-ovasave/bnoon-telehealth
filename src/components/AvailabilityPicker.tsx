@@ -23,11 +23,7 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
   return (
     <section className="bg-white dark:bg-gray-800 rounded-lg p-6 md:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
       <div className="text-center max-w-2xl mx-auto mb-6">
-        {eyebrow ? (
-          <p className="text-sm font-medium text-primary uppercase tracking-wide">{eyebrow}</p>
-        ) : (
-          <p className="text-sm font-medium text-primary uppercase tracking-wide">Choose how you’d like to meet</p>
-        )}
+        {eyebrow && <p className="text-sm font-medium text-primary uppercase tracking-wide">{eyebrow}</p>}
         <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-2">{title ?? "Pick a visit type"}</h2>
         <p className="text-gray-600 dark:text-gray-300 mt-3">
           {description ??
@@ -55,7 +51,7 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
             </div>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 flex-1">{option.description}</p>
             <div className="flex items-center justify-between text-sm font-bold bg-primary px-4 py-2 rounded-md text-white w-fit">
-              <span>Select {option.value === "clinic" ? "an in-person" : "a virtual"} visit</span>
+              <span>Select {option.value === "clinic" ? "a clinic" : "a virtual"} visit</span>
             </div>
           </button>
         ))}

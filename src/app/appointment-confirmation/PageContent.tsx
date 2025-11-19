@@ -20,6 +20,7 @@ export const PageContent: FC = () => {
 
   const appointmentId = searchParams.get("appointmentId");
   const selectedVisitType = searchParams.get("selectedVisitType") || "-";
+  console.log("selectedVisitType", selectedVisitType);
   const selectedDoctor = searchParams.get("selectedDoctor") || "-";
   const selectedService = searchParams.get("selectedService") || "-";
   const selectedClinicLocation = searchParams.get("selectedClinicLocation") || "-";
@@ -30,7 +31,7 @@ export const PageContent: FC = () => {
 
   const { data: currentUserData, isLoading: loadingCurrentUser } = useCurrentUser();
 
-  const { data: patientData, isLoading: loadingPatient } = useFertiSmartPatient();
+  const { data: patientData, isLoading: loadingPatient, fullName } = useFertiSmartPatient();
   const gender = patientData?.sex === 0 ? "Female" : "Male";
 
   const idType = useMemo(() => {
@@ -47,8 +48,6 @@ export const PageContent: FC = () => {
   );
 
   const idNumber = patientData?.identityId ?? "-";
-
-  const fullName = `${patientData?.firstName} ${patientData?.lastName}`;
 
   // Get user's timezone and check if it's KSA
   const userTimezone = useMemo(() => {
@@ -133,7 +132,7 @@ export const PageContent: FC = () => {
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Visit Type</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{selectedVisitType}</span>
+                  <span className="font-medium text-gray-900 dark:text-white capitalize">{selectedVisitType}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Doctor</span>
@@ -211,7 +210,7 @@ export const PageContent: FC = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+          <div className="flex flex-col items-center sm:flex-row gap-4 justify-center mt-8">
             <Link href="/manage-appointments">
               <Button size="lg" className="px-8 py-3">
                 <CalendarDays className="h-4 w-4 mr-2" />

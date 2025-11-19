@@ -50,7 +50,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
   const { data: currentUserData, isLoading: loadingCurrentUser, mutate: mutateCurrentUser } = useCurrentUser();
 
   const fullPhoneNumber = useMemo(() => {
-    return `${selectedCountryCode}${phoneNumber ?? ""}`;
+    return `${selectedCountryCode}${phoneNumber.startsWith("0") ? phoneNumber.slice(1) : phoneNumber}`;
   }, [phoneNumber, selectedCountryCode]);
 
   const handleSendOtp = async () => {

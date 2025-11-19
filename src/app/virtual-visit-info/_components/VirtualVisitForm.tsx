@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, User, Mail, Globe, Users, CreditCard } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -48,6 +48,10 @@ interface FormErrors {
   idNumber?: string;
 }
 
+function isOnlyDigits(str: string) {
+  return /^[0-9]+$/.test(str);
+}
+
 export default function VirtualVisitForm() {
   const { data: currentUserData, mutate: mutateCurrentUser, fullName: currentUserFullName } = useCurrentUser();
   const { nationalities, data: nationalitiesData } = useFertiSmartCountries();
@@ -62,6 +66,43 @@ export default function VirtualVisitForm() {
     idType: patientData?.identityIdType?.id?.toString(),
     idNumber: patientData?.identityId ?? "",
   });
+
+  const isSaudiNational = formData.nationality === "Saudi Arabia";
+
+  const { data: idTypeDataList } = useFertiSmartIDTypes();
+
+  const selectedIdType = useMemo(
+    () => idTypeDataList?.find((type) => type.id?.toString() === formData.idType),
+    [formData.idType, idTypeDataList]
+  );
+
+  const didSelectIqamaNo = useMemo(() => selectedIdType?.name?.toLocaleLowerCase().includes("iqama no"), [selectedIdType?.name]);
+
+  const idTypeData = useMemo(() => {
+    if (isSaudiNational) {
+      return idTypeDataList?.filter((type) => type.name?.toLocaleLowerCase().includes("national id"));
+    }
+    return idTypeDataList?.filter((type) => !type.name?.toLocaleLowerCase().includes("national id"));
+  }, [idTypeDataList, isSaudiNational]);
+
+  useEffect(() => {
+    if (isSaudiNational) {
+      setFormData((val) => {
+        return {
+          ...val,
+          idType: idTypeDataList?.find((type) => type.name?.toLocaleLowerCase().includes("national id"))?.id?.toString(),
+        };
+      });
+    } else {
+      setFormData((val) => {
+        return {
+          ...val,
+          idType: patientData?.identityIdType?.id?.toString(),
+        };
+      });
+    }
+  }, [idTypeDataList, isSaudiNational, patientData?.identityIdType?.id]);
+
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -100,7 +141,34 @@ export default function VirtualVisitForm() {
     if (!formData.idNumber.trim()) {
       return "ID number is required";
     }
-  }, [formData.email, formData.fullName, formData.gender, formData.nationality, formData.idType, formData.idNumber]);
+    if (isSaudiNational) {
+      if (!formData.idNumber.startsWith("1")) {
+        return "National ID number must start with 1";
+      } else if (!isOnlyDigits(formData.idNumber.trim())) {
+        return "National ID number must only contain digits";
+      } else if (formData.idNumber.trim().length !== 10) {
+        return "National ID number must be 10 digits";
+      }
+    }
+    if (didSelectIqamaNo) {
+      if (!formData.idNumber.startsWith("2")) {
+        return "Iqama number must start with 2";
+      } else if (!isOnlyDigits(formData.idNumber.trim())) {
+        return "Iqama number must only contain digits";
+      } else if (formData.idNumber.trim().length !== 10) {
+        return "Iqama number must be 10 digits";
+      }
+    }
+  }, [
+    formData.fullName,
+    formData.email,
+    formData.nationality,
+    formData.gender,
+    formData.idType,
+    formData.idNumber,
+    isSaudiNational,
+    didSelectIqamaNo,
+  ]);
 
   const { data: statusesData } = useFertiSmartAppointmentStatuses();
   const { data: branchesData } = useFertiSmartBranches();
@@ -129,8 +197,6 @@ export default function VirtualVisitForm() {
       return resource.linkedUserFullName?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? "");
     });
   }, [fertiSmartResources, selectedDoctor?.name]);
-
-  const { data: idTypeData } = useFertiSmartIDTypes();
 
   const handleFormSubmit = useCallback(async () => {
     if (validateForm) {
@@ -380,17 +446,13 @@ export default function VirtualVisitForm() {
             <label htmlFor="idNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <div className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4 text-gray-500" />
-                {formData.idType === "passport"
-                  ? "Passport Number"
-                  : formData.idType === "nationalId"
-                  ? "National ID Number"
-                  : "ID Number"}{" "}
-                *
+                {selectedIdType?.name} *
               </div>
             </label>
             <input
               id="idNumber"
               type="text"
+              maxLength={didSelectIqamaNo || isSaudiNational ? 10 : undefined}
               value={formData.idNumber}
               onChange={(e) => handleInputChange("idNumber", e.target.value)}
               placeholder={

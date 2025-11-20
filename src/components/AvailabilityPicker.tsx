@@ -2,13 +2,12 @@
 
 import { AvailabilityFilter } from "@/models/VisitTypeModel";
 import { cn } from "@/lib/utils";
-import { LucideIcon } from "lucide-react";
 
 export interface AvailabilityOption {
   value: AvailabilityFilter;
   title: string;
   description: string;
-  icon: LucideIcon;
+  icon: React.ReactNode;
 }
 
 interface AvailabilityPickerProps {
@@ -42,9 +41,7 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
             )}
           >
             <div className="flex items-center gap-3">
-              <div className="rounded-full bg-primary/10 p-3 text-primary">
-                <option.icon className="h-5 w-5" />
-              </div>
+              <div className="rounded-full bg-primary/10 p-3 text-primary">{option.icon}</div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{option.title}</h3>
               </div>

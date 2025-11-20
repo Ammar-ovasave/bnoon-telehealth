@@ -4,6 +4,7 @@ import { getCurrentUser } from "../../current-user/_services";
 import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
 import { formatInTimeZone } from "date-fns-tz";
 import { getCancelAppointmentEmail, getRescheduleAppointmentEmail } from "@/services/templates";
+import { clinicLocations } from "@/models/ClinicModel";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -57,6 +58,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
     const oldDate = formatInTimeZone(appointment.time?.start ?? "", KSA_TIMEZONE, "dd-MM-yyyy");
     const oldTime = formatInTimeZone(appointment.time?.start ?? "", KSA_TIMEZONE, "hh:mm a");
     const patientEmail = currentUser.emailAddress ?? "";
+    const clinicBranch = clinicLocations.find((clinic) => clinic.apiUrl === baseAPIURL);
     if (payload.type === "reschedule") {
       const newDate = formatInTimeZone(payload.startTime ?? "", KSA_TIMEZONE, "dd-MM-yyyy");
       const newTime = formatInTimeZone(payload.startTime ?? "", KSA_TIMEZONE, "hh:mm a");
@@ -70,6 +72,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         serviceName: serviceName,
         location: location,
         appointmentLink: appointmentLink,
+        clinicName: clinicBranch?.name ?? "",
       });
       await Promise.all([
         sendUpdatedAppointmentSMS({
@@ -103,6 +106,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         appointmentTime: oldTime,
         serviceName: serviceName,
         location: location,
+        clinicName: clinicBranch?.name ?? "",
       });
       await Promise.all([
         sendCancelledAppointmentSMS({

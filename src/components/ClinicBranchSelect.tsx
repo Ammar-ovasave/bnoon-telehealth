@@ -1,12 +1,13 @@
 "use client";
 import { ChangeEvent } from "react";
-import { Building2, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { clinicLocations } from "@/models/ClinicModel";
 import { cn } from "@/lib/utils";
 import useCurrentBranch from "@/hooks/useCurrentBranch";
 import useSwitchBranch from "@/hooks/useSwitchBranch";
 import LoadingOverlay from "./LoadingOverlay";
+import Image from "next/image";
 
 interface ClinicBranchSelectProps {
   className?: string;
@@ -39,7 +40,7 @@ export default function ClinicBranchSelect({ className }: ClinicBranchSelectProp
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Building2 className="size-6" aria-hidden="true" />
+              <Image src={`/icons/ClinicBuilding.png`} alt="Clinic Branch" width={100} height={100} />
             </div>
             <div>
               <p className="text-sm font-semibold uppercase tracking-wide text-primary">Clinic Branch</p>

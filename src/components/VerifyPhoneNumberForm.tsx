@@ -185,8 +185,8 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
-                <Phone className="h-8 w-8 text-primary dark:text-blue-400" />
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Phone className="h-8 w-8 text-primary" />
               </div>
             </div>
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -201,7 +201,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
           {/* Phone Number Input */}
           {!showOtpInput && (
             <div className="mb-8">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Phone Number
                 </label>
@@ -211,7 +211,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                       type="button"
                       disabled={true}
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors min-w-[120px]"
+                      className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors min-w-[100px]"
                     >
                       <span className="text-lg">{getSelectedCountry().flag}</span>
                       <span className="text-sm text-gray-600 dark:text-gray-400">{selectedCountryCode}</span>

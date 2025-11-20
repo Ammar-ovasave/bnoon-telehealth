@@ -3,12 +3,13 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { doctors as fullDoctorsList } from "@/models/DoctorModel";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Filter, MapPin, Video } from "lucide-react";
+import { ArrowLeft, Filter } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import DoctorCard from "@/components/DoctorCard";
 import AvailabilityPicker, { AvailabilityOption } from "@/components/AvailabilityPicker";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { AvailabilityFilter } from "@/models/VisitTypeModel";
+import Image from "next/image";
 
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
@@ -72,13 +73,13 @@ export default function DoctorsListPage() {
       value: "clinic",
       title: "Clinic Visit",
       description: "Visit our clinic for an in-person consultation and comprehensive examination.",
-      icon: MapPin,
+      icon: <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={25} />,
     },
     {
       value: "virtual",
       title: "Virtual Visit",
       description: "Consult with your doctor from the comfort of your home via video call.",
-      icon: Video,
+      icon: <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={25} height={25} />,
     },
   ];
 

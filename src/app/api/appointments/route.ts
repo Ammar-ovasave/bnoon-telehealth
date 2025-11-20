@@ -16,6 +16,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import { AUTH_TOKEN_NAME } from "@/constants";
 import { signJwt } from "@/services/signJwt";
 import axios from "@/services/axios";
+import { clinicLocations } from "@/models/ClinicModel";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -59,16 +60,20 @@ export async function POST(request: Request) {
     const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
     const appointmentDate = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy");
     const appointmentTime = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a");
+    const clinicBranch = clinicLocations.find((clinic) => clinic.apiUrl === baseAPIURL);
     const emailTemplate = await getConfirmAppointmentEmail({
       appointmentDate: appointmentDate,
       appointmentLink: appointmentLink,
       appointmentTime: appointmentTime,
       doctorName: doctorResource?.linkedUserFullName ?? "",
       location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
-      patientEmail: patientToUse.emailAddress ?? "",
+      patientEmail: payload.email ?? patientToUse.emailAddress ?? "",
       patientGender: patientToUse.sex === 0 ? "female" : "male",
-      patientName: `${patientToUse.firstName ?? ""} ${patientToUse.lastName ?? ""}`.trim(),
+      patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${
+        payload.lastName ?? patientToUse.lastName ?? ""
+      }`.trim(),
       serviceName: service?.name ?? "",
+      clinicName: clinicBranch?.name ?? "",
     });
     console.log("emailTemplate", emailTemplate);
     await Promise.all([
@@ -88,7 +93,7 @@ export async function POST(request: Request) {
           })
         : Promise.resolve(null),
       sendNewAppointmentSMS({
-        fullName: `${patientToUse.firstName ?? ""} ${patientToUse.lastName ?? ""}`.trim(),
+        fullName: `${payload.firstName ?? ""} ${payload.lastName ?? ""}`.trim(),
         mrn: patientToUse.mrn ?? "",
         doctorName: doctorResource?.linkedUserFullName ?? "",
         appointmentDate: appointmentDate,

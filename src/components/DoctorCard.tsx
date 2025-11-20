@@ -2,7 +2,7 @@ import { DoctorModel } from "@/models/DoctorModel";
 import { FC } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { cn } from "@/lib/utils";
-import { MapPin, Video, Award, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 
@@ -27,14 +27,14 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
     if (doctor.availability.clinic && doctor.availability.virtual) {
       return (
         <>
-          <MapPin className="h-4 w-4" />
-          <Video className="h-4 w-4" />
+          <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={20} className="size-[20px] mb-[2px]" />
+          <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={25} height={20} className="size-[20px]" />
         </>
       );
     } else if (doctor.availability.clinic) {
-      return <MapPin className="h-4 w-4" />;
+      return <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={20} />;
     } else {
-      return <Video className="h-4 w-4" />;
+      return <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={25} height={20} />;
     }
   };
 
@@ -61,16 +61,16 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
         <CardDescription className="text-primary text-sm font-semibold mb-2">{doctor.specialty}</CardDescription>
       </CardHeader>
       <CardContent className="pt-0 flex-1 px-4">
-        <div className="space-y-3 flex flex-col h-full">
+        <div className="space-y-1 flex flex-col h-full">
           {/* Languages */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 text-sm">
-              <Award className="h-4 w-4" />
+              <Image src={`/icons/Language.png`} alt="Languages" width={25} height={20} className="size-[30px] object-cover" />
               <span>{doctor.languages.join(", ")}</span>
             </div>
           </div>
           {/* Availability */}
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+          <div className="flex items-center mb-4 justify-center gap-1 text-sm text-gray-600 dark:text-gray-300">
             {getAvailabilityIcon()}
             <span className="font-medium">{getAvailabilityText()}</span>
           </div>

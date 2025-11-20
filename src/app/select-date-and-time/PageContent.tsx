@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { ArrowLeft, ArrowRight, Calendar as CalendarIcon, Clock, MapPin, Video } from "lucide-react";
+import { ArrowLeft, ArrowRight, MapPin, Video } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { add, format } from "date-fns";
@@ -14,6 +14,7 @@ import Link from "next/link";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import Image from "next/image";
 
 export default function SelectDateAndTimePage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -106,12 +107,12 @@ export default function SelectDateAndTimePage() {
               >
                 {selectedVisitType === "clinic" ? (
                   <>
-                    <MapPin className="h-4 w-4" />
+                    <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={20} />
                     <span>In-Clinic Appointment</span>
                   </>
                 ) : (
                   <>
-                    <Video className="h-4 w-4" />
+                    <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={25} height={20} />
                     <span>Virtual Visit</span>
                   </>
                 )}
@@ -127,7 +128,7 @@ export default function SelectDateAndTimePage() {
           {/* Date Selection */}
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-4">
-              <CalendarIcon className="h-5 w-5 text-primary dark:text-primary-400" />
+              <Image src={`/icons/Calender.png`} alt="Select Date" width={25} height={20} />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Select Date</h2>
             </div>
             <div className="flex justify-center">
@@ -161,13 +162,15 @@ export default function SelectDateAndTimePage() {
           {/* Time Selection */}
           <div className="bg-white flex flex-col dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-4">
-              <Clock className="h-5 w-5 text-primary" />
+              <Image src={`/icons/Clock.png`} alt="Select Time" width={25} height={20} />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Select Time</h2>
             </div>
 
             {!selectedDate ? (
               <div className="text-center py-8">
-                <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                <div className="flex justify-center">
+                  <Image src={`/icons/Clock.png`} alt="Select Time" width={70} height={70} />
+                </div>
                 <p className="text-gray-500 dark:text-gray-400">Please select a date first to view available time slots</p>
               </div>
             ) : (
@@ -239,12 +242,12 @@ export default function SelectDateAndTimePage() {
                   <div className="flex items-center gap-2 mt-1">
                     {selectedVisitType === "clinic" ? (
                       <>
-                        <MapPin className="h-4 w-4 text-primary" />
+                        <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={20} />
                         <p className="font-medium text-gray-900 dark:text-white">In-Clinic Appointment</p>
                       </>
                     ) : (
                       <>
-                        <Video className="h-4 w-4 text-primary" />
+                        <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={25} height={20} />
                         <p className="font-medium text-gray-900 dark:text-white">Virtual Visit</p>
                       </>
                     )}

@@ -1,11 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Calendar, CalendarDays } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
 import AppointmentCard from "./_components/AppointmentCard";
 import ClinicBranchSelect from "@/components/ClinicBranchSelect";
+import Image from "next/image";
 
 export default function ManageAppointmentPageContent() {
   const { data: currentUserAppointmentsData, isLoading } = useCurrentUserAppointments();
@@ -17,7 +18,13 @@ export default function ManageAppointmentPageContent() {
         <div className="mb-8 text-center">
           <div className="mb-4 flex justify-center">
             <div className="rounded-full bg-primary/10 p-3">
-              <CalendarDays className="h-8 w-8 text-primary" />
+              <Image
+                src={`/icons/Calender.png`}
+                alt="Manage Your Appointment"
+                width={100}
+                height={100}
+                className="size-[70px] object-contain"
+              />
             </div>
           </div>
           <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">Manage Your Appointment</h1>

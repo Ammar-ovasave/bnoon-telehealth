@@ -5,6 +5,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 interface ServiceCardProps {
   service: Service;
@@ -29,7 +30,19 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
         )}
       >
         <CardHeader className="text-center px-4 gap-0">
-          <div className="text-4xl mb-0">{service.icon}</div>
+          <div className="text-4xl flex justify-center mb-0">
+            {service.imageSrc ? (
+              <Image
+                width={service.imageWidth ?? 50}
+                height={service.imageHeight ?? 50}
+                src={service.imageSrc}
+                alt={service.title}
+                className={cn("h-[80px] w-[80px] object-contain", service.imageClassName)}
+              />
+            ) : (
+              service.icon
+            )}
+          </div>
           <CardTitle className="text-lg font-bold text-gray-900 dark:text-white mb-2">{service.title}</CardTitle>
           <CardDescription className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
             {service.description}

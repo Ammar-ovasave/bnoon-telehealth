@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import { format, add } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
-import { Calendar, CheckCircle, Clock, MapPin, Phone, RefreshCw, User, X } from "lucide-react";
+import { CheckCircle, Clock, Phone, RefreshCw, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
 import {
   AlertDialog,
@@ -29,6 +29,7 @@ import Link from "next/link";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
 import useFertiSmartAppointmentStatuses from "@/hooks/useFertiSmartAppointmentStatuses";
+import Image from "next/image";
 
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -122,6 +123,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
       });
 
       mutateCurrentUserAppointments(undefined);
+      console.log("--- close reschedule dialog ");
       setShowRescheduleDialog(false);
       setSelectedRescheduleDate(undefined);
       setSelectedRescheduleTimeSlot(undefined);
@@ -196,7 +198,13 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Appointment Details</h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-primary" />
+              <Image
+                src={`/icons/Calender.png`}
+                alt="Manage Your Appointment"
+                width={100}
+                height={100}
+                className="h-[30px] w-[22px] object-cover"
+              />
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Date & Time</p>
                 <p className="font-medium text-gray-900 dark:text-white">{dateAndTime}</p>
@@ -204,21 +212,39 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <User className="h-5 w-5 text-primary" />
+              <Image
+                src={`/icons/Doctor.svg`}
+                alt="Manage Your Appointment"
+                width={100}
+                height={100}
+                className="h-[30px] w-[22px] object-cover"
+              />
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Doctor</p>
                 <p className="font-medium text-gray-900 dark:text-white">{resource?.linkedUserFullName}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-primary" />
+              <Image
+                src={`/icons/Icons-16.png`}
+                alt="Manage Your Appointment"
+                width={50}
+                height={50}
+                className="h-[30px] w-[22px] object-cover"
+              />
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Service</p>
                 <p className="font-medium text-gray-900 dark:text-white">{service?.name ?? "-"}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-primary" />
+              <Image
+                src={`/icons/Location1.png`}
+                alt="Location"
+                width={100}
+                height={100}
+                className="h-[30px] w-[22px] object-cover"
+              />
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Location</p>
                 <p className="font-medium text-gray-900 dark:text-white">
@@ -405,9 +431,13 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
             <AlertDialogCancel disabled={isRescheduling}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               disabled={isRescheduling || !selectedRescheduleDate || !selectedRescheduleTimeSlot}
-              onClick={handleRescheduleConfirm}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleRescheduleConfirm();
+              }}
             >
-              {isRescheduling ? "Rescheduling..." : "Confirm Reschedule"}
+              {isRescheduling ? <Spinner /> : "Confirm Reschedule"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -427,7 +457,9 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
             <AlertDialogAction
               disabled={isCancelling}
               className="bg-red-600 hover:bg-red-700"
-              onClick={async () => {
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 try {
                   setIsCancelling(true);
                   if (!appointment.id) return;
@@ -442,7 +474,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 }
               }}
             >
-              {isCancelling ? "Cancelling..." : "Yes, Cancel"}
+              {isCancelling ? <Spinner /> : "Yes, Cancel"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -474,10 +506,18 @@ const getAppointmentStatusIcon = (status: string) => {
       return <Clock className="h-4 w-4" />;
     case "completed":
       return <CheckCircle className="h-4 w-4" />;
-    case "cancelled":
+    case "Cancelled":
       return <X className="h-4 w-4" />;
     default:
-      return <Calendar className="h-4 w-4" />;
+      return (
+        <Image
+          src={`/icons/Calender.png`}
+          alt="Manage Your Appointment"
+          width={100}
+          height={100}
+          className="h-[20px] w-[20px] object-cover"
+        />
+      );
   }
 };
 

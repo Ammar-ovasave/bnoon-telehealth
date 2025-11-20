@@ -4,7 +4,7 @@ import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import { Spinner } from "@/components/ui/spinner";
 import InPersonForm from "./_components/InPersonForm";
-import { MapPin } from "lucide-react";
+import Image from "next/image";
 
 export default function InPersonAppointmentInfoPage() {
   const { isLoading } = useCurrentUser();
@@ -18,7 +18,7 @@ export default function InPersonAppointmentInfoPage() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="bg-primary/15 p-3 rounded-full">
-              <MapPin className="h-8 w-8 text-primary" />
+              <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={50} height={50} />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">In-Person Visit Information</h1>
@@ -40,7 +40,7 @@ export default function InPersonAppointmentInfoPage() {
         <div className="mt-6 bg-primary/5 rounded-lg p-4 border border-primary">
           <div className="flex items-start gap-3">
             <div className="bg-primary/15 p-1 rounded-full mt-0.5">
-              <MapPin className="h-4 w-4 text-primary" />
+              <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={25} />
             </div>
             <div>
               <h4 className="text-sm font-medium text-primary mb-1">In-Person Visit Details</h4>

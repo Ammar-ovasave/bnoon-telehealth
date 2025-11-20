@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Calendar, User, Mail, Globe, Users, CreditCard, CalendarDays } from "lucide-react";
+import { CheckCircle, User, Mail, Globe, Users, CreditCard, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { clinicLocations } from "@/models/ClinicModel";
 import { services } from "@/models/ServiceModel";
@@ -14,6 +14,7 @@ import useFertiSmartAppointment from "@/hooks/useFertiSmartAppointment";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import LoadingPage from "../loading";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
+import Image from "next/image";
 
 export const PageContent: FC = () => {
   const searchParams = useSearchParams();
@@ -96,8 +97,8 @@ export const PageContent: FC = () => {
           {/* Success Header */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <div className="bg-green-100 dark:bg-green-900 p-4 rounded-full">
-                <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
+              <div className="bg-primary/10 p-4 rounded-full">
+                <CheckCircle className="h-12 w-12 text-primary" />
               </div>
             </div>
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Your Appointment is Confirmed!</h1>
@@ -116,11 +117,17 @@ export const PageContent: FC = () => {
             {/* Appointment Details */}
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
+                <Image
+                  src={"/icons/Calender.png"}
+                  alt="Appointment Details"
+                  width={40}
+                  height={40}
+                  className="h-[30px] w-[20px] object-cover"
+                />
                 Appointment Details
               </h2>
               <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-start py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Date & Time</span>
                   <div className="text-right">
                     <span className="font-medium text-gray-900 dark:text-white">{selectedTimeSlot}</span>

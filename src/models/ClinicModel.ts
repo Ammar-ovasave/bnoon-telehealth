@@ -6,7 +6,7 @@ export interface ClinicLocation {
   city: string;
   address: string;
   doctors: string;
-  apiUrl: string;
+  apiUrl: string | null;
   imageSrc: string;
   contactNumber: string;
   contactEmail: string;
@@ -36,7 +36,7 @@ export const clinicLocations: ClinicLocation[] = [
     contactEmail: "info@bnoon.sa",
     contactNumber: "+966114448080",
     isCommingSoon: true,
-    apiUrl: `https://unvaunted-weedily-jannie.ngrok-free.dev`,
+    apiUrl: null,
   },
   {
     id: "jeddah",
@@ -60,7 +60,7 @@ export const clinicLocations: ClinicLocation[] = [
     contactNumber: "+966126800800",
     isCommingSoon: true,
     hideComingSoonBadge: true,
-    apiUrl: `https://undeclarable-kolby-overgraciously.ngrok-free.dev`,
+    apiUrl: null,
   },
 ];
 

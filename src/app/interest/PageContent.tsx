@@ -4,9 +4,13 @@ import { FC } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import ServiceCard from "@/components/ServiceCard";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 export const PageContent: FC = () => {
   const { isLoading, data: servicesData } = useFertiSmartAPIServices();
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -35,6 +39,12 @@ export const PageContent: FC = () => {
               ))}
           </div>
         )}
+        <div className="w-full flex justify-center mt-12">
+          <Button variant={"outline"} className="max-w-md w-full" onClick={() => router.back()}>
+            <ChevronLeft />
+            Back to clinic selection
+          </Button>
+        </div>
       </div>
     </div>
   );

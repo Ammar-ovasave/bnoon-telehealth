@@ -392,7 +392,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                     ) : (
                       <p className="text-gray-500 dark:text-gray-400 text-center col-span-2">
                         No availability on{" "}
-                        {selectedRescheduleDate ? format(selectedRescheduleDate, "yyyy-MM-dd") : "the selected date"}. Please
+                        {selectedRescheduleDate ? format(selectedRescheduleDate, "dd-MM-yyyy") : "the selected date"}. Please
                         select a different date.
                       </p>
                     )}

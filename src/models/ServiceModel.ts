@@ -18,7 +18,7 @@ export const services: Service[] = [
     description:
       "Start your parenthood journey with Bnoon to help you start or grow your family whether you’re facing primary or secondary infertility, seeking family balancing, or exploring ART to prevent genetic conditions.",
     icon: "👩🏻‍🍼",
-    imageSrc: `/icons/Icons-47.png`,
+    imageSrc: `/icons/Icons-51.png`,
     imageClassName: "h-[80px] w-[80px]",
   },
   {
@@ -38,7 +38,7 @@ export const services: Service[] = [
     description:
       "State-of-the-art fertility preservation solutions powered by advanced technology and comprehensive packages — helping you safeguard your reproductive health for the future.",
     icon: "🔒",
-    imageSrc: "/icons/Asset49.svg",
+    imageSrc: "/icons/Icons-15.png",
     imageClassName: "h-[80px] w-[70px]",
   },
   // {

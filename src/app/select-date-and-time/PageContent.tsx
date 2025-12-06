@@ -120,7 +120,7 @@ export default function SelectDateAndTimePage() {
             </div>
           )}
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Choose your preferred appointment date and time. Available slots are highlighted.
+            Choose your preferred appointment date and time. Available slots are highlighted on the left.
           </p>
         </div>
 
@@ -199,7 +199,7 @@ export default function SelectDateAndTimePage() {
                   ))
                 ) : (
                   <p className="text-gray-500 dark:text-gray-400 text-center col-span-2">
-                    No availability on {selectedDate ? format(selectedDate, "yyyy-MM-dd") : "the selected date"}. Please select a
+                    No availability on {selectedDate ? format(selectedDate, "dd-MM-yyyy") : "the selected date"}. Please select a
                     different date.
                   </p>
                 )}
@@ -259,7 +259,7 @@ export default function SelectDateAndTimePage() {
                 <p className="font-medium text-gray-900 dark:text-white">
                   {selectedDate ? format(selectedDate, "EEEE, MMMM do, yyyy") : "Not selected"}
                 </p>
-                {selectedDate && !isKSA && (
+                {/* {selectedDate && !isKSA && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     KSA:{" "}
                     {selectedTimeSlot && (availabilityData?.length ?? 0) > 0
@@ -270,7 +270,7 @@ export default function SelectDateAndTimePage() {
                         )
                       : formatInTimeZone(selectedDate, KSA_TIMEZONE, "EEEE, MMMM do, yyyy")}
                   </p>
-                )}
+                )} */}
               </div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Time</p>

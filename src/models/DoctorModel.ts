@@ -87,7 +87,7 @@ export const doctors: DoctorModel[] = [
       clinic: true,
       virtual: true,
     },
-    languages: ["Arabic", "English"],
+    languages: ["Arabic", "English", "French"],
     branchId: "riyadh-granada",
     services: ["having-child", "fertility-preservation", "general-fertility"],
   },
@@ -161,7 +161,7 @@ export const doctors: DoctorModel[] = [
   {
     id: "dr-moussa-el-naiemy",
     services: ["male-andrology"],
-    name: "Dr.Mousa AlNamee",
+    name: "Dr. Mussa AlNumi",
     specialty: "Consultant, Urology, Andrology & Male Infertility",
     availability: {
       clinic: true,

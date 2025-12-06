@@ -12,6 +12,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { Spinner } from "./ui/spinner";
 import useTimer from "@/hooks/useTimer";
 import { differenceInSeconds } from "date-fns";
+import { useTranslations } from "next-intl";
 
 const OTP_LENGTH = 4;
 
@@ -25,6 +26,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
   const [searchTerm, setSearchTerm] = useState<string>("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const t = useTranslations("VerifyPhonePage");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -55,10 +57,10 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
 
   const handleSendOtp = async () => {
     if (!selectedBranch) {
-      return toast.error("Branch not found");
+      return toast.error(t("errors.branchNotFound"));
     }
     if (!phoneNumber || phoneNumber.length < 7) {
-      alert("Please enter a valid phone number");
+      alert(t("errors.invalidPhoneNumber"));
       return;
     }
     setIsLoading(true);
@@ -78,7 +80,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
       : createPatientResponse?.mrn;
     if (!mrnToUse) {
       setIsLoading(false);
-      return toast.error("Faild to create a patient");
+      return toast.error(t("errors.failedToCreatePatient"));
     }
     const purpose = "verify phone number";
     const sendOTPResponse = await sendOTP({
@@ -90,7 +92,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
     });
     if (!sendOTPResponse?.length) {
       setIsLoading(false);
-      return toast.error("Faild to send OTP");
+      return toast.error(t("errors.failedToSendOTP"));
     }
     // console.log("sendOTPResponse", sendOTPResponse);
     // sessionStorage.setItem("otp", sendOTPResponse.code);
@@ -103,7 +105,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
 
   const handleVerifyOtp = async () => {
     if (!otp || otp.length !== OTP_LENGTH) {
-      alert(`Please enter a valid ${OTP_LENGTH}-digit OTP code`);
+      alert(t("errors.invalidOTPCode", { otpLength: OTP_LENGTH }));
       return;
     }
     setIsLoading(true);
@@ -114,7 +116,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
     });
     if (!response?.verified) {
       setIsLoading(false);
-      return toast.error("Invalid OTP. Please try again.");
+      return toast.error(t("errors.invalidOTP"));
     }
     // const urlSearchParams = new URLSearchParams(window.location.search);
     // const selectedVisitType = urlSearchParams.get("selectedVisitType");
@@ -190,12 +192,10 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
               </div>
             </div>
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              {showOtpInput ? "Verify Your Phone Number" : "Enter Your Phone Number"}
+              {showOtpInput ? t("title.verifyPhone") : t("title.enterPhone")}
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              {showOtpInput
-                ? `We've sent a verification code to your phone number. Please enter the ${OTP_LENGTH}-digit code below.`
-                : "We'll send you a verification code to confirm your phone number. This helps us keep your account secure."}
+              {showOtpInput ? t("description.verifyPhone", { otpLength: OTP_LENGTH }) : t("description.enterPhone")}
             </p>
           </div>
           {/* Phone Number Input */}
@@ -203,7 +203,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
             <div className="mb-8">
               <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Phone Number
+                  {t("labels.phoneNumber")}
                 </label>
                 <div className="flex gap-2">
                   <div className="relative" ref={dropdownRef}>
@@ -223,7 +223,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                         <div className="p-2">
                           <input
                             type="text"
-                            placeholder="Search countries..."
+                            placeholder={t("placeholders.searchCountries")}
                             value={searchTerm}
                             onChange={handleSearchChange}
                             className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
@@ -247,7 +247,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                             ))
                           ) : (
                             <div className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
-                              No countries found matching &quot;{searchTerm}&quot;
+                              {t("messages.noCountriesFound", { searchTerm })}
                             </div>
                           )}
                         </div>
@@ -259,23 +259,24 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                     type="tel"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
-                    placeholder={selectedCountryCode === "+966" ? "5XXXXXXXX" : "Enter phone number"}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    placeholder={
+                      selectedCountryCode === "+966" ? t("placeholders.phoneNumberKSA") : t("placeholders.phoneNumber")
+                    }
+                    className="flex-1 px-3 ltr:text-left rtl:text-right py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     maxLength={15}
                   />
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Enter your phone number without the country code</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t("labels.enterPhoneWithoutCode")}</p>
                 {isTimerActive && (
                   <div className="mt-4 p-3 bg-primary/10 border border-primary rounded-md">
                     <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
-                      Please wait <span className="font-mono font-semibold text-primary">{formatTime(remainingTime)}</span> before
-                      requesting a new code
+                      {t("messages.waitBeforeRequest", { time: formatTime(remainingTime) })}
                     </p>
                   </div>
                 )}
                 <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
                   <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
-                    <ArrowLeft /> Back
+                    <ArrowLeft /> {t("buttons.back")}
                   </Button>
                   <Button
                     onClick={handleSendOtp}
@@ -283,7 +284,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                     size="lg"
                     className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
                   >
-                    {isLoading ? "Sending..." : "Send Verification Code"} <ArrowRight />
+                    {isLoading ? t("buttons.sending") : t("buttons.sendVerificationCode")} <ArrowRight />
                   </Button>
                 </div>
               </div>
@@ -298,7 +299,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                   </div>
                 </div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 text-center">
-                  Enter Verification Code
+                  {t("labels.enterVerificationCode")}
                 </label>
                 <div className="flex justify-center">
                   <InputOTP maxLength={6} value={otp} onChange={setOtp} className="gap-2">
@@ -320,7 +321,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                     size="lg"
                     className="px-6 py-3 w-full md:w-auto"
                   >
-                    <ArrowLeft /> Back
+                    <ArrowLeft /> {t("buttons.back")}
                   </Button>
                   <Button
                     onClick={handleVerifyOtp}
@@ -328,7 +329,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                     size="lg"
                     className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
                   >
-                    {isLoading ? "Verifying..." : "Verify Phone Number"} <ArrowRight />
+                    {isLoading ? t("buttons.verifying") : t("buttons.verifyPhoneNumber")} <ArrowRight />
                   </Button>
                 </div>
               </div>

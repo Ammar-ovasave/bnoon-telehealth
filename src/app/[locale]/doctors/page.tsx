@@ -5,11 +5,12 @@ import { doctors as fullDoctorsList } from "@/models/DoctorModel";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Filter } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import DoctorCard from "@/components/DoctorCard";
-import AvailabilityPicker, { AvailabilityOption } from "@/components/AvailabilityPicker";
-import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { AvailabilityFilter } from "@/models/VisitTypeModel";
+import AvailabilityPicker, { AvailabilityOption } from "@/components/AvailabilityPicker";
+import DoctorCard from "@/components/DoctorCard";
+import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
@@ -17,6 +18,7 @@ export default function DoctorsListPage() {
   // const availabilityFilter: AvailabilityFilter = (searchParams.get("selectedVisitType") as AvailabilityFilter) || "clinic";
   const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>();
   const router = useRouter();
+  const t = useTranslations("DoctorsPage");
 
   const handleSetAvailabilityFilter = (value: AvailabilityFilter) => {
     const newSearchParams = new URLSearchParams(searchParams);
@@ -71,14 +73,14 @@ export default function DoctorsListPage() {
   const availabilityOptions: AvailabilityOption[] = [
     {
       value: "clinic",
-      title: "Clinic Visit",
-      description: "Visit our clinic for an in-person consultation and comprehensive examination.",
+      title: t("visitType.clinic.title"),
+      description: t("visitType.clinic.description"),
       icon: <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={25} />,
     },
     {
       value: "virtual",
-      title: "Virtual Visit",
-      description: "Consult with your doctor from the comfort of your home via video call.",
+      title: t("visitType.virtual.title"),
+      description: t("visitType.virtual.description"),
       icon: <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={25} height={25} />,
     },
   ];
@@ -92,19 +94,16 @@ export default function DoctorsListPage() {
       ) : (
         <div className="mx-auto px-4 py-8 max-w-5xl pb-30">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Your Doctor</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Choose from our trusted team of experts — highly qualified, board-certified consultants dedicated to providing
-              expert guidance, advanced treatments, and innovative, personalized care.
-            </p>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
           </div>
           <div>
             {!availabilityFilter ? (
               <AvailabilityPicker
                 options={availabilityOptions}
                 onSelect={handleSetAvailabilityFilter}
-                title="Select Visit Type"
-                description="Choose how you'd like to have your consultation - whether visiting us at the clinic or remotely through a virtual consultation. Both options provide excellent care tailored to your needs."
+                title={t("visitType.title")}
+                description={t("visitType.description")}
               />
             ) : filteredDoctors.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -121,17 +120,15 @@ export default function DoctorsListPage() {
               <div className="text-center py-12">
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-sm border border-gray-200 dark:border-gray-700">
                   <Filter className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No doctors found</h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    No doctors match your current filter criteria. Try adjusting your availability filter.
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t("noDoctorsFound.title")}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">{t("noDoctorsFound.description")}</p>
                 </div>
               </div>
             )}
           </div>
           <div className="mt-8 text-center">
             <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3">
-              <ArrowLeft /> Back to Service Selection
+              <ArrowLeft /> {t("buttons.backToServiceSelection")}
             </Button>
           </div>
         </div>

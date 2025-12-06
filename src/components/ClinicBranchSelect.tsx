@@ -8,12 +8,15 @@ import useCurrentBranch from "@/hooks/useCurrentBranch";
 import useSwitchBranch from "@/hooks/useSwitchBranch";
 import LoadingOverlay from "./LoadingOverlay";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface ClinicBranchSelectProps {
   className?: string;
 }
 
 export default function ClinicBranchSelect({ className }: ClinicBranchSelectProps) {
+  const t = useTranslations("ManageAppointmentsPage.clinicBranchSelect");
+  const tHomePage = useTranslations("HomePage");
   const { data, isLoading } = useCurrentBranch();
 
   const selectedBranchId = data?.branch?.id ?? "";
@@ -40,16 +43,16 @@ export default function ClinicBranchSelect({ className }: ClinicBranchSelectProp
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Image src={`/icons/ClinicBuilding.png`} alt="Clinic Branch" width={100} height={100} />
+              <Image src={`/icons/ClinicBuilding.png`} alt={t("label")} width={100} height={100} />
             </div>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-primary">Clinic Branch</p>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white">Manage your appointments by location</h2>
+              <p className="text-sm font-semibold uppercase tracking-wide text-primary">{t("label")}</p>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t("heading")}</h2>
             </div>
           </div>
           <div className="flex min-w-[240px] flex-col gap-2">
             <label htmlFor="clinic-branch-select" className="text-sm font-medium text-slate-800 dark:text-slate-100">
-              Select branch
+              {t("selectBranch")}
             </label>
             <div className="relative w-fit">
               <NativeSelect
@@ -61,11 +64,14 @@ export default function ClinicBranchSelect({ className }: ClinicBranchSelectProp
               >
                 {clinicLocations
                   .filter((item) => !item.isCommingSoon)
-                  .map((clinic) => (
-                    <NativeSelectOption key={clinic.id} value={clinic.id} disabled={clinic.isCommingSoon}>
-                      {clinic.name}
-                    </NativeSelectOption>
-                  ))}
+                  .map((clinic) => {
+                    const clinicName = tHomePage(`clinics.${clinic.id}.name`);
+                    return (
+                      <NativeSelectOption key={clinic.id} value={clinic.id} disabled={clinic.isCommingSoon}>
+                        {clinicName}
+                      </NativeSelectOption>
+                    );
+                  })}
               </NativeSelect>
               {(isLoading || switchingBranch) && (
                 <Loader2

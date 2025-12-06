@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface ServiceCardProps {
   service: Service;
@@ -15,6 +16,7 @@ interface ServiceCardProps {
 
 const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
   const searchParams = useSearchParams();
+  const t = useTranslations("ServicesPage");
 
   const newUrlSearchParams = useMemo(() => {
     const params = new URLSearchParams(searchParams);
@@ -43,9 +45,11 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
               service.icon
             )}
           </div>
-          <CardTitle className="text-lg font-bold text-gray-900 dark:text-white mb-2">{service.title}</CardTitle>
+          <CardTitle className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+            {t(`services.${service.id}.title`)}
+          </CardTitle>
           <CardDescription className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-            {service.description}
+            {t(`services.${service.id}.description`)}
           </CardDescription>
         </CardHeader>
       </Card>

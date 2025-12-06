@@ -15,11 +15,13 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export default function SelectDateAndTimePage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>();
   const router = useRouter();
+  const t = useTranslations("SelectDateAndTimePage");
 
   const searchParams = useSearchParams();
   const selectedDoctorId = searchParams.get("selectedDoctor");
@@ -96,7 +98,7 @@ export default function SelectDateAndTimePage() {
       <div className="container mx-auto px-4 py-8 max-w-6xl pb-40">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Date & Time</h1>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
           {selectedVisitType && (
             <div className="flex justify-center mb-4">
               <div
@@ -108,20 +110,18 @@ export default function SelectDateAndTimePage() {
                 {selectedVisitType === "clinic" ? (
                   <>
                     <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={20} />
-                    <span>In-Clinic Appointment</span>
+                    <span>{t("visitTypes.clinic")}</span>
                   </>
                 ) : (
                   <>
                     <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={25} height={20} />
-                    <span>Virtual Visit</span>
+                    <span>{t("visitTypes.virtual")}</span>
                   </>
                 )}
               </div>
             </div>
           )}
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Choose your preferred appointment date and time. Available slots are highlighted on the left.
-          </p>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -129,7 +129,7 @@ export default function SelectDateAndTimePage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-4">
               <Image src={`/icons/Calender.png`} alt="Select Date" width={25} height={20} />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Select Date</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t("selectDate")}</h2>
             </div>
             <div className="flex justify-center">
               <Calendar
@@ -150,20 +150,20 @@ export default function SelectDateAndTimePage() {
                 }}
               />
             </div>
-            {selectedDate && (
+            {/* {selectedDate && (
               <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
                 <p className="text-sm text-green-800 dark:text-green-200">
-                  Selected: <span className="font-medium">{format(selectedDate, "EEEE, MMMM do, yyyy")}</span>
+                  {t("messages.selected")} <span className="font-medium">{format(selectedDate, "EEEE, MMMM do, yyyy")}</span>
                 </p>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Time Selection */}
           <div className="bg-white flex flex-col dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-4">
               <Image src={`/icons/Clock.png`} alt="Select Time" width={25} height={20} />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Select Time</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t("selectTime")}</h2>
             </div>
 
             {!selectedDate ? (
@@ -171,7 +171,7 @@ export default function SelectDateAndTimePage() {
                 <div className="flex justify-center">
                   <Image src={`/icons/Clock.png`} alt="Select Time" width={70} height={70} />
                 </div>
-                <p className="text-gray-500 dark:text-gray-400">Please select a date first to view available time slots</p>
+                <p className="text-gray-500 dark:text-gray-400">{t("messages.selectDateFirst")}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3 max-h-96 flex-1 overflow-y-auto p-4">
@@ -199,8 +199,9 @@ export default function SelectDateAndTimePage() {
                   ))
                 ) : (
                   <p className="text-gray-500 dark:text-gray-400 text-center col-span-2">
-                    No availability on {selectedDate ? format(selectedDate, "dd-MM-yyyy") : "the selected date"}. Please select a
-                    different date.
+                    {t("messages.noAvailability", {
+                      date: selectedDate ? format(selectedDate, "dd-MM-yyyy") : t("messages.notSelected"),
+                    })}
                   </p>
                 )}
               </div>
@@ -209,22 +210,20 @@ export default function SelectDateAndTimePage() {
             {selectedTimeSlot && (availabilityData?.length ?? 0) > 0 && (
               <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
                 <p className="text-sm text-primary dark:text-primary-200">
-                  Selected:{" "}
+                  {t("messages.selected")}{" "}
                   <span className="font-medium">
                     {format(
                       availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
-                      "hh:mm aa"
+                      "EEEE, MMMM do, yyyy hh:mm aa"
                     )}
                   </span>
                   {!isKSA && (
                     <span className="text-xs ml-2 opacity-75">
-                      (
                       {`${formatInTimeZone(
                         availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
                         KSA_TIMEZONE,
                         "hh:mm aa"
-                      )} KSA time`}
-                      )
+                      )} ${t("summary.ksaTime")}`}
                     </span>
                   )}
                 </p>
@@ -234,30 +233,30 @@ export default function SelectDateAndTimePage() {
         </div>
         {(selectedDate || selectedTimeSlot) && (
           <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Appointment Summary</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t("summary.title")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {selectedVisitType && (
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Visit Type</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t("summary.visitType")}</p>
                   <div className="flex items-center gap-2 mt-1">
                     {selectedVisitType === "clinic" ? (
                       <>
                         <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={20} />
-                        <p className="font-medium text-gray-900 dark:text-white">In-Clinic Appointment</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{t("visitTypes.clinic")}</p>
                       </>
                     ) : (
                       <>
                         <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={25} height={20} />
-                        <p className="font-medium text-gray-900 dark:text-white">Virtual Visit</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{t("visitTypes.virtual")}</p>
                       </>
                     )}
                   </div>
                 </div>
               )}
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Date</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("summary.date")}</p>
                 <p className="font-medium text-gray-900 dark:text-white">
-                  {selectedDate ? format(selectedDate, "EEEE, MMMM do, yyyy") : "Not selected"}
+                  {selectedDate ? format(selectedDate, "EEEE, MMMM do, yyyy") : t("messages.notSelected")}
                 </p>
                 {/* {selectedDate && !isKSA && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -273,18 +272,18 @@ export default function SelectDateAndTimePage() {
                 )} */}
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Time</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("summary.time")}</p>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {selectedTimeSlot && (availabilityData?.length ?? 0) > 0
                     ? format(
                         availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
                         "hh:mm aa"
                       )
-                    : "Not selected"}
+                    : t("messages.notSelected")}
                 </p>
                 {selectedTimeSlot && (availabilityData?.length ?? 0) > 0 && !isKSA && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    KSA:{" "}
+                    {t("summary.ksaTime")}:{" "}
                     {formatInTimeZone(
                       availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
                       KSA_TIMEZONE,
@@ -301,7 +300,7 @@ export default function SelectDateAndTimePage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col-reverse md:flex-row gap-6 justify-between container">
             <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
-              <ArrowLeft /> Back
+              <ArrowLeft /> {t("buttons.back")}
             </Button>
             <Link href={getNextPageUrl()}>
               <Button
@@ -309,7 +308,7 @@ export default function SelectDateAndTimePage() {
                 size="lg"
                 className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
               >
-                Continue <ArrowRight />
+                {t("buttons.continue")} <ArrowRight />
               </Button>
             </Link>
           </div>

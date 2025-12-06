@@ -5,8 +5,10 @@ import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import { Spinner } from "@/components/ui/spinner";
 import InPersonForm from "./_components/InPersonForm";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export default function InPersonAppointmentInfoPage() {
+  const t = useTranslations("InPersonAppointmentInfoPage");
   const { isLoading } = useCurrentUser();
   const { isLoading: loadingPatientData } = useFertiSmartPatient();
   const { isLoading: loadingCountries } = useFertiSmartCountries();
@@ -18,13 +20,11 @@ export default function InPersonAppointmentInfoPage() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="bg-primary/15 p-3 rounded-full">
-              <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={50} height={50} />
+              <Image src={`/icons/Location1.png`} alt={t("title")} width={50} height={50} />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">In-Person Visit Information</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            {`Please provide your name to complete your in-person appointment booking. We'll use this information to prepare for your visit.`}
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
         </div>
 
         {/* Form */}
@@ -40,13 +40,11 @@ export default function InPersonAppointmentInfoPage() {
         <div className="mt-6 bg-primary/5 rounded-lg p-4 border border-primary">
           <div className="flex items-start gap-3">
             <div className="bg-primary/15 p-1 rounded-full mt-0.5">
-              <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={25} />
+              <Image src={`/icons/Location1.png`} alt={t("visitDetails.title")} width={25} height={25} />
             </div>
             <div>
-              <h4 className="text-sm font-medium text-primary mb-1">In-Person Visit Details</h4>
-              <p className="text-sm text-primary">
-                {`You'll receive a confirmation email. Please arrive 10 minutes before your scheduled appointment time.`}
-              </p>
+              <h4 className="text-sm font-medium text-primary mb-1">{t("visitDetails.title")}</h4>
+              <p className="text-sm text-primary">{t("visitDetails.description")}</p>
             </div>
           </div>
         </div>

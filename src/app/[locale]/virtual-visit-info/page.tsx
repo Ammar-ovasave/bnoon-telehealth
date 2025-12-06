@@ -6,12 +6,14 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
+import { useTranslations } from "next-intl";
 
 export default function VirtualVisitInfoPage() {
   const { isLoading } = useCurrentUser();
   const { isLoading: loadingPatientData } = useFertiSmartPatient();
   const { isLoading: loadingCountries } = useFertiSmartCountries();
   const { isLoading: loadingIdTypes } = useFertiSmartIDTypes();
+  const t = useTranslations("VirtualVisitInfoPage");
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
@@ -23,11 +25,8 @@ export default function VirtualVisitInfoPage() {
               <User className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Personal Information</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Please provide your personal information to complete your visit booking. This information helps us provide you with
-            the best possible care.
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
         </div>
         {/* Form */}
         {isLoading || loadingPatientData || loadingCountries || loadingIdTypes ? (
@@ -44,11 +43,8 @@ export default function VirtualVisitInfoPage() {
               <User className="h-4 w-4 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <h4 className="text-sm font-medium text-green-800 dark:text-green-200 mb-1">Privacy & Security</h4>
-              <p className="text-sm text-green-700 dark:text-green-300">
-                Your personal information is encrypted and stored securely. We only use this information to provide you with
-                healthcare services and will never share it with third parties without your consent.
-              </p>
+              <h4 className="text-sm font-medium text-green-800 dark:text-green-200 mb-1">{t("privacy.title")}</h4>
+              <p className="text-sm text-green-700 dark:text-green-300">{t("privacy.description")}</p>
             </div>
           </div>
         </div>

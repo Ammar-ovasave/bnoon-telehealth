@@ -7,8 +7,10 @@ import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
 import AppointmentCard from "./_components/AppointmentCard";
 import ClinicBranchSelect from "@/components/ClinicBranchSelect";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export default function ManageAppointmentPageContent() {
+  const t = useTranslations("ManageAppointmentsPage");
   const { data: currentUserAppointmentsData, isLoading } = useCurrentUserAppointments();
 
   return (
@@ -27,10 +29,8 @@ export default function ManageAppointmentPageContent() {
               />
             </div>
           </div>
-          <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">Manage Your Appointment</h1>
-          <p className="mx-auto max-w-3xl text-gray-600 dark:text-gray-300 md:text-lg">
-            View, reschedule, or cancel your appointments.
-          </p>
+          <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">{t("title")}</h1>
+          <p className="mx-auto max-w-3xl text-gray-600 dark:text-gray-300 md:text-lg">{t("description")}</p>
         </div>
         <ClinicBranchSelect className="mb-10" />
         {/* Appointments List */}
@@ -42,11 +42,11 @@ export default function ManageAppointmentPageContent() {
           ) : (currentUserAppointmentsData?.length ?? 0) === 0 ? (
             <div className="py-12 text-center">
               <Calendar className="mx-auto mb-4 h-16 w-16 text-gray-400" />
-              <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">No Appointments Found</h3>
-              <p className="mb-6 text-gray-600 dark:text-gray-400">{`You don't have any appointments scheduled.`}</p>
+              <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">{t("noAppointmentsFound.title")}</h3>
+              <p className="mb-6 text-gray-600 dark:text-gray-400">{t("noAppointmentsFound.description")}</p>
               <Link href="/">
                 <Button size="lg" className="px-8 py-3">
-                  Book New Appointment
+                  {t("buttons.bookNewAppointment")}
                 </Button>
               </Link>
             </div>
@@ -61,7 +61,7 @@ export default function ManageAppointmentPageContent() {
           <div className="mt-8 text-center">
             <Link href="/">
               <Button size="lg" className="px-8 py-3">
-                Book Another Appointment
+                {t("buttons.bookAnotherAppointment")}
               </Button>
             </Link>
           </div>

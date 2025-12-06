@@ -2,6 +2,7 @@
 
 import { AvailabilityFilter } from "@/models/VisitTypeModel";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export interface AvailabilityOption {
   value: AvailabilityFilter;
@@ -19,6 +20,8 @@ interface AvailabilityPickerProps {
 }
 
 export default function AvailabilityPicker({ options, onSelect, eyebrow, title, description }: AvailabilityPickerProps) {
+  const t = useTranslations("DoctorsPage");
+
   return (
     <section className="bg-white dark:bg-gray-800 rounded-lg p-6 md:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
       <div className="text-center max-w-2xl mx-auto mb-6">
@@ -35,7 +38,7 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
             key={option.value}
             onClick={() => onSelect(option.value)}
             className={cn(
-              "group w-full cursor-pointer rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/40 p-5 md:p-6 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+              "group w-full cursor-pointer rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-900/40 p-5 md:p-6 text-start transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
               "hover:border-primary/60 hover:bg-white dark:hover:bg-gray-900",
               "flex flex-col gap-4"
             )}
@@ -48,7 +51,7 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
             </div>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 flex-1">{option.description}</p>
             <div className="flex items-center justify-between text-sm font-bold bg-primary px-4 py-2 rounded-md text-white w-fit">
-              <span>Select {option.value === "clinic" ? "a clinic" : "a virtual"} visit</span>
+              <span>{option.value === "clinic" ? t("visitType.clinic.selectButton") : t("visitType.virtual.selectButton")}</span>
             </div>
           </button>
         ))}

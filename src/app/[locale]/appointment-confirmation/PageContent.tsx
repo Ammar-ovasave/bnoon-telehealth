@@ -15,8 +15,13 @@ import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import LoadingPage from "../loading";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
+import { getDoctorName } from "@/lib/getDoctorName";
 
 export const PageContent: FC = () => {
+  const t = useTranslations("AppointmentConfirmationPage");
+  const tServices = useTranslations("ServicesPage");
+  const locale = useLocale();
   const searchParams = useSearchParams();
 
   const appointmentId = searchParams.get("appointmentId");
@@ -32,7 +37,9 @@ export const PageContent: FC = () => {
   const { data: currentUserData, isLoading: loadingCurrentUser } = useCurrentUser();
 
   const { data: patientData, isLoading: loadingPatient, fullName } = useFertiSmartPatient();
-  const gender = patientData?.sex === 0 ? "Female" : "Male";
+  const gender = useMemo(() => {
+    return patientData?.sex === 0 ? t("patientInformation.genders.female") : t("patientInformation.genders.male");
+  }, [patientData?.sex, t]);
 
   const idType = useMemo(() => {
     return patientData?.identityIdType?.name;
@@ -86,6 +93,11 @@ export const PageContent: FC = () => {
 
   const service = useMemo(() => services.find((service) => service.id === selectedService), [selectedService]);
 
+  const serviceTitle = useMemo(() => {
+    if (!service?.id) return service?.title ?? "-";
+    return tServices(`services.${service.id}.title`);
+  }, [service?.id, service?.title, tServices]);
+
   const doctor = useMemo(() => doctors.find((doc) => doc.id === selectedDoctor), [selectedDoctor]);
 
   return (
@@ -101,14 +113,11 @@ export const PageContent: FC = () => {
                 <CheckCircle className="h-12 w-12 text-primary" />
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Your Appointment is Confirmed!</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Your appointment has been successfully booked and confirmed. You will receive a confirmation email or SMS shortly
-              with all the details.
-            </p>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
             <div className="mt-4 bg-primary/10 rounded-lg p-4 border border-primary">
               <p className="text-primary font-medium">
-                Confirmation Number: <span className="font-bold">{confirmationNumber}</span>
+                {t("confirmationNumber")}: <span className="font-bold">{confirmationNumber}</span>
               </p>
             </div>
           </div>
@@ -119,37 +128,39 @@ export const PageContent: FC = () => {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <Image
                   src={"/icons/Calender.png"}
-                  alt="Appointment Details"
+                  alt={t("appointmentDetails.title")}
                   width={40}
                   height={40}
                   className="h-[30px] w-[20px] object-cover"
                 />
-                Appointment Details
+                {t("appointmentDetails.title")}
               </h2>
               <div className="space-y-4">
                 <div className="flex justify-between items-start py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">Date & Time</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.dateTime")}</span>
                   <div className="text-right">
                     <span className="font-medium text-gray-900 dark:text-white">{selectedTimeSlot}</span>
                     {selectedTimeSlotKSA && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">KSA: {selectedTimeSlotKSA}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {t("appointmentDetails.ksaTime")}: {selectedTimeSlotKSA}
+                      </p>
                     )}
                   </div>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">Visit Type</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.visitType")}</span>
                   <span className="font-medium text-gray-900 dark:text-white capitalize">{selectedVisitType}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">Doctor</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{doctor?.name}</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.doctor")}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{getDoctorName(doctor, locale)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">Service</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{service?.title}</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.service")}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{serviceTitle}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600 dark:text-gray-400">Location</span>
+                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.location")}</span>
                   <span className="font-medium text-gray-900 dark:text-white">{clinic?.name}</span>
                 </div>
               </div>
@@ -159,28 +170,30 @@ export const PageContent: FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <User className="h-5 w-5 text-primary" />
-                Patient Information
+                {t("patientInformation.title")}
               </h2>
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Full Name
+                    {t("patientInformation.fullName")}
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">{fullName}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                     <Mail className="h-4 w-4" />
-                    Mobile Number
+                    {t("patientInformation.mobileNumber")}
                   </span>
-                  <span className="font-medium text-gray-900 dark:text-white">{currentUserData?.contactNumber}</span>
+                  <span dir="ltr" className="font-medium text-gray-900 dark:text-white">
+                    {currentUserData?.contactNumber}
+                  </span>
                 </div>
                 {patientCountry?.name && (
                   <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                       <Globe className="h-4 w-4" />
-                      Nationality
+                      {t("patientInformation.nationality")}
                     </span>
                     <span className="font-medium text-gray-900 dark:text-white">{patientCountry?.name ?? "-"}</span>
                   </div>
@@ -188,7 +201,7 @@ export const PageContent: FC = () => {
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    Gender
+                    {t("patientInformation.gender")}
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">{gender}</span>
                 </div>
@@ -207,14 +220,11 @@ export const PageContent: FC = () => {
 
           {/* Next Steps */}
           <div className="mt-8 bg-primary/10 rounded-lg p-6 border border-primary">
-            <h3 className="text-lg font-semibold text-primary dark:text-primary mb-3">{"What's Next?"}</h3>
+            <h3 className="text-lg font-semibold text-primary dark:text-primary mb-3">{t("nextSteps.title")}</h3>
             <div className="space-y-2 text-primary">
-              <p>• You will receive a confirmation email or SMS with your appointment details.</p>
-              <p>• {`For virtual visits, you'll receive a meeting link with the confirmation email.`}</p>
-              <p>
-                • For in-person visits, please arrive 10 minutes early at the clinic location. Please bring your ID, passport copy
-                and previous medical reports, if any.
-              </p>
+              <p>• {t("nextSteps.confirmationMessage")}</p>
+              <p>• {t("nextSteps.virtualVisitMessage")}</p>
+              <p>• {t("nextSteps.inPersonVisitMessage")}</p>
             </div>
           </div>
 
@@ -223,7 +233,7 @@ export const PageContent: FC = () => {
             <Link href="/manage-appointments">
               <Button size="lg" className="px-8 py-3">
                 <CalendarDays className="h-4 w-4 mr-2" />
-                Manage Appointments
+                {t("buttons.manageAppointments")}
               </Button>
             </Link>
           </div>

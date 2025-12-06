@@ -4,6 +4,7 @@ import { ServiceID } from "./ServiceModel";
 export interface DoctorModel {
   id: string;
   name: string;
+  arName: string;
   specialty: string;
   photo: string;
   availability: {
@@ -19,6 +20,7 @@ export const doctors: DoctorModel[] = [
   {
     id: "dr-abdalaziz-al-shahrani",
     name: "Dr. Abdulaziz Alshahrani",
+    arName: "الدكتور عبد العزيز الشهراني",
     specialty:
       "Group Medical Director Consultant, Obstetrics, Gynecology, Reproductive Endorinology, Infertility (IVF) & Minimally Invasive Surgery",
     photo: "/images/dr_ abdulaziz.jpg",
@@ -32,6 +34,7 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "bassam-mahammad-nusair",
+    arName: "الدكتور بسام نصير",
     availability: { clinic: true, virtual: true },
     branchId: "al-ahsa",
     languages: ["Arabic", "English"],
@@ -42,6 +45,7 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "rania-mohamed-ibrahim",
+    arName: "الدكتورة رانيا الشريفي",
     availability: { clinic: true, virtual: true },
     branchId: "al-ahsa",
     languages: ["Arabic", "English"],
@@ -53,6 +57,7 @@ export const doctors: DoctorModel[] = [
   {
     id: "dr-fawaz-edris",
     name: "Dr. Fawaz Edris",
+    arName: "البروفيسور فواز إدريس",
     specialty:
       "Executive Director, Bnoon - Jeddah Consultant, Obstetrics, Gynecology, Reproductive Endocrinology, Infertility (IVF), Minimally Invasive Surgery & Maternal Fetal Medicine",
     photo: "/images/dr-fawad.jpg",
@@ -66,6 +71,7 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-mazin-bishara",
+    arName: "الدكتور مازن بشارة",
     name: "Dr. Mazen Beshara",
     specialty:
       "Medical Director, Bnoon - Jeddah Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery",
@@ -81,6 +87,7 @@ export const doctors: DoctorModel[] = [
   {
     id: "dr-asim-al-wuhaibi",
     name: "Dr. Asim Al Wohaibi",
+    arName: "الدكتور عاصم الوهيبي",
     specialty: "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery",
     photo: "/images/dr-asim.jpg",
     availability: {
@@ -108,6 +115,7 @@ export const doctors: DoctorModel[] = [
   {
     id: "dr-ahmed-alshaikh",
     name: "Dr. Ahmed Alshaikh",
+    arName: "الدكتور أحمد الشيخ",
     specialty: "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery",
     photo: "/images/dr-ahmed-bekar.jpg",
     availability: {
@@ -120,6 +128,7 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-wajdi-al-omari",
+    arName: "الدكتور وجدي  العمري",
     name: "Dr. Wajdi Al Omari",
     specialty: "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology & Infertility (IVF), Minimally Invasive Surgery",
     photo: "/images/dr-wajdi.jpg",
@@ -135,6 +144,7 @@ export const doctors: DoctorModel[] = [
   {
     id: "dr-dalia-adel",
     name: "Dr. Dalia Adel Nour",
+    arName: "الدكتورة داليا  نور",
     specialty: "Consultant, Obstetrics, Gynecology & Infertility",
     photo: "/images/dr-dalia.jpg",
     availability: {
@@ -147,6 +157,7 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-ahmad-haroun",
+    arName: "الدكتور أحمد هارون",
     name: "Dr. Ahmad Haroun",
     specialty: "Consultant, Urology, Andrology & Male Infertility",
     photo: "/images/dr-haroun.jpg",
@@ -162,6 +173,7 @@ export const doctors: DoctorModel[] = [
     id: "dr-moussa-el-naiemy",
     services: ["male-andrology"],
     name: "Dr. Mussa AlNumi",
+    arName: "الدكتور موسى  النعمي",
     specialty: "Consultant, Urology, Andrology & Male Infertility",
     availability: {
       clinic: true,
@@ -173,6 +185,7 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-maya-albezreh",
+    arName: "الدكتورة مايا البزره",
     name: "Dr. Maya Albezreh",
     specialty: "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology & Infertility (IVF)",
     photo: "/images/dr-maya-albezreh.jpg",
@@ -186,6 +199,7 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-razan-ghaith",
+    arName: "الدكتورة رزان غيث",
     name: "Dr. Razan Ghaith",
     specialty: "Consultant, Obstetrics, Gynecology & Delayed Pregnancy",
     photo: "/images/dr-razan-ghaith.jpg",
@@ -199,6 +213,7 @@ export const doctors: DoctorModel[] = [
   },
   {
     id: "dr-maram-dadoua",
+    arName: "الدكتورة مرام دعدوع",
     name: "Dr. Maram Dadoua",
     specialty: "Senior Registrar, Obstetrics & Gynecology",
     photo: "/images/dr-maram.jpg",

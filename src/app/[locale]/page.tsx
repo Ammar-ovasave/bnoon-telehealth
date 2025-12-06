@@ -3,9 +3,15 @@ import { Suspense, useMemo } from "react";
 import { groupClinicsByCity, ClinicLocation } from "@/models/ClinicModel";
 import ClinicCard from "@/components/ClinicCard";
 import LoadingPage from "./loading";
+import { useTranslations } from "next-intl";
 
 export default function Home() {
+  const t = useTranslations("HomePage");
   const clinicsByCity = useMemo(() => groupClinicsByCity(), []);
+
+  const getTranslatedCity = (city: string) => {
+    return t(`cities.${city}`) || city;
+  };
 
   const clinicsWithCitySeparators = useMemo(() => {
     const result: Array<{ type: "clinic" | "separator"; data?: ClinicLocation; city?: string }> = [];
@@ -26,12 +32,8 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Your Nearest Bnoon Clinic</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            <strong>Bnoon</strong> brings advanced care closer to you — with trusted doctors, innovative technologies, and a
-            commitment to compassionate, personalized care; dedicated to setting new benchmarks in fertility and women’s health
-            care.
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">{t("description")}</p>
         </div>
         {/* Mobile */}
         <div className="md:hidden space-y-6">
@@ -39,7 +41,7 @@ export default function Home() {
             <div key={city} className="space-y-4">
               {/* City Header */}
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{city}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{getTranslatedCity(city)}</h2>
                 <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700"></div>
                 <span className="text-sm text-gray-500 dark:text-gray-400">{clinics.length}</span>
               </div>

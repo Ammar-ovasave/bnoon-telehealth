@@ -59,7 +59,6 @@ export const clinicLocations: ClinicLocation[] = [
     contactEmail: "info.jeddah@bnoon.sa",
     contactNumber: "+966126800800",
     isCommingSoon: true,
-    hideComingSoonBadge: true,
     apiUrl: null,
   },
 ];

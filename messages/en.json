@@ -1,0 +1,384 @@
+{
+  "HomePage": {
+    "title": "Select Your Nearest Bnoon Clinic",
+    "description": "Bnoon brings advanced care closer to you — with trusted doctors, innovative technologies, and a commitment to compassionate, personalized care; dedicated to setting new benchmarks in fertility and women's health care.",
+    "cities": {
+      "Riyadh": "Riyadh",
+      "Jeddah": "Jeddah",
+      "Al Ahsa": "Al Ahsa"
+    },
+    "clinics": {
+      "riyadh-granada": {
+        "name": "Bnoon - Riyadh",
+        "address": "Granada District"
+      },
+      "riyadh-king-salman": {
+        "name": "Bnoon – Riyadh",
+        "address": "King Salman Road"
+      },
+      "jeddah": {
+        "name": "Bnoon – Jeddah",
+        "address": "Alshatae District"
+      },
+      "al-ahsa": {
+        "name": "Bnoon – Al Ahsa",
+        "address": "Almoosa Specialist Hospital, North Tower, Floor 12"
+      }
+    },
+    "buttons": {
+      "selectClinic": "Select Clinic",
+      "openingSoon": "Opening Soon"
+    }
+  },
+  "ServicesPage": {
+    "title": "What Are You Interested In?",
+    "description": "Select the reason for your appointment — the service that best fits your needs. From assessment to treatment, our team of consultants will guide you every step of the way with expert care and a personalized plan.",
+    "buttons": {
+      "backToClinicSelection": "Back to clinic selection"
+    },
+    "services": {
+      "having-child": {
+        "title": "Having a Child",
+        "description": "Start your parenthood journey with Bnoon to help you start or grow your family whether you're facing primary or secondary infertility, seeking family balancing, or exploring ART to prevent genetic conditions."
+      },
+      "general-fertility": {
+        "title": "General Fertility Consultation",
+        "description": "Expert consultation and evaluation of reproductive health to personalized treatments for women and men. Our specialists provide advanced, supportive care every step of the way."
+      },
+      "fertility-preservation": {
+        "title": "Fertility Preservation",
+        "description": "State-of-the-art fertility preservation solutions powered by advanced technology and comprehensive packages — helping you safeguard your reproductive health for the future."
+      },
+      "pregnancy-followup": {
+        "title": "Gynecology and Maternity Services",
+        "description": "Comprehensive women's health and pregnancy care — from puberty to post-menopause. Our gynecologists offer personalized support, from prenatal and postnatal care to managing PCOS, endometriosis, menopause, and more."
+      },
+      "male-andrology": {
+        "title": "Andrology and Male Problems",
+        "description": "Specialized care for male infertility and urological conditions. Our expert andrologists diagnose and treat issues such as low sperm count, hormonal imbalance, and erectile dysfunction to support fertility and overall male reproductive health."
+      }
+    }
+  },
+  "DoctorsPage": {
+    "title": "Select Your Doctor",
+    "description": "Choose from our trusted team of experts — highly qualified, board-certified consultants dedicated to providing expert guidance, advanced treatments, and innovative, personalized care.",
+    "visitType": {
+      "title": "Select Visit Type",
+      "description": "Choose how you'd like to have your consultation - whether visiting us at the clinic or remotely through a virtual consultation. Both options provide excellent care tailored to your needs.",
+      "clinic": {
+        "title": "Clinic Visit",
+        "description": "Visit our clinic for an in-person consultation and comprehensive examination.",
+        "selectButton": "Select a clinic visit"
+      },
+      "virtual": {
+        "title": "Virtual Visit",
+        "description": "Consult with your doctor from the comfort of your home via video call.",
+        "selectButton": "Select a virtual visit"
+      }
+    },
+    "availability": {
+      "clinicAndVirtual": "Clinic & Virtual",
+      "clinicOnly": "Clinic Only",
+      "virtualOnly": "Virtual Only"
+    },
+    "buttons": {
+      "bookAppointment": "Book an Appointment",
+      "backToServiceSelection": "Back to Service Selection"
+    },
+    "noDoctorsFound": {
+      "title": "No doctors found",
+      "description": "No doctors match your current filter criteria. Try adjusting your availability filter."
+    },
+    "doctors": {
+      "dr-abdalaziz-al-shahrani": {
+        "specialty": "Group Medical Director Consultant, Obstetrics, Gynecology, Reproductive Endorinology, Infertility (IVF) & Minimally Invasive Surgery"
+      },
+      "bassam-mahammad-nusair": {
+        "specialty": "Consultant, Obstetrics, Gynecology, Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery"
+      },
+      "rania-mohamed-ibrahim": {
+        "specialty": "Consultant, Obstetrics, Gynecology & Delayed Pregnancy"
+      },
+      "dr-fawaz-edris": {
+        "specialty": "Executive Director, Bnoon - Jeddah Consultant, Obstetrics, Gynecology, Reproductive Endocrinology, Infertility (IVF), Minimally Invasive Surgery & Maternal Fetal Medicine"
+      },
+      "dr-mazin-bishara": {
+        "specialty": "Medical Director, Bnoon - Jeddah Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery"
+      },
+      "dr-asim-al-wuhaibi": {
+        "specialty": "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery"
+      },
+      "dr-ahmed-alshaikh": {
+        "specialty": "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery"
+      },
+      "dr-wajdi-al-omari": {
+        "specialty": "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology & Infertility (IVF), Minimally Invasive Surgery"
+      },
+      "dr-dalia-adel": {
+        "specialty": "Consultant, Obstetrics, Gynecology & Infertility"
+      },
+      "dr-ahmad-haroun": {
+        "specialty": "Consultant, Urology, Andrology & Male Infertility"
+      },
+      "dr-moussa-el-naiemy": {
+        "specialty": "Consultant, Urology, Andrology & Male Infertility"
+      },
+      "dr-maya-albezreh": {
+        "specialty": "Consultant, Obstetrics, Gynecology,  Reproductive Endocrinology & Infertility (IVF)"
+      },
+      "dr-razan-ghaith": {
+        "specialty": "Consultant, Obstetrics, Gynecology & Delayed Pregnancy"
+      },
+      "dr-maram-dadoua": {
+        "specialty": "Senior Registrar, Obstetrics & Gynecology"
+      }
+    }
+  },
+  "SelectDateAndTimePage": {
+    "title": "Select Date & Time",
+    "description": "Choose your preferred appointment date and time. Available slots are highlighted on the left.",
+    "selectDate": "Select Date",
+    "selectTime": "Select Time",
+    "visitTypes": {
+      "clinic": "In-Clinic Appointment",
+      "virtual": "Virtual Visit"
+    },
+    "messages": {
+      "selectDateFirst": "Please select a date first to view available time slots",
+      "noAvailability": "No availability on {date}. Please select a different date.",
+      "selected": "Selected:",
+      "notSelected": "Not selected"
+    },
+    "summary": {
+      "title": "Appointment Summary",
+      "visitType": "Visit Type",
+      "date": "Date",
+      "time": "Time",
+      "ksaTime": "KSA time"
+    },
+    "buttons": {
+      "back": "Back",
+      "continue": "Continue"
+    }
+  },
+  "VerifyPhonePage": {
+    "title": {
+      "enterPhone": "Enter Your Phone Number",
+      "verifyPhone": "Verify Your Phone Number"
+    },
+    "description": {
+      "enterPhone": "We'll send you a verification code to confirm your phone number. This helps us keep your account secure.",
+      "verifyPhone": "We've sent a verification code to your phone number. Please enter the {otpLength}-digit code below."
+    },
+    "labels": {
+      "phoneNumber": "Phone Number",
+      "enterVerificationCode": "Enter Verification Code",
+      "enterPhoneWithoutCode": "Enter your phone number without the country code"
+    },
+    "placeholders": {
+      "phoneNumber": "Enter phone number",
+      "phoneNumberKSA": "5XXXXXXXX",
+      "searchCountries": "Search countries..."
+    },
+    "messages": {
+      "waitBeforeRequest": "Please wait {time} before requesting a new code",
+      "noCountriesFound": "No countries found matching \"{searchTerm}\""
+    },
+    "buttons": {
+      "back": "Back",
+      "sendVerificationCode": "Send Verification Code",
+      "sending": "Sending...",
+      "verifyPhoneNumber": "Verify Phone Number",
+      "verifying": "Verifying..."
+    },
+    "errors": {
+      "branchNotFound": "Branch not found",
+      "invalidPhoneNumber": "Please enter a valid phone number",
+      "failedToCreatePatient": "Failed to create a patient",
+      "failedToSendOTP": "Failed to send OTP",
+      "invalidOTP": "Invalid OTP. Please try again.",
+      "invalidOTPCode": "Please enter a valid {otpLength}-digit OTP code"
+    }
+  },
+  "VirtualVisitInfoPage": {
+    "title": "Personal Information",
+    "description": "Please provide your personal information to complete your visit booking. This information helps us provide you with the best possible care.",
+    "labels": {
+      "fullName": "Full Name",
+      "emailAddress": "Email Address",
+      "nationality": "Nationality",
+      "selectNationality": "Select your nationality",
+      "gender": "Gender",
+      "idType": "ID Type",
+      "idNumber": "ID Number"
+    },
+    "genders": {
+      "male": "Male",
+      "female": "Female"
+    },
+    "placeholders": {
+      "fullName": "Enter your full name",
+      "emailAddress": "Enter your email address",
+      "passportNumber": "Enter your passport number",
+      "nationalIdNumber": "Enter your national ID number",
+      "idNumber": "Enter your ID number"
+    },
+    "errors": {
+      "fullNameRequired": "Full name is required",
+      "fullNameMinLength": "Full name must be at least 2 characters",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "nationalityRequired": "Please select your nationality",
+      "genderRequired": "Please select your gender",
+      "idTypeRequired": "Please select your ID type",
+      "idNumberRequired": "ID number is required",
+      "nationalIdStartWith1": "National ID number must start with 1",
+      "nationalIdDigitsOnly": "National ID number must only contain digits",
+      "nationalIdLength": "National ID number must be 10 digits",
+      "iqamaStartWith2": "Iqama number must start with 2",
+      "iqamaDigitsOnly": "Iqama number must only contain digits",
+      "iqamaLength": "Iqama number must be 10 digits",
+      "somethingWentWrong": "Something went wrong"
+    },
+    "privacy": {
+      "title": "Privacy & Security",
+      "description": "Your personal information is encrypted and stored securely. We only use this information to provide you with healthcare services and will never share it with third parties without your consent."
+    },
+    "buttons": {
+      "back": "Back",
+      "confirm": "Confirm",
+      "loading": "Loading"
+    }
+  },
+  "AppointmentConfirmationPage": {
+    "title": "Your Appointment is Confirmed!",
+    "description": "Your appointment has been successfully booked and confirmed. You will receive a confirmation email or SMS shortly with all the details.",
+    "confirmationNumber": "Confirmation Number",
+    "appointmentDetails": {
+      "title": "Appointment Details",
+      "dateTime": "Date & Time",
+      "visitType": "Visit Type",
+      "doctor": "Doctor",
+      "service": "Service",
+      "location": "Location",
+      "ksaTime": "KSA"
+    },
+    "patientInformation": {
+      "title": "Patient Information",
+      "fullName": "Full Name",
+      "mobileNumber": "Mobile Number",
+      "nationality": "Nationality",
+      "gender": "Gender",
+      "genders": {
+        "male": "Male",
+        "female": "Female"
+      }
+    },
+    "nextSteps": {
+      "title": "What's Next?",
+      "confirmationMessage": "You will receive a confirmation email or SMS with your appointment details.",
+      "virtualVisitMessage": "For virtual visits, you'll receive a meeting link with the confirmation email.",
+      "inPersonVisitMessage": "For in-person visits, please arrive 10 minutes early at the clinic location. Please bring your ID, passport copy and previous medical reports, if any."
+    },
+    "buttons": {
+      "manageAppointments": "Manage Appointments"
+    }
+  },
+  "ManageAppointmentsPage": {
+    "title": "Manage Your Appointment",
+    "description": "View, reschedule, or cancel your appointments.",
+    "clinicBranchSelect": {
+      "label": "Clinic Branch",
+      "heading": "Manage your appointments by location",
+      "selectBranch": "Select branch"
+    },
+    "noAppointmentsFound": {
+      "title": "No Appointments Found",
+      "description": "You don't have any appointments scheduled."
+    },
+    "buttons": {
+      "bookNewAppointment": "Book New Appointment",
+      "bookAnotherAppointment": "Book Another Appointment"
+    },
+    "appointmentCard": {
+      "confirmation": "Confirmation",
+      "buttons": {
+        "join": "Join",
+        "reschedule": "Reschedule",
+        "cancel": "Cancel"
+      },
+      "appointmentDetails": {
+        "title": "Appointment Details",
+        "dateTime": "Date & Time",
+        "doctor": "Doctor",
+        "service": "Service",
+        "location": "Location",
+        "virtualVisit": "Virtual Visit",
+        "inClinic": "In Clinic",
+        "ksaTime": "KSA"
+      },
+      "patientInformation": {
+        "title": "Patient Information",
+        "fullName": "Full Name",
+        "email": "Email",
+        "phoneNumber": "Phone Number",
+        "alternative": "Alternative",
+        "nationality": "Nationality",
+        "gender": "Gender",
+        "genders": {
+          "male": "Male",
+          "female": "Female"
+        }
+      },
+      "reschedule": {
+        "title": "Reschedule Appointment",
+        "description": "Choose your preferred date and time for this appointment.",
+        "selectDate": "Select Date",
+        "selectTime": "Select Time",
+        "selected": "Selected",
+        "selectDateFirst": "Please select a date first to view available time slots",
+        "noAvailability": "No availability on {date}. Please select a different date.",
+        "ksaTime": "KSA time",
+        "buttons": {
+          "cancel": "Cancel",
+          "confirmReschedule": "Confirm Reschedule"
+        }
+      },
+      "cancel": {
+        "title": "Cancel appointment?",
+        "description": "Are you sure you want to cancel this appointment? This action cannot be undone.",
+        "buttons": {
+          "keepAppointment": "Keep Appointment",
+          "yesCancel": "Yes, Cancel"
+        }
+      },
+      "errors": {
+        "somethingWentWrong": "Something went wrong"
+      }
+    }
+  },
+  "InPersonAppointmentInfoPage": {
+    "title": "In-Person Visit Information",
+    "description": "Please provide your name to complete your in-person appointment booking. We'll use this information to prepare for your visit.",
+    "visitDetails": {
+      "title": "In-Person Visit Details",
+      "description": "You'll receive a confirmation email. Please arrive 10 minutes before your scheduled appointment time."
+    },
+    "labels": {
+      "fullName": "Full Name"
+    },
+    "placeholders": {
+      "fullName": "Enter your full name"
+    },
+    "errors": {
+      "fullNameRequired": "Full name is required",
+      "fullNameMinLength": "Full name must be at least 2 characters",
+      "somethingWentWrong": "Something went wrong"
+    },
+    "buttons": {
+      "back": "Back",
+      "confirm": "Confirm",
+      "loading": "Loading"
+    }
+  }
+}

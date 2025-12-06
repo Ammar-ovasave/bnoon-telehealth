@@ -16,6 +16,7 @@ import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import { doctors } from "@/models/DoctorModel";
 import { containsArabic } from "@/services/containsArabic";
+import { useTranslations } from "next-intl";
 
 interface FormData {
   fullName: string;
@@ -26,6 +27,7 @@ interface FormErrors {
 }
 
 export default function InPersonForm() {
+  const t = useTranslations("InPersonAppointmentInfoPage");
   const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
   const { mutate: mutatePatient, fullName } = useFertiSmartPatient();
   const [formData, setFormData] = useState<FormData>({
@@ -48,11 +50,11 @@ export default function InPersonForm() {
 
   const validateForm = useMemo((): string | undefined => {
     if (!formData.fullName.trim()) {
-      return "Full name is required";
+      return t("errors.fullNameRequired");
     } else if (formData.fullName.trim().length < 2) {
-      return "Full name must be at least 2 characters";
+      return t("errors.fullNameMinLength");
     }
-  }, [formData.fullName]);
+  }, [formData.fullName, t]);
 
   const searchParams = useSearchParams();
   const selectedTimeSlot = decodeURIComponent(searchParams.get("selectedTimeSlot") ?? "");
@@ -80,20 +82,20 @@ export default function InPersonForm() {
     }
     if (!currentUserData?.mrn) {
       console.log("--- no current user mrn");
-      return toast.error("Something went wrong");
+      return toast.error(t("errors.somethingWentWrong"));
     }
     const status = statusesData?.find((item) => item.name === "Approved/Confirmed");
     if (!status) {
       console.log("could not find status");
-      return toast.error("Something went wrong");
+      return toast.error(t("errors.somethingWentWrong"));
     }
     if (!apiServicesData?.length) {
       console.log("could not find api service");
-      return toast.error("Something went wrong");
+      return toast.error(t("errors.somethingWentWrong"));
     }
     if (!branchesData?.length) {
       console.log("could not find branch");
-      return toast.error("Something went wrong");
+      return toast.error(t("errors.somethingWentWrong"));
     }
     setLoading(true);
     try {
@@ -117,11 +119,11 @@ export default function InPersonForm() {
       const newCurrentUser = await getCurrentUser();
       if (!newCurrentUser) {
         console.log("no new current user");
-        return toast.error("Something went wrong");
+        return toast.error(t("errors.somethingWentWrong"));
       }
       if (!createAppointmentResponse?.id) {
         console.log("could not create appointment", createAppointmentResponse);
-        return toast.error("Something went wrong");
+        return toast.error(t("errors.somethingWentWrong"));
       }
       await updatePatient({
         arabicName: containsArabic(formData.fullName) ? formData.fullName : undefined,
@@ -136,7 +138,7 @@ export default function InPersonForm() {
       router.replace(`/appointment-confirmation?${newSearchParams.toString()}`);
     } catch (e) {
       console.log("--- create appointment error", e);
-      toast.error("Something went wrong");
+      toast.error(t("errors.somethingWentWrong"));
     } finally {
       setLoading(false);
     }
@@ -155,6 +157,7 @@ export default function InPersonForm() {
     selectedTimeSlot,
     statusesData,
     validateForm,
+    t,
   ]);
 
   return (
@@ -171,7 +174,7 @@ export default function InPersonForm() {
             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-gray-500" />
-                Full Name *
+                {t("labels.fullName")} *
               </div>
             </label>
             <input
@@ -179,7 +182,7 @@ export default function InPersonForm() {
               type="text"
               value={formData.fullName}
               onChange={(e) => handleInputChange("fullName", e.target.value)}
-              placeholder="Enter your full name"
+              placeholder={t("placeholders.fullName")}
               className={cn(
                 "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent dark:bg-gray-700 dark:text-white",
                 errors.fullName ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
@@ -192,7 +195,7 @@ export default function InPersonForm() {
         {/* Action Buttons */}
         <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
           <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
-            <ArrowLeft /> Back
+            <ArrowLeft /> {t("buttons.back")}
           </Button>
           <Button
             type="submit"
@@ -200,7 +203,7 @@ export default function InPersonForm() {
             className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
             disabled={loading || !formData.fullName}
           >
-            {loading ? "Loading" : "Confirm"} <ArrowRight />
+            {loading ? t("buttons.loading") : t("buttons.confirm")} <ArrowRight />
           </Button>
         </div>
       </div>

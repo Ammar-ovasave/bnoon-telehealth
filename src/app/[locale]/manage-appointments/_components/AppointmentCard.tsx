@@ -8,6 +8,7 @@ import { format, add } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { CheckCircle, Clock, Phone, RefreshCw, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,8 +31,15 @@ import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
 import useFertiSmartAppointmentStatuses from "@/hooks/useFertiSmartAppointmentStatuses";
 import Image from "next/image";
+import { services } from "@/models/ServiceModel";
+import { doctors } from "@/models/DoctorModel";
+import { useLocale } from "next-intl";
+import { getDoctorName } from "@/lib/getDoctorName";
 
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
+  const t = useTranslations("ManageAppointmentsPage.appointmentCard");
+  const tServices = useTranslations("ServicesPage");
+  const locale = useLocale();
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [showRescheduleDialog, setShowRescheduleDialog] = useState(false);
@@ -46,10 +54,38 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
     return apiServicesData?.find((item) => item.id === appointment.service?.id);
   }, [apiServicesData, appointment.service?.id]);
 
+  const serviceTitle = useMemo(() => {
+    if (!service?.name) return service?.name ?? "-";
+
+    // Try to match the API service name with ServiceModel service titles
+    const matchedService = services.find((s) => s.title.toLowerCase() === service.name?.toLowerCase());
+
+    if (matchedService?.id) {
+      return tServices(`services.${matchedService.id}.title`);
+    }
+
+    // Fallback to API service name if no match found
+    return service.name;
+  }, [service?.name, tServices]);
+
   const { data: resourcesData } = useFertiSmartResources();
 
   const resourceId = appointment.resources?.[0]?.id;
   const resource = useMemo(() => resourcesData?.find((resource) => resource.id === resourceId), [resourceId, resourcesData]);
+
+  // Map API resource name to DoctorModel for localized display
+  const doctorFromModel = useMemo(() => {
+    if (!resource?.linkedUserFullName) return undefined;
+    return doctors.find((doctor) => resource.linkedUserFullName?.toLocaleLowerCase().includes(doctor.name.toLocaleLowerCase()));
+  }, [resource?.linkedUserFullName]);
+
+  const displayDoctorName = useMemo(() => {
+    if (doctorFromModel) {
+      return getDoctorName(doctorFromModel, locale);
+    }
+    // Fallback to API name if no match found
+    return resource?.linkedUserFullName ?? "";
+  }, [doctorFromModel, locale, resource?.linkedUserFullName]);
 
   const userTimezone = useMemo(() => {
     if (typeof window !== "undefined") {
@@ -129,7 +165,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
       setSelectedRescheduleTimeSlot(undefined);
     } catch (error) {
       console.error("Error rescheduling appointment:", error);
-      toast.error("Something went wrong");
+      toast.error(t("errors.somethingWentWrong"));
     } finally {
       setIsRescheduling(false);
     }
@@ -162,7 +198,9 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
             {getAppointmentStatusIcon(appointment.status?.name ?? "")}
             {(appointment.status?.name?.charAt(0)?.toUpperCase() ?? "") + (appointment.status?.name?.slice(1) ?? "")}
           </div>
-          <span className="text-sm text-gray-500 dark:text-gray-400">Confirmation: {appointment.id}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {t("confirmation")}: {appointment.id}
+          </span>
         </div>
         <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
           {appointment.status?.name !== "Cancelled" && (
@@ -170,12 +208,12 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               <Link href={`/video-call/${appointment.id}/prepare`}>
                 <Button variant="default" size="sm" className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
-                  Join
+                  {t("buttons.join")}
                 </Button>
               </Link>
               <Button onClick={() => handleReschedule()} variant="outline" size="sm" className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" />
-                Reschedule
+                {t("buttons.reschedule")}
               </Button>
               <Button
                 onClick={() => handleCancel()}
@@ -184,7 +222,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
               >
                 <X className="h-4 w-4" />
-                Cancel
+                {t("buttons.cancel")}
               </Button>
             </>
           )}
@@ -195,60 +233,66 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
       <div className="grid md:grid-cols-2 gap-6">
         {/* Left Column - Appointment Info */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Appointment Details</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("appointmentDetails.title")}</h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <Image
                 src={`/icons/Calender.png`}
-                alt="Manage Your Appointment"
+                alt={t("appointmentDetails.title")}
                 width={100}
                 height={100}
                 className="h-[30px] w-[22px] object-cover"
               />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Date & Time</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("appointmentDetails.dateTime")}</p>
                 <p className="font-medium text-gray-900 dark:text-white">{dateAndTime}</p>
-                {dateAndTimeKSA && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">KSA: {dateAndTimeKSA}</p>}
+                {dateAndTimeKSA && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {t("appointmentDetails.ksaTime")}: {dateAndTimeKSA}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Image
                 src={`/icons/Doctor.svg`}
-                alt="Manage Your Appointment"
+                alt={t("appointmentDetails.doctor")}
                 width={100}
                 height={100}
                 className="h-[30px] w-[22px] object-cover"
               />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Doctor</p>
-                <p className="font-medium text-gray-900 dark:text-white">{resource?.linkedUserFullName}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("appointmentDetails.doctor")}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{displayDoctorName}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Image
                 src={`/icons/Icons-16.png`}
-                alt="Manage Your Appointment"
+                alt={t("appointmentDetails.service")}
                 width={50}
                 height={50}
                 className="h-[30px] w-[22px] object-cover"
               />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Service</p>
-                <p className="font-medium text-gray-900 dark:text-white">{service?.name ?? "-"}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("appointmentDetails.service")}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{serviceTitle}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Image
                 src={`/icons/Location1.png`}
-                alt="Location"
+                alt={t("appointmentDetails.location")}
                 width={100}
                 height={100}
                 className="h-[30px] w-[22px] object-cover"
               />
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Location</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("appointmentDetails.location")}</p>
                 <p className="font-medium text-gray-900 dark:text-white">
-                  {appointment.description?.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic"}
+                  {appointment.description?.toLocaleLowerCase().includes("virtual")
+                    ? t("appointmentDetails.virtualVisit")
+                    : t("appointmentDetails.inClinic")}
                 </p>
               </div>
             </div>
@@ -257,38 +301,42 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 
         {/* Right Column - Patient Info */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Patient Information</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("patientInformation.title")}</h3>
           <div className="space-y-3">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Full Name</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.fullName")}</p>
               <p className="font-medium text-gray-900 dark:text-white">{fullName}</p>
             </div>
             {patientData?.emailAddress && (
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.email")}</p>
                 <p className="font-medium text-gray-900 dark:text-white">{patientData?.emailAddress}</p>
               </div>
             )}
             {patientData?.contactNumber && (
               <div className="">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Phone Number</p>
-                <p className="font-medium text-gray-900 dark:text-white">{patientData.contactNumber}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.phoneNumber")}</p>
+                <p dir="ltr" className="font-medium ltr:text-left rtl:text-right text-gray-900 dark:text-white">
+                  {patientData.contactNumber}
+                </p>
                 {patientData?.alternativeContactNumber && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Alternative: {patientData.alternativeContactNumber}
+                    {t("patientInformation.alternative")}: {patientData.alternativeContactNumber}
                   </p>
                 )}
               </div>
             )}
             {nationality?.name && (
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Nationality</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.nationality")}</p>
                 <p className="font-medium text-gray-900 dark:text-white">{nationality?.name ?? "-"}</p>
               </div>
             )}
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Gender</p>
-              <p className="font-medium text-gray-900 dark:text-white">{"Female"}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.gender")}</p>
+              <p className="font-medium text-gray-900 dark:text-white">
+                {patientData?.sex === 0 ? t("patientInformation.genders.female") : t("patientInformation.genders.male")}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">{patientData?.identityIdType?.name}</p>
@@ -302,8 +350,8 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
       <AlertDialog open={showRescheduleDialog} onOpenChange={setShowRescheduleDialog}>
         <AlertDialogContent className="!max-w-[800px] max-h-[90vh] overflow-y-auto">
           <AlertDialogHeader>
-            <AlertDialogTitle>Reschedule Appointment</AlertDialogTitle>
-            <AlertDialogDescription>Choose your preferred date and time for this appointment.</AlertDialogDescription>
+            <AlertDialogTitle>{t("reschedule.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("reschedule.description")}</AlertDialogDescription>
           </AlertDialogHeader>
           {loadingAppointmentStatus ? (
             <div className="p-4 flex justify-center items-center">
@@ -313,7 +361,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-4">
               {/* Date Selection */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Date</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t("reschedule.selectDate")}</h3>
                 <div className="flex justify-center">
                   <CalendarComponent
                     mode="single"
@@ -334,11 +382,12 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 {selectedRescheduleDate && (
                   <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
                     <p className="text-sm text-green-800 dark:text-green-200">
-                      Selected: <span className="font-medium">{format(selectedRescheduleDate, "EEEE, MMMM do, yyyy")}</span>
+                      {t("reschedule.selected")}:{" "}
+                      <span className="font-medium">{format(selectedRescheduleDate, "EEEE, MMMM do, yyyy")}</span>
                     </p>
                     {!isKSA && (
                       <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                        KSA:{" "}
+                        {t("reschedule.ksaTime")}:{" "}
                         {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0
                           ? formatInTimeZone(
                               availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
@@ -355,11 +404,11 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 
               {/* Time Selection */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Time</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t("reschedule.selectTime")}</h3>
                 {!selectedRescheduleDate ? (
                   <div className="text-center py-8">
                     <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-500 dark:text-gray-400">Please select a date first to view available time slots</p>
+                    <p className="text-gray-500 dark:text-gray-400">{t("reschedule.selectDateFirst")}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
@@ -383,7 +432,8 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                             {format(slot.start ?? "", "hh:mm aa")}
                             {!isKSA && (
                               <span className="text-xs block opacity-75 mt-0.5">
-                                ({formatInTimeZone(slot.start ?? new Date().toISOString(), KSA_TIMEZONE, "hh:mm aa")} KSA time)
+                                ({formatInTimeZone(slot.start ?? new Date().toISOString(), KSA_TIMEZONE, "hh:mm aa")}{" "}
+                                {t("reschedule.ksaTime")})
                               </span>
                             )}
                           </div>
@@ -391,9 +441,9 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                       ))
                     ) : (
                       <p className="text-gray-500 dark:text-gray-400 text-center col-span-2">
-                        No availability on{" "}
-                        {selectedRescheduleDate ? format(selectedRescheduleDate, "yyyy-MM-dd") : "the selected date"}. Please
-                        select a different date.
+                        {t("reschedule.noAvailability", {
+                          date: selectedRescheduleDate ? format(selectedRescheduleDate, "dd-MM-yyyy") : "the selected date",
+                        })}
                       </p>
                     )}
                   </div>
@@ -401,7 +451,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0 && (
                   <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
                     <p className="text-sm text-primary dark:text-primary-200">
-                      Selected:{" "}
+                      {t("reschedule.selected")}:{" "}
                       <span className="font-medium">
                         {format(
                           availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
@@ -417,7 +467,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                               new Date().toISOString(),
                             KSA_TIMEZONE,
                             "hh:mm aa"
-                          )} KSA time`}
+                          )} ${t("reschedule.ksaTime")}`}
                           )
                         </span>
                       )}
@@ -428,7 +478,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
             </div>
           )}
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isRescheduling}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isRescheduling}>{t("reschedule.buttons.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               disabled={isRescheduling || !selectedRescheduleDate || !selectedRescheduleTimeSlot}
               onClick={(e) => {
@@ -437,7 +487,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 handleRescheduleConfirm();
               }}
             >
-              {isRescheduling ? <Spinner /> : "Confirm Reschedule"}
+              {isRescheduling ? <Spinner /> : t("reschedule.buttons.confirmReschedule")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -447,13 +497,11 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
       <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cancel appointment?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to cancel this appointment? This action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("cancel.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("cancel.description")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isCancelling}>Keep Appointment</AlertDialogCancel>
+            <AlertDialogCancel disabled={isCancelling}>{t("cancel.buttons.keepAppointment")}</AlertDialogCancel>
             <AlertDialogAction
               disabled={isCancelling}
               className="bg-red-600 hover:bg-red-700"
@@ -474,7 +522,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 }
               }}
             >
-              {isCancelling ? <Spinner /> : "Yes, Cancel"}
+              {isCancelling ? <Spinner /> : t("cancel.buttons.yesCancel")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

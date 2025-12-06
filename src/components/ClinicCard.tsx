@@ -8,10 +8,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import useSwitchBranch from "@/hooks/useSwitchBranch";
 import LoadingOverlay from "./LoadingOverlay";
+import { useTranslations } from "next-intl";
 
 const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("HomePage");
 
   const { handleSwitchBranch, loading: loadingSwitchBranch } = useSwitchBranch();
 
@@ -44,10 +46,10 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80" />
         <div className="p-4 relative z-10 h-full flex flex-col justify-end gap-4">
           <CardHeader className="p-0">
-            <CardTitle className="text-lg font-bold text-white">{clinic.name}</CardTitle>
+            <CardTitle className="text-lg font-bold text-white">{t(`clinics.${clinic.id}.name`)}</CardTitle>
             <CardDescription className="flex items-center gap-2 text-sm">
               <MapPin className="h-4 w-4 text-white" />
-              <span className="text-white">{clinic.address}</span>
+              <span className="text-white">{t(`clinics.${clinic.id}.address`)}</span>
             </CardDescription>
           </CardHeader>
           {clinic.hideComingSoonBadge ? null : (
@@ -57,12 +59,12 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
               className="w-full bg-white text-black hover:bg-white/90 font-semibold"
               size="lg"
             >
-              {clinic.isCommingSoon ? "Opening Soon" : "Select Clinic"}
+              {clinic.isCommingSoon ? t("buttons.openingSoon") : t("buttons.selectClinic")}
             </Button>
           )}
           {clinic.isCommingSoon && !clinic.hideComingSoonBadge && (
             <p className="text-white text-sm absolute top-2 z-20 right-2 bg-white/20 rounded-sm px-2 backdrop-blur-2xl">
-              Opening Soon
+              {t("buttons.openingSoon")}
             </p>
           )}
         </div>

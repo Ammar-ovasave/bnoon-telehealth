@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./ui/button";
+import { useTranslations, useLocale } from "next-intl";
+import { getDoctorName } from "@/lib/getDoctorName";
 
 interface DoctorCardProps {
   doctor: DoctorModel;
@@ -13,13 +15,17 @@ interface DoctorCardProps {
 }
 
 const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDoctor }) => {
+  const t = useTranslations("DoctorsPage");
+  const locale = useLocale();
+  const doctorName = getDoctorName(doctor, locale);
+
   const getAvailabilityText = () => {
     if (doctor.availability.clinic && doctor.availability.virtual) {
-      return "Clinic & Virtual";
+      return t("availability.clinicAndVirtual");
     } else if (doctor.availability.clinic) {
-      return "Clinic Only";
+      return t("availability.clinicOnly");
     } else {
-      return "Virtual Only";
+      return t("availability.virtualOnly");
     }
   };
 
@@ -51,14 +57,16 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
         <div className="relative w-32 h-32 mx-auto mb-4">
           <Image
             src={doctor.photo}
-            alt={`${doctor.name} photo`}
+            alt={`${doctorName} photo`}
             fill
             className="object-cover rounded-full border-4 border-white shadow-lg"
             sizes="96px"
           />
         </div>
-        <CardTitle className="text-xl font-bold text-gray-900 dark:text-white mb-1">{doctor.name}</CardTitle>
-        <CardDescription className="text-primary text-sm font-semibold mb-2">{doctor.specialty}</CardDescription>
+        <CardTitle className="text-xl font-bold text-gray-900 dark:text-white mb-1">{doctorName}</CardTitle>
+        <CardDescription className="text-primary text-sm font-semibold mb-2">
+          {t(`doctors.${doctor.id}.specialty`)}
+        </CardDescription>
       </CardHeader>
       <CardContent className="pt-0 flex-1 px-4">
         <div className="space-y-1 flex flex-col h-full">
@@ -75,7 +83,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
             <span className="font-medium">{getAvailabilityText()}</span>
           </div>
           <Button className="w-full mt-auto cursor-pointer" variant="default" onClick={() => setSelectedDoctor(doctor.id)}>
-            Book an Appointment
+            {t("buttons.bookAppointment")}
             <ChevronRight className="size-6" />
           </Button>
         </div>

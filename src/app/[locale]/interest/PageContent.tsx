@@ -40,7 +40,7 @@ export const PageContent: FC = () => {
         )}
         <div className="w-full flex justify-center mt-12">
           <Button variant={"outline"} className="max-w-md w-full" onClick={() => router.back()}>
-            <ChevronLeft />
+            <ChevronLeft className="rtl:scale-x-[-1]" />
             {t("buttons.backToClinicSelection")}
           </Button>
         </div>

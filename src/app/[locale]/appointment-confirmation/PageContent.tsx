@@ -9,6 +9,7 @@ import { FC, useMemo } from "react";
 import { doctors } from "@/models/DoctorModel";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { format } from "date-fns";
+import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
 import useFertiSmartAppointment from "@/hooks/useFertiSmartAppointment";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
@@ -21,6 +22,8 @@ import { getDoctorName } from "@/lib/getDoctorName";
 export const PageContent: FC = () => {
   const t = useTranslations("AppointmentConfirmationPage");
   const tServices = useTranslations("ServicesPage");
+  const tHomePage = useTranslations("HomePage");
+  const tIdTypes = useTranslations("idTypes");
   const locale = useLocale();
   const searchParams = useSearchParams();
 
@@ -42,12 +45,10 @@ export const PageContent: FC = () => {
   }, [patientData?.sex, t]);
 
   const idType = useMemo(() => {
-    return patientData?.identityIdType?.name;
-    // if (patientData?.identityIdType?.name?.toLocaleLowerCase()?.includes("passport")) {
-    //   return "Passport";
-    // }
-    // return "National ID";
-  }, [patientData?.identityIdType?.name]);
+    if (!patientData?.identityIdType?.name) return undefined;
+    const idTypeName = patientData.identityIdType.name;
+    return tIdTypes(idTypeName) || idTypeName;
+  }, [patientData?.identityIdType?.name, tIdTypes]);
 
   const patientCountry = useMemo(
     () => countriesData?.find((item) => item.id === patientData?.nationality?.id),
@@ -56,7 +57,6 @@ export const PageContent: FC = () => {
 
   const idNumber = patientData?.identityId ?? "-";
 
-  // Get user's timezone and check if it's KSA
   const userTimezone = useMemo(() => {
     if (typeof window !== "undefined") {
       return Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -67,29 +67,40 @@ export const PageContent: FC = () => {
   const isKSA = userTimezone === "Asia/Riyadh";
   const KSA_TIMEZONE = "Asia/Riyadh";
 
+  const tVisitTypes = useTranslations("visitTypes");
+
+  const dateFnsLocale = useMemo(() => {
+    return locale === "ar" ? ar : enUS;
+  }, [locale]);
+
   const selectedTimeSlot = useMemo(() => {
     if (!appointmentData?.time?.start) return "-";
     try {
-      return format(appointmentData?.time?.start ?? "", "yyyy-MM-dd hh:mm a");
+      return format(appointmentData?.time?.start ?? "", "yyyy-MM-dd hh:mm a", { locale: dateFnsLocale });
     } catch (e) {
       console.log("--- no time slot found error", e);
       return "-";
     }
-  }, [appointmentData?.time?.start]);
+  }, [appointmentData?.time?.start, dateFnsLocale]);
 
   const selectedTimeSlotKSA = useMemo(() => {
     if (!appointmentData?.time?.start || isKSA) return null;
     try {
-      return formatInTimeZone(appointmentData?.time?.start ?? "", KSA_TIMEZONE, "yyyy-MM-dd hh:mm a");
+      return formatInTimeZone(appointmentData?.time?.start ?? "", KSA_TIMEZONE, "yyyy-MM-dd hh:mm a", { locale: dateFnsLocale });
     } catch (e) {
       console.log("--- no KSA time slot found error", e);
       return null;
     }
-  }, [appointmentData?.time?.start, isKSA]);
+  }, [appointmentData?.time?.start, isKSA, dateFnsLocale]);
 
   const confirmationNumber = appointmentData?.id;
 
   const clinic = useMemo(() => clinicLocations.find((clinic) => clinic.id === selectedClinicLocation), [selectedClinicLocation]);
+
+  const clinicName = useMemo(() => {
+    if (!clinic?.id) return clinic?.name ?? "-";
+    return tHomePage(`clinics.${clinic.id}.name`) || clinic.name;
+  }, [clinic?.id, clinic?.name, tHomePage]);
 
   const service = useMemo(() => services.find((service) => service.id === selectedService), [selectedService]);
 
@@ -149,7 +160,7 @@ export const PageContent: FC = () => {
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.visitType")}</span>
-                  <span className="font-medium text-gray-900 dark:text-white capitalize">{selectedVisitType}</span>
+                  <span className="font-medium text-gray-900 dark:text-white capitalize">{tVisitTypes(selectedVisitType)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.doctor")}</span>
@@ -161,7 +172,7 @@ export const PageContent: FC = () => {
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.location")}</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{clinic?.name}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{clinicName}</span>
                 </div>
               </div>
             </div>

@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, MapPin, Video } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { add, format } from "date-fns";
+import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { Spinner } from "@/components/ui/spinner";
@@ -15,13 +16,18 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function SelectDateAndTimePage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>();
   const router = useRouter();
   const t = useTranslations("SelectDateAndTimePage");
+  const locale = useLocale();
+
+  const dateFnsLocale = useMemo(() => {
+    return locale === "ar" ? ar : enUS;
+  }, [locale]);
 
   const searchParams = useSearchParams();
   const selectedDoctorId = searchParams.get("selectedDoctor");
@@ -140,6 +146,7 @@ export default function SelectDateAndTimePage() {
                   setSelectedTimeSlot(undefined);
                 }}
                 disabled={isDateDisabled}
+                locale={dateFnsLocale}
                 className="rounded-md border"
                 classNames={{
                   day: "hover:bg-green-50 dark:hover:bg-green-900/20",
@@ -191,7 +198,7 @@ export default function SelectDateAndTimePage() {
                           : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
                       )}
                     >
-                      {format(slot.start ?? new Date().toISOString(), "hh:mm aa")}
+                      {format(slot.start ?? new Date().toISOString(), "hh:mm aa", { locale: dateFnsLocale })}
                       <div className="absolute top-[-6px] rounded-full p-1 right-[-6px] bg-primary text-white">
                         {selectedVisitType === "clinic" ? <MapPin className="h-3 w-3" /> : <Video className="h-3 w-3" />}
                       </div>
@@ -211,22 +218,24 @@ export default function SelectDateAndTimePage() {
               <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
                 <p className="text-sm text-primary dark:text-primary-200">
                   {t("messages.selected")}{" "}
-                  <span className="font-medium">
+                  <span dir="ltr" className="font-medium">
                     {format(
                       availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
-                      "EEEE, MMMM do, yyyy hh:mm aa"
+                      "EEEE, MMMM do, yyyy hh:mm aa",
+                      { locale: dateFnsLocale }
                     )}
-                  </span>
-                  {!isKSA && (
-                    <span className="text-xs ml-2 opacity-75">
-                      {`${formatInTimeZone(
-                        availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
-                        KSA_TIMEZONE,
-                        "hh:mm aa"
-                      )} ${t("summary.ksaTime")}`}
-                    </span>
-                  )}
+                  </span>{" "}
                 </p>
+                {!isKSA && (
+                  <span className="text-xs ml-2 opacity-75">
+                    {`${formatInTimeZone(
+                      availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
+                      KSA_TIMEZONE,
+                      "hh:mm aa",
+                      { locale: dateFnsLocale }
+                    )} ${t("summary.ksaTime")}`}
+                  </span>
+                )}
               </div>
             )}
           </div>
@@ -256,7 +265,9 @@ export default function SelectDateAndTimePage() {
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{t("summary.date")}</p>
                 <p className="font-medium text-gray-900 dark:text-white">
-                  {selectedDate ? format(selectedDate, "EEEE, MMMM do, yyyy") : t("messages.notSelected")}
+                  {selectedDate
+                    ? format(selectedDate, "EEEE, MMMM do, yyyy", { locale: dateFnsLocale })
+                    : t("messages.notSelected")}
                 </p>
                 {/* {selectedDate && !isKSA && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -277,7 +288,8 @@ export default function SelectDateAndTimePage() {
                   {selectedTimeSlot && (availabilityData?.length ?? 0) > 0
                     ? format(
                         availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
-                        "hh:mm aa"
+                        "hh:mm aa",
+                        { locale: dateFnsLocale }
                       )
                     : t("messages.notSelected")}
                 </p>
@@ -287,7 +299,8 @@ export default function SelectDateAndTimePage() {
                     {formatInTimeZone(
                       availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
                       KSA_TIMEZONE,
-                      "hh:mm aa"
+                      "hh:mm aa",
+                      { locale: dateFnsLocale }
                     )}
                   </p>
                 )}
@@ -300,7 +313,7 @@ export default function SelectDateAndTimePage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex flex-col-reverse md:flex-row gap-6 justify-between container">
             <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
-              <ArrowLeft /> {t("buttons.back")}
+              <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
             </Button>
             <Link href={getNextPageUrl()}>
               <Button
@@ -308,7 +321,7 @@ export default function SelectDateAndTimePage() {
                 size="lg"
                 className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
               >
-                {t("buttons.continue")} <ArrowRight />
+                {t("buttons.continue")} <ArrowRight className="rtl:scale-x-[-1]" />
               </Button>
             </Link>
           </div>

@@ -2,12 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
 import AppointmentCard from "./_components/AppointmentCard";
 import ClinicBranchSelect from "@/components/ClinicBranchSelect";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 
 export default function ManageAppointmentPageContent() {
   const t = useTranslations("ManageAppointmentsPage");

@@ -128,7 +128,7 @@ export default function DoctorsListPage() {
           </div>
           <div className="mt-8 text-center">
             <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3">
-              <ArrowLeft /> {t("buttons.backToServiceSelection")}
+              <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.backToServiceSelection")}
             </Button>
           </div>
         </div>

@@ -84,7 +84,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
           </div>
           <Button className="w-full mt-auto cursor-pointer" variant="default" onClick={() => setSelectedDoctor(doctor.id)}>
             {t("buttons.bookAppointment")}
-            <ChevronRight className="size-6" />
+            <ChevronRight className="size-6 rtl:scale-x-[-1]" />
           </Button>
         </div>
       </CardContent>

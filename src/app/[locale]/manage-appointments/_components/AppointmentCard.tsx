@@ -5,6 +5,7 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { cn } from "@/lib/utils";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import { format, add } from "date-fns";
+import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
 import { CheckCircle, Clock, Phone, RefreshCw, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
@@ -39,6 +40,8 @@ import { getDoctorName } from "@/lib/getDoctorName";
 const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const t = useTranslations("ManageAppointmentsPage.appointmentCard");
   const tServices = useTranslations("ServicesPage");
+  const tVisitStatus = useTranslations("visitStatus");
+  const tIdType = useTranslations("idTypes");
   const locale = useLocale();
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -181,6 +184,10 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
     return appointmentStatusData?.find((status) => status.name?.toLocaleLowerCase().includes("cancel"))?.id;
   }, [appointmentStatusData]);
 
+  const dateFnsLocale = useMemo(() => {
+    return locale === "ar" ? ar : enUS;
+  }, [locale]);
+
   return (
     <div
       key={appointment.id}
@@ -196,11 +203,13 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
             )}
           >
             {getAppointmentStatusIcon(appointment.status?.name ?? "")}
-            {(appointment.status?.name?.charAt(0)?.toUpperCase() ?? "") + (appointment.status?.name?.slice(1) ?? "")}
+            {tVisitStatus(appointment.status?.name ?? "") || appointment.status?.name}
           </div>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {t("confirmation")}: {appointment.id}
-          </span>
+          {appointment.status?.name?.toLocaleLowerCase() !== "cancelled" && (
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {t("confirmation")}: {appointment.id}
+            </span>
+          )}
         </div>
         <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
           {appointment.status?.name !== "Cancelled" && (
@@ -339,7 +348,9 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{patientData?.identityIdType?.name}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {tIdType(patientData?.identityIdType?.name ?? "") || patientData?.identityIdType?.name}
+              </p>
               <p className="font-medium text-gray-900 dark:text-white">{patientData?.identityId ?? "-"}</p>
             </div>
           </div>
@@ -371,11 +382,14 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                       setSelectedRescheduleTimeSlot(undefined);
                     }}
                     disabled={isDateDisabled}
+                    locale={dateFnsLocale}
                     className="rounded-md border"
                     classNames={{
                       day: "hover:bg-green-50 dark:hover:bg-green-900/20",
                       day_selected: "bg-green-600 text-white hover:bg-green-700",
                       day_today: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
+                      button_next: "bg-primary cursor-pointer text-white p-1 rounded-sm",
+                      button_previous: "bg-primary cursor-pointer text-white p-1 rounded-sm",
                     }}
                   />
                 </div>

@@ -1,4 +1,17 @@
 {
+  "visitStatus": {
+    "Approved/Confirmed": "Confirmed",
+    "Cancelled": "Cancelled"
+  },
+  "visitTypes": {
+    "clinic": "In-Clinic Appointment",
+    "virtual": "Virtual Visit"
+  },
+  "idTypes": {
+    "National Id": "National Id",
+    "Iqama No": "Iqama No",
+    "Passport": "Passport"
+  },
   "HomePage": {
     "title": "Select Your Nearest Bnoon Clinic",
     "description": "Bnoon brings advanced care closer to you — with trusted doctors, innovative technologies, and a commitment to compassionate, personalized care; dedicated to setting new benchmarks in fertility and women's health care.",
@@ -325,6 +338,7 @@
         "alternative": "Alternative",
         "nationality": "Nationality",
         "gender": "Gender",
+        "idType": "ID Type",
         "genders": {
           "male": "Male",
           "female": "Female"
@@ -380,5 +394,11 @@
       "confirm": "Confirm",
       "loading": "Loading"
     }
+  },
+  "NavHeader": {
+    "bnoon": "Bnoon",
+    "myAppointments": "My Appointments",
+    "login": "Login",
+    "logout": "Logout"
   }
 }

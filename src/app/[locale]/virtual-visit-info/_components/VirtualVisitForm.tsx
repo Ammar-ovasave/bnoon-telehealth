@@ -52,6 +52,7 @@ function isOnlyDigits(str: string) {
 
 export default function VirtualVisitForm() {
   const t = useTranslations("VirtualVisitInfoPage");
+  const tIdTypes = useTranslations("idTypes");
   const { data: currentUserData, mutate: mutateCurrentUser, fullName: currentUserFullName } = useCurrentUser();
   const { nationalities, data: nationalitiesData } = useFertiSmartCountries();
   const { data: patientData, mutate: mutatePatient, fullName } = useFertiSmartPatient();
@@ -440,7 +441,7 @@ export default function VirtualVisitForm() {
                       : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 dark:hover:bg-purple-900/20 hover:border-primary"
                   )}
                 >
-                  {idType.name}
+                  {tIdTypes(idType.name ?? "") || idType.name}
                 </button>
               ))}
             </div>
@@ -452,7 +453,7 @@ export default function VirtualVisitForm() {
             <label htmlFor="idNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <div className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4 text-gray-500" />
-                {selectedIdType?.name} *
+                {tIdTypes(selectedIdType?.name ?? "") || selectedIdType?.name} *
               </div>
             </label>
             <input
@@ -480,7 +481,7 @@ export default function VirtualVisitForm() {
         {/* Action Buttons */}
         <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
           <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
-            <ArrowLeft /> {t("buttons.back")}
+            <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
           </Button>
           <Button
             type="submit"
@@ -496,7 +497,7 @@ export default function VirtualVisitForm() {
             size="lg"
             className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
           >
-            {loading ? t("buttons.loading") : t("buttons.confirm")} <ArrowRight />
+            {loading ? t("buttons.loading") : t("buttons.confirm")} <ArrowRight className="rtl:scale-x-[-1]" />
           </Button>
         </div>
       </div>

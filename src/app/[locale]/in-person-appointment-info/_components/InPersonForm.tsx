@@ -195,7 +195,7 @@ export default function InPersonForm() {
         {/* Action Buttons */}
         <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
           <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
-            <ArrowLeft /> {t("buttons.back")}
+            <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
           </Button>
           <Button
             type="submit"
@@ -203,7 +203,7 @@ export default function InPersonForm() {
             className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
             disabled={loading || !formData.fullName}
           >
-            {loading ? t("buttons.loading") : t("buttons.confirm")} <ArrowRight />
+            {loading ? t("buttons.loading") : t("buttons.confirm")} <ArrowRight className="rtl:scale-x-[-1]" />
           </Button>
         </div>
       </div>

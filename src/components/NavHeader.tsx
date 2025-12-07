@@ -9,20 +9,22 @@ import { Spinner } from "./ui/spinner";
 import { useRouter } from "next/navigation";
 import useCurrentBranch from "@/hooks/useCurrentBranch";
 import { Badge } from "./ui/badge";
+import { useTranslations } from "next-intl";
 
 function NavHeader() {
   const { data: currentUserData, isLoading } = useCurrentUser();
+  const t = useTranslations("NavHeader");
 
   return (
     <header className="bg-white border-b border-b-neutral-200 px-4 py-4 flex items-center gap-4">
       <Link href={"/"}>
-        <h2 className="text-primary font-bold">Bnoon</h2>
+        <h2 className="text-primary font-bold">{t("bnoon")}</h2>
       </Link>
       <ul className="flex-1">
         {!isLoading && currentUserData?.mrn && (
           <li>
             <Link className="text-sm" href={"/manage-appointments"}>
-              My Appointments
+              {t("myAppointments")}
             </Link>
           </li>
         )}
@@ -32,7 +34,7 @@ function NavHeader() {
         <LogoutButton />
       ) : (
         <Link href={"/login"} className="cursor-pointer">
-          <Button variant={"link"}>Login</Button>
+          <Button variant={"link"}>{t("login")}</Button>
         </Link>
       )}
     </header>
@@ -41,16 +43,20 @@ function NavHeader() {
 
 const BranchName: FC = () => {
   const { data } = useCurrentBranch();
+  const t = useTranslations("HomePage");
 
-  if (!data?.branch?.name) return null;
+  if (!data?.branch?.id) return null;
 
-  return <Badge className="hidden sm:block">{data?.branch?.name}</Badge>;
+  const branchName = t(`clinics.${data.branch.id}.name`);
+
+  return <Badge className="hidden sm:block">{branchName}</Badge>;
 };
 
 const LogoutButton: FC = () => {
   const [loading, setLoading] = useState(false);
   const { mutate } = useCurrentUser();
   const router = useRouter();
+  const t = useTranslations("NavHeader");
 
   const handleClick = useCallback(async () => {
     setLoading(true);
@@ -62,7 +68,7 @@ const LogoutButton: FC = () => {
 
   return (
     <Button onClick={handleClick} variant={"link"} disabled={loading}>
-      {loading ? <Spinner /> : `Logout`}
+      {loading ? <Spinner /> : t("logout")}
     </Button>
   );
 };

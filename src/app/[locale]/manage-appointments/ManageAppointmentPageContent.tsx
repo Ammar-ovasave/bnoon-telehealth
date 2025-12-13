@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 import Link from "next/link";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
 import AppointmentCard from "./_components/AppointmentCard";
@@ -11,7 +12,15 @@ import Image from "next/image";
 
 export default function ManageAppointmentPageContent() {
   const t = useTranslations("ManageAppointmentsPage");
-  const { data: currentUserAppointmentsData, isLoading } = useCurrentUserAppointments();
+  const { data, isLoading } = useCurrentUserAppointments();
+
+  const currentUserAppointmentsData = useMemo(
+    () =>
+      data?.filter((appointment) => {
+        return appointment.status?.name?.toLocaleLowerCase() !== "cancelled";
+      }),
+    [data]
+  );
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">

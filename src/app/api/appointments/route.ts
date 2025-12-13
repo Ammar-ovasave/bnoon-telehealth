@@ -15,8 +15,8 @@ import { getConfirmAppointmentEmail } from "@/services/templates";
 import { formatInTimeZone } from "date-fns-tz";
 import { AUTH_TOKEN_NAME } from "@/constants";
 import { signJwt } from "@/services/signJwt";
-import axios from "@/services/axios";
 import { clinicLocations } from "@/models/ClinicModel";
+import axios from "@/services/axios";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -98,7 +98,6 @@ export async function POST(request: Request) {
         doctorName: doctorResource?.linkedUserFullName ?? "",
         appointmentDate: appointmentDate,
         appointmentTime: appointmentTime,
-        appointmentLink: appointmentLink,
         mobileNumber: patientToUse.contactNumber ?? "",
       }),
     ]);
@@ -126,7 +125,7 @@ async function sendNewAppointmentSMS(params: {
   doctorName: string;
   appointmentDate: string;
   appointmentTime: string;
-  appointmentLink: string;
+  // appointmentLink: string;
   mobileNumber: string;
 }) {
   try {
@@ -142,12 +141,9 @@ async function sendNewAppointmentSMS(params: {
       .replace(/{{RESOURCE_NAME}}/g, params.doctorName)
       .replace(/{{TIME}}/g, params.appointmentTime)
       .replace(/{{PATIENT_MRN}}/g, params.mrn);
-    const messageWithLink = textContent.includes(params.appointmentLink)
-      ? textContent
-      : `${textContent}\n\n${params.appointmentLink}`;
     const success = await sendSMS({
       mobileNumber: params.mobileNumber,
-      message: messageWithLink,
+      message: textContent,
     });
     return success;
   } catch (error) {

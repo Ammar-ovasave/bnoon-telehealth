@@ -439,7 +439,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
             <label htmlFor="idNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               <div className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4 text-gray-500" />
-                {tIdTypes(selectedIdType?.name ?? "") || selectedIdType?.name} *
+                {tIdTypes(selectedIdType?.name ?? "idTypes") || selectedIdType?.name} *
               </div>
             </label>
             <input

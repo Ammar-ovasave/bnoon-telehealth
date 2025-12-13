@@ -8,6 +8,7 @@
     "virtual": "استشارة افتراضية"
   },
   "idTypes": {
+    "idTypes": "رقم الهوية",
     "National Id": "رقم الهوية",
     "Iqama No": "رقم الإقامة",
     "Passport": "جواز السفر"

@@ -216,9 +216,14 @@ export async function updateAppointmentServer(params: UpdateAppointmentPayload &
   }
 }
 
+export interface MessageTemplateModel {
+  ar?: string;
+  en?: string;
+}
+
 export async function getSMSTemplates(params: { baseAPIURL?: string }) {
   try {
-    const res = await axios.get<{ new: string; updated: string; cancelled: string }>(
+    const res = await axios.get<{ new: MessageTemplateModel; updated: MessageTemplateModel; cancelled: MessageTemplateModel }>(
       params.baseAPIURL ? `${params.baseAPIURL}/messages/smses/templates` : `/messages/smses/templates`
     );
     return res.data;

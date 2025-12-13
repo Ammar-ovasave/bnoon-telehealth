@@ -61,21 +61,7 @@ export async function POST(request: Request) {
     const appointmentDate = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy");
     const appointmentTime = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a");
     const clinicBranch = clinicLocations.find((clinic) => clinic.apiUrl === baseAPIURL);
-    const emailTemplate = await getConfirmAppointmentEmail({
-      appointmentDate: appointmentDate,
-      appointmentLink: appointmentLink,
-      appointmentTime: appointmentTime,
-      doctorName: doctorResource?.linkedUserFullName ?? "",
-      location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
-      patientEmail: payload.email ?? patientToUse.emailAddress ?? "",
-      patientGender: patientToUse.sex === 0 ? "female" : "male",
-      patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${
-        payload.lastName ?? patientToUse.lastName ?? ""
-      }`.trim(),
-      serviceName: service?.name ?? "",
-      clinicName: clinicBranch?.name ?? "",
-    });
-    console.log("emailTemplate", emailTemplate);
+    const isVirtualAppointment = payload.description === "Virtual Visit";
     await Promise.all([
       updateAppointmentServer({
         type: null,
@@ -83,15 +69,24 @@ export async function POST(request: Request) {
         appointmentId: createAppointmentResponse.data.id,
         description: `${payload.description} - ${appointmentLink}`,
       }),
-      payload.email
-        ? sendEmail({
-            baseAPIURL: baseAPIURL ?? null,
-            mrn: payload.patientMrn,
-            email: payload.email,
-            body: emailTemplate ?? `<p>Join appointment: <a href="${appointmentLink}"></a></p>`,
-            subject: `Appointment Confirmed ${createAppointmentResponse.data.id}`,
-          })
-        : Promise.resolve(null),
+      sendConfirmAppointmentEmail({
+        appointmentDate,
+        appointmentLink,
+        appointmentTime,
+        doctorName: doctorResource?.linkedUserFullName ?? "",
+        location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
+        patientEmail: payload.email ?? patientToUse.emailAddress ?? "",
+        patientGender: patientToUse.sex === 0 ? "female" : "male",
+        patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${payload.lastName ?? patientToUse.lastName ?? ""
+          }`.trim(),
+        serviceName: service?.name ?? "",
+        clinicName: clinicBranch?.name ?? "",
+        isVirtual: isVirtualAppointment,
+        locationLink: clinicBranch?.locationLink,
+        baseAPIURL: baseAPIURL ?? null,
+        mrn: payload.patientMrn,
+        appointmentId: createAppointmentResponse.data.id ?? 0,
+      }),
       sendNewAppointmentSMS({
         fullName: `${payload.firstName ?? ""} ${payload.lastName ?? ""}`.trim(),
         mrn: patientToUse.mrn ?? "",
@@ -119,6 +114,47 @@ export async function POST(request: Request) {
   }
 }
 
+async function sendConfirmAppointmentEmail(params: {
+  appointmentDate: string;
+  appointmentLink: string;
+  appointmentTime: string;
+  doctorName: string;
+  location: string;
+  patientEmail: string;
+  patientGender: "female" | "male";
+  patientName: string;
+  serviceName: string;
+  clinicName: string;
+  isVirtual: boolean;
+  locationLink?: string;
+  baseAPIURL: string | null;
+  mrn: string;
+  appointmentId: number;
+}) {
+  if (!params.patientEmail) return null;
+  const emailTemplate = await getConfirmAppointmentEmail({
+    appointmentDate: params.appointmentDate,
+    appointmentLink: params.appointmentLink,
+    appointmentTime: params.appointmentTime,
+    doctorName: params.doctorName,
+    location: params.location,
+    patientEmail: params.patientEmail,
+    patientGender: params.patientGender,
+    patientName: params.patientName,
+    serviceName: params.serviceName,
+    clinicName: params.clinicName,
+    isVirtual: params.isVirtual,
+    locationLink: params.locationLink,
+  });
+  return sendEmail({
+    baseAPIURL: params.baseAPIURL,
+    mrn: params.mrn,
+    email: params.patientEmail,
+    body: emailTemplate ?? `<p>Join appointment: <a href="${params.appointmentLink}"></a></p>`,
+    subject: `Appointment Confirmed ${params.appointmentId}`,
+  });
+}
+
 async function sendNewAppointmentSMS(params: {
   fullName: string;
   mrn: string;
@@ -132,10 +168,11 @@ async function sendNewAppointmentSMS(params: {
     const cookiesStore = await cookies();
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    if (!templates?.new) {
+    const templateText = templates?.new.en || templates?.new.ar;
+    if (!templateText) {
       return null;
     }
-    const textContent = templates.new
+    const textContent = templateText
       .replace(/{{PATIENT_NAME}}/g, params.fullName)
       .replace(/{{DATE}}/g, params.appointmentDate)
       .replace(/{{RESOURCE_NAME}}/g, params.doctorName)

@@ -17,6 +17,7 @@ import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import { doctors } from "@/models/DoctorModel";
 import { containsArabic } from "@/services/containsArabic";
 import { useTranslations } from "next-intl";
+import { services } from "@/models/ServiceModel";
 
 interface FormData {
   fullName: string;
@@ -77,6 +78,15 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
     });
   }, [fertiSmartResources, selectedDoctor?.name]);
 
+  const selectedServiceId = decodeURIComponent(searchParams.get("selectedService") ?? "");
+
+  const selectedFertiSmartService = useMemo(() => {
+    const serviceName = services.find((item) => item.id === selectedServiceId)?.title.toLocaleLowerCase() ?? "";
+    const fertiSmartService = apiServicesData?.find((item) => item.name?.toLocaleLowerCase().includes(serviceName));
+    if (fertiSmartService) return fertiSmartService;
+    return apiServicesData?.[0];
+  }, [apiServicesData, selectedServiceId]);
+
   const handleFormSubmit = useCallback(async () => {
     if (validateForm) {
       console.log("invalid data");
@@ -112,7 +122,7 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
           branchId: branchesData?.[0].id ?? 0,
           description: `In Clinic`,
           patientMrn: currentUserData.mrn ?? "",
-          serviceId: apiServicesData?.[0].id ?? 0,
+          serviceId: selectedFertiSmartService?.id ?? 0,
           resourceIds: [selectedResource?.id ?? 0],
           startTime: selectedTimeSlot,
           endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
@@ -145,19 +155,20 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
       setLoading(false);
     }
   }, [
-    apiServicesData,
-    branchesData,
-    currentUserData?.contactNumber,
+    validateForm,
     currentUserData?.mrn,
+    currentUserData?.contactNumber,
+    statusesData,
+    apiServicesData?.length,
+    branchesData,
+    t,
     formData.fullName,
-    mutateCurrentUser,
-    mutatePatient,
-    router,
+    selectedFertiSmartService?.id,
     selectedResource?.id,
     selectedTimeSlot,
-    statusesData,
-    validateForm,
-    t,
+    mutatePatient,
+    mutateCurrentUser,
+    router,
   ]);
 
   return (

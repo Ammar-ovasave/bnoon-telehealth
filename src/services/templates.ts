@@ -12,10 +12,13 @@ export async function getConfirmAppointmentEmail(params: {
   patientGender: string;
   appointmentLink: string;
   clinicName: string;
+  isVirtual?: boolean;
+  locationLink?: string;
 }) {
   try {
-    const file = await fs.readFile(path.resolve("src", "templates", "confirm-appointment.html"), { encoding: "utf-8" });
-    const html = file
+    const templateFileName = params.isVirtual ? "confirm-appointment.html" : "confirm-appointment-in-clinic.html";
+    const file = await fs.readFile(path.resolve("src", "templates", templateFileName), { encoding: "utf-8" });
+    let html = file
       .replace(/{{appointmentLink}}/g, params.appointmentLink)
       .replace(/{{appointmentDate}}/g, params.appointmentDate)
       .replace(/{{appointmentTime}}/g, params.appointmentTime)
@@ -26,6 +29,9 @@ export async function getConfirmAppointmentEmail(params: {
       .replace(/{{patientGender}}/g, params.patientGender)
       .replace(/{{doctorName}}/g, params.doctorName)
       .replace(/{{clinicName}}/g, params.clinicName);
+    if (params.locationLink) {
+      html = html.replace(/{{locationLink}}/g, params.locationLink);
+    }
     return html;
   } catch (error) {
     console.log("--- error getConfirmAppointmentEmail", error);
@@ -44,10 +50,13 @@ export async function getRescheduleAppointmentEmail(params: {
   location: string;
   appointmentLink: string;
   clinicName: string;
+  isVirtual?: boolean;
+  locationLink?: string;
 }) {
   try {
-    const file = await fs.readFile(path.resolve("src", "templates", "reschedule-appointment.html"), { encoding: "utf-8" });
-    const html = file
+    const templateFileName = params.isVirtual ? "reschedule-appointment.html" : "reschedule-appointment-in-clinic.html";
+    const file = await fs.readFile(path.resolve("src", "templates", templateFileName), { encoding: "utf-8" });
+    let html = file
       .replace(/{{patientName}}/g, params.patientName)
       .replace(/{{doctorName}}/g, params.doctorName)
       .replace(/{{oldDate}}/g, params.oldDate)
@@ -58,6 +67,9 @@ export async function getRescheduleAppointmentEmail(params: {
       .replace(/{{location}}/g, params.location)
       .replace(/{{appointmentLink}}/g, params.appointmentLink)
       .replace(/{{clinicName}}/g, params.clinicName);
+    if (params.locationLink) {
+      html = html.replace(/{{locationLink}}/g, params.locationLink);
+    }
     return html;
   } catch (error) {
     console.log("--- error getRescheduleAppointmentEmail", error);

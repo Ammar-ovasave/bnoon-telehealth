@@ -12,6 +12,7 @@ export interface ClinicLocation {
   contactEmail: string;
   isCommingSoon?: boolean;
   hideComingSoonBadge?: boolean;
+  locationLink: string;
 }
 
 export const clinicLocations: ClinicLocation[] = [
@@ -25,6 +26,7 @@ export const clinicLocations: ClinicLocation[] = [
     contactEmail: "info@bnoon.sa",
     contactNumber: "+966114448080",
     apiUrl: `https://unvaunted-weedily-jannie.ngrok-free.dev`,
+    locationLink: "https://maps.app.goo.gl/eCbGioC7si1WEdzW6?g_st=aw",
   },
   {
     id: "riyadh-king-salman",
@@ -37,6 +39,7 @@ export const clinicLocations: ClinicLocation[] = [
     contactNumber: "+966114448080",
     isCommingSoon: true,
     apiUrl: null,
+    locationLink: "https://maps.app.goo.gl/eCbGioC7si1WEdzW6?g_st=aw",
   },
   {
     id: "jeddah",
@@ -48,6 +51,7 @@ export const clinicLocations: ClinicLocation[] = [
     contactEmail: "info.jeddah@bnoon.sa",
     contactNumber: "+966126800800",
     apiUrl: `https://undeclarable-kolby-overgraciously.ngrok-free.dev`,
+    locationLink: `https://maps.app.goo.gl/hmNLqgHMyj8LkXpp7?g_st=aw`,
   },
   {
     id: "al-ahsa",
@@ -60,6 +64,7 @@ export const clinicLocations: ClinicLocation[] = [
     contactNumber: "+966126800800",
     isCommingSoon: true,
     apiUrl: null,
+    locationLink: "https://maps.app.goo.gl/UXqd59VG37ct38f38",
   },
 ];
 

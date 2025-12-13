@@ -21,13 +21,6 @@ import { services } from "@/models/ServiceModel";
 import { containsArabic } from "@/services/containsArabic";
 import { useTranslations } from "next-intl";
 
-// Genders will be translated in the component
-
-// const idTypes = [
-//   { id: "passport", label: "Passport" },
-//   { id: "nationalId", label: "National ID" },
-// ];
-
 interface FormData {
   fullName: string;
   email: string;
@@ -50,27 +43,22 @@ function isOnlyDigits(str: string) {
   return /^[0-9]+$/.test(str);
 }
 
-export default function VirtualVisitForm() {
+interface VirtualVisitFormProps {
+  defaultValues: FormData;
+}
+
+export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProps) {
   const t = useTranslations("VirtualVisitInfoPage");
   const tIdTypes = useTranslations("idTypes");
-  const { data: currentUserData, mutate: mutateCurrentUser, fullName: currentUserFullName } = useCurrentUser();
+  const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
   const { nationalities, data: nationalitiesData } = useFertiSmartCountries();
-  const { data: patientData, mutate: mutatePatient, fullName } = useFertiSmartPatient();
+  const { data: patientData, mutate: mutatePatient } = useFertiSmartPatient();
 
   const genders = [
     { id: "male", label: t("genders.male") },
     { id: "female", label: t("genders.female") },
   ];
-  const [formData, setFormData] = useState<FormData>({
-    fullName: fullName || currentUserFullName || "",
-    email: currentUserData?.emailAddress || currentUserData?.emailAddress || "",
-    nationality: patientData?.nationality?.name
-      ? nationalities?.find((item) => item === patientData?.nationality?.name) ?? ""
-      : "",
-    gender: patientData?.sex === 1 ? "male" : "female",
-    idType: patientData?.identityIdType?.id?.toString(),
-    idNumber: patientData?.identityId ?? "",
-  });
+  const [formData, setFormData] = useState<FormData>(defaultValues);
 
   const isSaudiNational = formData.nationality === "Saudi Arabia";
 
@@ -231,8 +219,8 @@ export default function VirtualVisitForm() {
       const splitName = formData.fullName.split(" ");
       const [createAppointmentResponse] = await Promise.all([
         createAppointment({
-          firstName: currentUserData.firstName ?? "",
-          lastName: currentUserData.lastName ?? "",
+          firstName: splitName[0],
+          lastName: splitName.slice(1).join(" "),
           phoneNumber: currentUserData.contactNumber ?? "",
           email: formData.email,
           statusId: status.id ?? 0,
@@ -279,8 +267,6 @@ export default function VirtualVisitForm() {
     apiServicesData?.length,
     branchesData,
     currentUserData?.contactNumber,
-    currentUserData?.firstName,
-    currentUserData?.lastName,
     currentUserData?.mrn,
     formData.email,
     formData.fullName,

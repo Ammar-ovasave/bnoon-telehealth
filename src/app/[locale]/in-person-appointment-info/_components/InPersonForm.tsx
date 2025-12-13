@@ -26,13 +26,15 @@ interface FormErrors {
   fullName?: string;
 }
 
-export default function InPersonForm() {
+interface InPersonFormProps {
+  defaultValus: FormData;
+}
+
+export default function InPersonForm({ defaultValus }: InPersonFormProps) {
   const t = useTranslations("InPersonAppointmentInfoPage");
   const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
-  const { mutate: mutatePatient, fullName } = useFertiSmartPatient();
-  const [formData, setFormData] = useState<FormData>({
-    fullName: fullName,
-  });
+  const { mutate: mutatePatient } = useFertiSmartPatient();
+  const [formData, setFormData] = useState<FormData>(defaultValus);
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const router = useRouter();

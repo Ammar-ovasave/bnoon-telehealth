@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 export default function InPersonAppointmentInfoPage() {
   const t = useTranslations("InPersonAppointmentInfoPage");
   const { isLoading } = useCurrentUser();
-  const { isLoading: loadingPatientData } = useFertiSmartPatient();
+  const { isLoading: loadingPatientData, fullName } = useFertiSmartPatient();
   const { isLoading: loadingCountries } = useFertiSmartCountries();
 
   return (
@@ -33,7 +33,7 @@ export default function InPersonAppointmentInfoPage() {
             <Spinner className="size-10" />
           </div>
         ) : (
-          <InPersonForm />
+          <InPersonForm defaultValus={{ fullName }} />
         )}
 
         {/* Visit Information */}

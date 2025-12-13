@@ -23,7 +23,10 @@ const KSA_TIMEZONE = "Asia/Riyadh";
 
 export async function POST(request: Request) {
   try {
-    const cookiesStore = await cookies();
+    const [cookiesStore, locale] = await Promise.all([
+      cookies(),
+      getLocale()
+    ]);
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const payload: CreateAppointmentPayload = await request.json();
     const [patient, doctorResource, services] = await Promise.all([
@@ -87,6 +90,7 @@ export async function POST(request: Request) {
         baseAPIURL: baseAPIURL ?? null,
         mrn: payload.patientMrn,
         appointmentId: createAppointmentResponse.data.id ?? 0,
+        locale: locale,
       }),
       sendNewAppointmentSMS({
         fullName: `${payload.firstName ?? ""} ${payload.lastName ?? ""}`.trim(),
@@ -131,6 +135,7 @@ async function sendConfirmAppointmentEmail(params: {
   baseAPIURL: string | null;
   mrn: string;
   appointmentId: number;
+  locale?: string;
 }) {
   if (!params.patientEmail) return null;
   const emailTemplate = await getConfirmAppointmentEmail({
@@ -146,6 +151,7 @@ async function sendConfirmAppointmentEmail(params: {
     clinicName: params.clinicName,
     isVirtual: params.isVirtual,
     locationLink: params.locationLink,
+    locale: params.locale,
   });
   return sendEmail({
     baseAPIURL: params.baseAPIURL,

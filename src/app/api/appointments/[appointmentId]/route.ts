@@ -31,11 +31,12 @@ export async function GET(request: Request, context: { params: Promise<{ appoint
 
 export async function PATCH(request: Request, context: { params: Promise<{ appointmentId: string }> }) {
   try {
-    const [requestJson, params, cookieStore, currentUser] = await Promise.all([
+    const [requestJson, params, cookieStore, currentUser, locale] = await Promise.all([
       request.json(),
       context.params,
       cookies(),
       getCurrentUser(),
+      getLocale(),
     ]);
     if (!currentUser) {
       return Response.error();
@@ -76,6 +77,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         clinicName: clinicBranch?.name ?? "",
         isVirtual: location.toLowerCase().includes("virtual"),
         locationLink: clinicBranch?.locationLink,
+        locale: locale,
       });
       await Promise.all([
         sendUpdatedAppointmentSMS({
@@ -109,6 +111,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         serviceName: serviceName,
         location: location,
         clinicName: clinicBranch?.name ?? "",
+        locale: locale,
       });
       await Promise.all([
         sendCancelledAppointmentSMS({

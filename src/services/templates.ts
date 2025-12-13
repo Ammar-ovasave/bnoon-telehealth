@@ -1,6 +1,15 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 
+const getTemplateName = (baseName: string, locale?: string) => {
+  if (locale === "ar") {
+    const ext = path.extname(baseName);
+    const name = path.basename(baseName, ext);
+    return `${name}-ar${ext}`;
+  }
+  return baseName;
+};
+
 export async function getConfirmAppointmentEmail(params: {
   appointmentDate: string;
   appointmentTime: string;
@@ -14,9 +23,11 @@ export async function getConfirmAppointmentEmail(params: {
   clinicName: string;
   isVirtual?: boolean;
   locationLink?: string;
+  locale?: string;
 }) {
   try {
-    const templateFileName = params.isVirtual ? "confirm-appointment.html" : "confirm-appointment-in-clinic.html";
+    const baseTemplateName = params.isVirtual ? "confirm-appointment.html" : "confirm-appointment-in-clinic.html";
+    const templateFileName = getTemplateName(baseTemplateName, params.locale);
     const file = await fs.readFile(path.resolve("src", "templates", templateFileName), { encoding: "utf-8" });
     let html = file
       .replace(/{{appointmentLink}}/g, params.appointmentLink)
@@ -52,9 +63,11 @@ export async function getRescheduleAppointmentEmail(params: {
   clinicName: string;
   isVirtual?: boolean;
   locationLink?: string;
+  locale?: string;
 }) {
   try {
-    const templateFileName = params.isVirtual ? "reschedule-appointment.html" : "reschedule-appointment-in-clinic.html";
+    const baseTemplateName = params.isVirtual ? "reschedule-appointment.html" : "reschedule-appointment-in-clinic.html";
+    const templateFileName = getTemplateName(baseTemplateName, params.locale);
     const file = await fs.readFile(path.resolve("src", "templates", templateFileName), { encoding: "utf-8" });
     let html = file
       .replace(/{{patientName}}/g, params.patientName)
@@ -85,9 +98,11 @@ export async function getCancelAppointmentEmail(params: {
   serviceName: string;
   location: string;
   clinicName: string;
+  locale?: string;
 }) {
   try {
-    const file = await fs.readFile(path.resolve("src", "templates", "cancel-appointment.html"), { encoding: "utf-8" });
+    const templateFileName = getTemplateName("cancel-appointment.html", params.locale);
+    const file = await fs.readFile(path.resolve("src", "templates", templateFileName), { encoding: "utf-8" });
     const html = file
       .replace(/{{patientName}}/g, params.patientName)
       .replace(/{{doctorName}}/g, params.doctorName)

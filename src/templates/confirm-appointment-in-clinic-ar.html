@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Appointment Rescheduled</title>
+    <title>تم تأكيد الموعد</title>
     <!--[if mso]>
       <style type="text/css">
         body,
@@ -27,7 +27,7 @@
             cellpadding="0"
             border="0"
             width="600"
-            style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)"
+            style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); direction: rtl; text-align: right;"
           >
             <!-- Header -->
             <tr>
@@ -37,64 +37,13 @@
                   alt="Bnoon Logo"
                   style="max-width: 150px; margin-bottom: 20px"
                 />
-                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold">Appointment Rescheduled</h1>
+                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold">تم تأكيد الموعد</h1>
               </td>
             </tr>
 
-            <!-- Message Section -->
-            <tr>
-              <td style="padding: 30px 30px 20px">
-                <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">Dear {{patientName}},</p>
-                <p style="margin: 15px 0 0; color: #333333; font-size: 16px; line-height: 24px">
-                  Your appointment has been successfully rescheduled. Please find the updated details below.
-                </p>
-              </td>
-            </tr>
-
-            <!-- Previous Appointment Details Section -->
-            <tr>
-              <td style="padding: 0 30px 20px">
-                <h2 style="margin: 0 0 15px; color: #333333; font-size: 18px; font-weight: 600">Previous Appointment</h2>
-                <table
-                  role="presentation"
-                  cellspacing="0"
-                  cellpadding="0"
-                  border="0"
-                  width="100%"
-                  style="background-color: #f8f9fa; border-radius: 6px; padding: 20px"
-                >
-                  <tr>
-                    <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Date & Time (KSA Time)</td>
-                        </tr>
-                        <tr>
-                          <td style="color: #666666; font-size: 16px; font-weight: 600">{{oldDate}} at {{oldTime}} KSA</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 12px 0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Doctor</td>
-                        </tr>
-                        <tr>
-                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{doctorName}}</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <!-- New Appointment Details Section -->
+            <!-- Appointment Details Section -->
             <tr>
               <td style="padding: 0 30px 30px">
-                <h2 style="margin: 0 0 15px; color: #333333; font-size: 18px; font-weight: 600">New Appointment Details</h2>
                 <table
                   role="presentation"
                   cellspacing="0"
@@ -108,10 +57,12 @@
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Date & Time (KSA Time)</td>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">التاريخ والوقت (توقيت السعودية)</td>
                         </tr>
                         <tr>
-                          <td style="color: #004e78; font-size: 16px; font-weight: bold">{{newDate}} at {{newTime}} KSA</td>
+                          <td style="color: #004e78; font-size: 16px; font-weight: bold">
+                            {{appointmentDate}} في {{appointmentTime}} KSA
+                          </td>
                         </tr>
                       </table>
                     </td>
@@ -122,7 +73,7 @@
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Doctor</td>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">الطبيب</td>
                         </tr>
                         <tr>
                           <td style="color: #333333; font-size: 16px; font-weight: 600">{{doctorName}}</td>
@@ -136,7 +87,7 @@
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Service</td>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">الخدمة</td>
                         </tr>
                         <tr>
                           <td style="color: #333333; font-size: 16px; font-weight: 600">{{serviceName}}</td>
@@ -150,7 +101,7 @@
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Location</td>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">الموقع</td>
                         </tr>
                         <tr>
                           <td style="color: #333333; font-size: 16px; font-weight: 600; padding-bottom: 8px">{{location}}</td>
@@ -166,7 +117,7 @@
                                 font-size: 14px;
                                 font-weight: 600;
                               "
-                              >Click here for location</a
+                              >اضغط هنا للموقع</a
                             >
                           </td>
                         </tr>
@@ -179,7 +130,7 @@
                     <td style="padding: 12px 0">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Clinic</td>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">العيادة</td>
                         </tr>
                         <tr>
                           <td style="color: #333333; font-size: 16px; font-weight: 600">{{clinicName}}</td>
@@ -190,7 +141,85 @@
                 </table>
               </td>
             </tr>
-            
+
+            <!-- Patient Information Section -->
+            <tr>
+              <td style="padding: 0 30px 30px">
+                <h2 style="margin: 0 0 15px; color: #333333; font-size: 18px; font-weight: 600">معلومات المريض</h2>
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  width="100%"
+                  style="background-color: #f8f9fa; border-radius: 6px; padding: 20px"
+                >
+                  <!-- Patient Name -->
+                  <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="color: #666666; font-size: 14px; width: 120px">الاسم:</td>
+                          <td style="color: #333333; font-size: 14px; font-weight: 600">{{patientName}}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Patient Email -->
+                  <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="color: #666666; font-size: 14px; width: 120px">البريد الإلكتروني:</td>
+                          <td style="color: #333333; font-size: 14px">{{patientEmail}}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Patient Gender -->
+                  <tr>
+                    <td style="padding: 8px 0">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="color: #666666; font-size: 14px; width: 120px">الجنس:</td>
+                          <td style="color: #333333; font-size: 14px">{{patientGender}}</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Important Information Section -->
+            <tr>
+              <td style="padding: 0 30px 30px">
+                <table
+                  role="presentation"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  width="100%"
+                  style="background-color: #fff3cd; border-right: 4px solid #ffc107; border-radius: 4px; padding: 20px"
+                >
+                  <tr>
+                    <td>
+                      <p style="margin: 0 0 10px; color: #856404; font-size: 14px; font-weight: 600; line-height: 20px">
+                        تذكيرات مهمة:
+                      </p>
+                      <ul style="margin: 0; padding-right: 20px; color: #856404; font-size: 14px; line-height: 24px">
+                        <li>يرجى الوصول قبل 15 دقيقة على الأقل من موعدك</li>
+                        <li>أحضر هوية سارية وبطاقة التأمين الخاصة بك (إذا كان ينطبق)</li>
+                        <li>إذا كنت بحاجة إلى إعادة جدولة أو إلغاء الموعد، يرجى الاتصال بنا قبل 24 ساعة على الأقل</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
             <!-- View Appointment Button Section -->
             <tr>
               <td style="padding: 0 30px 30px; text-align: center">
@@ -211,11 +240,14 @@
                           text-align: center;
                           line-height: 1.5;
                         "
-                        >View Appointment Details</a
+                        >عرض تفاصيل الموعد</a
                       >
                     </td>
                   </tr>
                 </table>
+                <p style="margin: 15px 0 0; color: #666666; font-size: 14px; line-height: 20px">
+                  نتطلع لرؤيتك في العيادة.
+                </p>
               </td>
             </tr>
 
@@ -231,7 +263,7 @@
                 "
               >
                 <p style="margin: 0 0 10px; color: #666666; font-size: 12px; line-height: 18px">
-                  This is an automated confirmation email. Please do not reply to this message.
+                  هذه رسالة تأكيد آلية. يرجى عدم الرد على هذه الرسالة.
                 </p>
               </td>
             </tr>

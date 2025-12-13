@@ -9,9 +9,9 @@ import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
 import { useTranslations } from "next-intl";
 
 export default function VirtualVisitInfoPage() {
-  const { isLoading } = useCurrentUser();
-  const { isLoading: loadingPatientData } = useFertiSmartPatient();
-  const { isLoading: loadingCountries } = useFertiSmartCountries();
+  const { isLoading, fullName: currentUserFullName, data: currentUserData } = useCurrentUser();
+  const { isLoading: loadingPatientData, fullName, data: patientData } = useFertiSmartPatient();
+  const { isLoading: loadingCountries, nationalities } = useFertiSmartCountries();
   const { isLoading: loadingIdTypes } = useFertiSmartIDTypes();
   const t = useTranslations("VirtualVisitInfoPage");
 
@@ -34,7 +34,18 @@ export default function VirtualVisitInfoPage() {
             <Spinner className="size-10" />
           </div>
         ) : (
-          <VirtualVisitForm />
+          <VirtualVisitForm
+            defaultValues={{
+              fullName: fullName || currentUserFullName || "",
+              email: patientData?.emailAddress || currentUserData?.emailAddress || "",
+              gender: patientData?.sex === 1 ? "male" : "female",
+              idNumber: patientData?.identityId ?? "",
+              idType: patientData?.identityIdType?.id?.toString(),
+              nationality: patientData?.nationality?.name
+                ? nationalities?.find((item) => item === patientData?.nationality?.name) ?? ""
+                : "",
+            }}
+          />
         )}
         {/* Information Notice */}
         <div className="mt-6 bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">

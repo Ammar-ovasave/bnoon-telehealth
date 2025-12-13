@@ -349,12 +349,14 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 {patientData?.sex === 0 ? t("patientInformation.genders.female") : t("patientInformation.genders.male")}
               </p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {tIdType(patientData?.identityIdType?.name ?? "") || patientData?.identityIdType?.name}
-              </p>
-              <p className="font-medium text-gray-900 dark:text-white">{patientData?.identityId ?? "-"}</p>
-            </div>
+            {patientData?.identityId && (
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {tIdType(patientData?.identityIdType?.name ?? "") || patientData?.identityIdType?.name}
+                </p>
+                <p className="font-medium text-gray-900 dark:text-white">{patientData?.identityId ?? "-"}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -399,7 +401,9 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                   <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
                     <p className="text-sm text-green-800 dark:text-green-200">
                       {t("reschedule.selected")}:{" "}
-                      <span className="font-medium">{format(selectedRescheduleDate, "EEEE, MMMM do, yyyy")}</span>
+                      <span className="font-medium">
+                        {format(selectedRescheduleDate, "EEEE, MMMM do, yyyy", { locale: dateFnsLocale })}
+                      </span>
                     </p>
                     {!isKSA && (
                       <p className="text-xs text-green-700 dark:text-green-300 mt-1">
@@ -409,9 +413,12 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                               availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
                                 new Date().toISOString(),
                               KSA_TIMEZONE,
-                              "EEEE, MMMM do, yyyy"
+                              "EEEE, MMMM do, yyyy",
+                              { locale: dateFnsLocale }
                             )
-                          : formatInTimeZone(selectedRescheduleDate, KSA_TIMEZONE, "EEEE, MMMM do, yyyy")}
+                          : formatInTimeZone(selectedRescheduleDate, KSA_TIMEZONE, "EEEE, MMMM do, yyyy", {
+                              locale: dateFnsLocale,
+                            })}
                       </p>
                     )}
                   </div>
@@ -445,11 +452,13 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                           )}
                         >
                           <div>
-                            {format(slot.start ?? "", "hh:mm aa")}
+                            {format(slot.start ?? "", "hh:mm aa", { locale: dateFnsLocale })}
                             {!isKSA && (
                               <span className="text-xs block opacity-75 mt-0.5">
-                                ({formatInTimeZone(slot.start ?? new Date().toISOString(), KSA_TIMEZONE, "hh:mm aa")}{" "}
-                                {t("reschedule.ksaTime")})
+                                {formatInTimeZone(slot.start ?? new Date().toISOString(), KSA_TIMEZONE, "hh:mm aa", {
+                                  locale: dateFnsLocale,
+                                })}{" "}
+                                {t("reschedule.ksaTime")}
                               </span>
                             )}
                           </div>
@@ -472,19 +481,19 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                         {format(
                           availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
                             new Date().toISOString(),
-                          "hh:mm aa"
+                          "hh:mm aa",
+                          { locale: dateFnsLocale }
                         )}
                       </span>
                       {!isKSA && (
                         <span className="text-xs ml-2 opacity-75">
-                          (
                           {`${formatInTimeZone(
                             availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
                               new Date().toISOString(),
                             KSA_TIMEZONE,
-                            "hh:mm aa"
+                            "hh:mm aa",
+                            { locale: dateFnsLocale }
                           )} ${t("reschedule.ksaTime")}`}
-                          )
                         </span>
                       )}
                     </p>

@@ -73,6 +73,8 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         location: location,
         appointmentLink: appointmentLink,
         clinicName: clinicBranch?.name ?? "",
+        isVirtual: location.toLowerCase().includes("virtual"),
+        locationLink: clinicBranch?.locationLink,
       });
       await Promise.all([
         sendUpdatedAppointmentSMS({
@@ -149,10 +151,11 @@ async function sendUpdatedAppointmentSMS(params: {
     const cookiesStore = await cookies();
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    if (!templates?.updated) {
+    const templateText = templates?.updated.en || templates?.updated.ar;
+    if (!templateText) {
       return null;
     }
-    const textContent = templates.updated
+    const textContent = templateText
       .replace(/{{PATIENT_NAME}}/gi, params.fullName)
       .replace(/{{DATE_OLD}}/gi, params.oldDate)
       .replace(/{{TIME_OLD}}/gi, params.oldTime)
@@ -186,10 +189,11 @@ async function sendCancelledAppointmentSMS(params: {
     const cookiesStore = await cookies();
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    if (!templates?.cancelled) {
+    const templateText = templates?.cancelled.en || templates?.cancelled.ar;
+    if (!templateText) {
       return null;
     }
-    const textContent = templates.cancelled
+    const textContent = templateText
       .replace(/{{PATIENT_NAME}}/gi, params.fullName)
       .replace(/{{DATE}}/gi, params.appointmentDate)
       .replace(/{{TIME}}/gi, params.appointmentTime)

@@ -83,7 +83,6 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
           oldTime: oldTime,
           newDate: newDate,
           newTime: newTime,
-          appointmentLink: appointmentLink,
           mobileNumber: currentUser?.contactNumber ?? "",
         }),
         patientEmail
@@ -143,7 +142,7 @@ async function sendUpdatedAppointmentSMS(params: {
   oldTime: string;
   newDate: string;
   newTime: string;
-  appointmentLink: string;
+  // appointmentLink: string;
   mobileNumber: string;
 }) {
   try {
@@ -164,12 +163,9 @@ async function sendUpdatedAppointmentSMS(params: {
       .replace(/{{RESOURCE_NAME_OLD}}/gi, params.doctorName)
       .replace(/{{RESOURCE_NAME}}/gi, params.doctorName)
       .replace(/{{PATIENT_MRN}}/gi, params.mrn);
-    const messageWithLink = textContent.includes(params.appointmentLink)
-      ? textContent
-      : `${textContent}\n\n${params.appointmentLink}`;
     const success = await sendSMS({
       mobileNumber: params.mobileNumber,
-      message: messageWithLink,
+      message: textContent,
     });
     return success;
   } catch (error) {

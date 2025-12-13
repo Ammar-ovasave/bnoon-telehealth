@@ -120,6 +120,8 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
     }
   }, [appointment.time?.start, isKSA]);
 
+  const isVirtuaAppointment = appointment.description?.toLocaleLowerCase().includes("virtual");
+
   const { data: patientData, fullName } = useFertiSmartPatient();
 
   const { data: countriesData } = useFertiSmartCountries();
@@ -214,12 +216,14 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
         <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
           {appointment.status?.name !== "Cancelled" && (
             <>
-              <Link href={`/video-call/${appointment.id}/prepare`}>
-                <Button variant="default" size="sm" className="flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  {t("buttons.join")}
-                </Button>
-              </Link>
+              {isVirtuaAppointment && (
+                <Link href={`/video-call/${appointment.id}/prepare`}>
+                  <Button variant="default" size="sm" className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
+                    {t("buttons.join")}
+                  </Button>
+                </Link>
+              )}
               <Button onClick={() => handleReschedule()} variant="outline" size="sm" className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" />
                 {t("buttons.reschedule")}
@@ -299,9 +303,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{t("appointmentDetails.location")}</p>
                 <p className="font-medium text-gray-900 dark:text-white">
-                  {appointment.description?.toLocaleLowerCase().includes("virtual")
-                    ? t("appointmentDetails.virtualVisit")
-                    : t("appointmentDetails.inClinic")}
+                  {isVirtuaAppointment ? t("appointmentDetails.virtualVisit") : t("appointmentDetails.inClinic")}
                 </p>
               </div>
             </div>

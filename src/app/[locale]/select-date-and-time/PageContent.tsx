@@ -227,7 +227,7 @@ export default function SelectDateAndTimePage() {
                   </span>{" "}
                 </p>
                 {!isKSA && (
-                  <span className="text-xs ml-2 opacity-75">
+                  <span className="text-xs opacity-75">
                     {`${formatInTimeZone(
                       availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
                       KSA_TIMEZONE,

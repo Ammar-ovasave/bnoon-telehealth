@@ -231,8 +231,8 @@ export default function VirtualVisitForm() {
       const splitName = formData.fullName.split(" ");
       const [createAppointmentResponse] = await Promise.all([
         createAppointment({
-          firstName: currentUserData.firstName ?? "",
-          lastName: currentUserData.lastName ?? "",
+          firstName: splitName[0],
+          lastName: splitName.slice(1).join(" "),
           phoneNumber: currentUserData.contactNumber ?? "",
           email: formData.email,
           statusId: status.id ?? 0,
@@ -279,8 +279,6 @@ export default function VirtualVisitForm() {
     apiServicesData?.length,
     branchesData,
     currentUserData?.contactNumber,
-    currentUserData?.firstName,
-    currentUserData?.lastName,
     currentUserData?.mrn,
     formData.email,
     formData.fullName,

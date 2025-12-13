@@ -8,7 +8,8 @@
     "virtual": "Virtual Visit"
   },
   "idTypes": {
-    "National Id": "National Id",
+    "idTypes": "ID Number",
+    "National Id": "National ID",
     "Iqama No": "Iqama No",
     "Passport": "Passport"
   },

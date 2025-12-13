@@ -5,6 +5,7 @@ import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
 import { formatInTimeZone } from "date-fns-tz";
 import { getCancelAppointmentEmail, getRescheduleAppointmentEmail } from "@/services/templates";
 import { clinicLocations } from "@/models/ClinicModel";
+import { getLocale } from "next-intl/server";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -89,14 +90,14 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         }),
         patientEmail
           ? sendEmail({
-              baseAPIURL: baseAPIURL ?? null,
-              mrn: currentUser.mrn ?? "",
-              email: patientEmail,
-              body:
-                emailTemplate ??
-                `<p>Your appointment has been rescheduled to ${newDate} at ${newTime}. <a href="${appointmentLink}">Join Appointment</a></p>`,
-              subject: `Appointment Rescheduled ${params.appointmentId}`,
-            })
+            baseAPIURL: baseAPIURL ?? null,
+            mrn: currentUser.mrn ?? "",
+            email: patientEmail,
+            body:
+              emailTemplate ??
+              `<p>Your appointment has been rescheduled to ${newDate} at ${newTime}. <a href="${appointmentLink}">Join Appointment</a></p>`,
+            subject: `Appointment Rescheduled ${params.appointmentId}`,
+          })
           : Promise.resolve(null),
       ]);
     } else if (payload.type === "cancel") {
@@ -120,12 +121,12 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         }),
         patientEmail
           ? sendEmail({
-              baseAPIURL: baseAPIURL ?? null,
-              mrn: currentUser.mrn ?? "",
-              email: patientEmail,
-              body: emailTemplate ?? `<p>Your appointment on ${oldDate} at ${oldTime} has been cancelled.</p>`,
-              subject: `Appointment Cancelled ${params.appointmentId}`,
-            })
+            baseAPIURL: baseAPIURL ?? null,
+            mrn: currentUser.mrn ?? "",
+            email: patientEmail,
+            body: emailTemplate ?? `<p>Your appointment on ${oldDate} at ${oldTime} has been cancelled.</p>`,
+            subject: `Appointment Cancelled ${params.appointmentId}`,
+          })
           : Promise.resolve(null),
       ]);
     }
@@ -148,10 +149,13 @@ async function sendUpdatedAppointmentSMS(params: {
   mobileNumber: string;
 }) {
   try {
-    const cookiesStore = await cookies();
+    const [cookiesStore, locale] = await Promise.all([
+      cookies(),
+      getLocale()
+    ])
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    const templateText = templates?.updated.en || templates?.updated.ar;
+    const templateText = templates?.new[locale as 'ar' | 'en'] || templates?.new.en || templates?.new.ar;
     if (!templateText) {
       return null;
     }
@@ -186,10 +190,13 @@ async function sendCancelledAppointmentSMS(params: {
   mobileNumber: string;
 }) {
   try {
-    const cookiesStore = await cookies();
+    const [cookiesStore, locale] = await Promise.all([
+      cookies(),
+      getLocale()
+    ])
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    const templateText = templates?.cancelled.en || templates?.cancelled.ar;
+    const templateText = templates?.cancelled[locale as 'ar' | 'en'] || templates?.cancelled.en || templates?.cancelled.ar;
     if (!templateText) {
       return null;
     }

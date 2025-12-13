@@ -17,6 +17,7 @@ import { AUTH_TOKEN_NAME } from "@/constants";
 import { signJwt } from "@/services/signJwt";
 import { clinicLocations } from "@/models/ClinicModel";
 import axios from "@/services/axios";
+import { getLocale } from "next-intl/server";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -165,10 +166,10 @@ async function sendNewAppointmentSMS(params: {
   mobileNumber: string;
 }) {
   try {
-    const cookiesStore = await cookies();
+    const [cookiesStore, locale] = await Promise.all([cookies(), getLocale()]);
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    const templateText = templates?.new.en || templates?.new.ar;
+    const templateText = templates?.new[locale as 'ar' | 'en'] || templates?.new.en || templates?.new.ar;
     if (!templateText) {
       return null;
     }

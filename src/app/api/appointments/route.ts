@@ -71,7 +71,7 @@ export async function POST(request: Request) {
         type: null,
         baseAPIURL: baseAPIURL,
         appointmentId: createAppointmentResponse.data.id,
-        description: `${payload.description} - ${appointmentLink}`,
+        description: isVirtualAppointment ? `${payload.description} - ${appointmentLink}` : payload.description,
       }),
       sendConfirmAppointmentEmail({
         appointmentDate,

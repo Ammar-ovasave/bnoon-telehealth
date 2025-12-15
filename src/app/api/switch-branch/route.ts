@@ -2,7 +2,7 @@ import { clinicLocations } from "@/models/ClinicModel";
 import { SwitchBranchPayload } from "@/models/SwitchBranchPayload";
 import { cookies } from "next/headers";
 import { getCurrentUser } from "../current-user/_services";
-import { createPatientServer, getBranches, getPatientsByPhoneNumberServer } from "@/services/appointment-services";
+import { createPatientServer, getBranches, getPatient, getPatientsByPhoneNumberServer } from "@/services/appointment-services";
 import { signJwt } from "@/services/signJwt";
 import { AUTH_TOKEN_NAME } from "@/constants";
 
@@ -25,10 +25,14 @@ export async function POST(request: Request) {
       console.log("switch branch error not matching clinic base url");
       return Response.error();
     }
-    const patientsFromNewBranch = await getPatientsByPhoneNumberServer({
-      baseAPIURL: newBaseAPIURL,
-      phoneNumber: currentUser?.contactNumber ?? "",
-    });
+    const baseAPIURL = cookieStore.get("branchAPIURL")?.value;
+    const [patientsFromNewBranch, patientFromCurrentBranch] = await Promise.all([
+      getPatientsByPhoneNumberServer({
+        baseAPIURL: newBaseAPIURL,
+        phoneNumber: currentUser?.contactNumber ?? "",
+      }),
+      getPatient({ mrn: currentUser.mrn, baseAPIURL: baseAPIURL ?? null })
+    ]);
     let patientFromNewBranch = patientsFromNewBranch?.[0];
     if (!patientFromNewBranch?.mrn) {
       const fertiSmartBranches = await getBranches({ baseAPIURL: newBaseAPIURL });
@@ -39,6 +43,9 @@ export async function POST(request: Request) {
           contactNumber: currentUser?.contactNumber ?? "",
           firstName: currentUser?.firstName || "-",
           lastName: currentUser?.lastName || "-",
+          middleName: patientFromCurrentBranch?.middleName,
+          dob: patientFromCurrentBranch?.dob,
+          sex: patientFromCurrentBranch?.sex
         },
       });
       if (!newPatient?.mrn) {

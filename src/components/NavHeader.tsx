@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import useCurrentBranch from "@/hooks/useCurrentBranch";
 import { Badge } from "./ui/badge";
 import { useTranslations } from "next-intl";
+import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 
 function NavHeader() {
   const { data: currentUserData, isLoading } = useCurrentUser();
@@ -54,17 +55,19 @@ const BranchName: FC = () => {
 
 const LogoutButton: FC = () => {
   const [loading, setLoading] = useState(false);
-  const { mutate } = useCurrentUser();
+  const { mutate: mutateCurrentUser } = useCurrentUser();
   const router = useRouter();
   const t = useTranslations("NavHeader");
+  const { mutate: mutatePatient } = useFertiSmartPatient();
 
   const handleClick = useCallback(async () => {
     setLoading(true);
     await logout();
     setLoading(false);
-    mutate(undefined);
+    mutateCurrentUser(undefined);
+    mutatePatient(undefined);
     router.replace("/");
-  }, [mutate, router]);
+  }, [mutateCurrentUser, mutatePatient, router]);
 
   return (
     <Button onClick={handleClick} variant={"link"} disabled={loading}>

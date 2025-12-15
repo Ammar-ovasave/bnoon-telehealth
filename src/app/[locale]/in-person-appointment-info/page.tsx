@@ -2,9 +2,9 @@
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
-import { Spinner } from "@/components/ui/spinner";
 import InPersonForm from "./_components/InPersonForm";
 import Image from "next/image";
+import { Spinner } from "@/components/ui/spinner";
 import { useTranslations } from "next-intl";
 
 export default function InPersonAppointmentInfoPage() {
@@ -12,6 +12,7 @@ export default function InPersonAppointmentInfoPage() {
   const { isLoading } = useCurrentUser();
   const { isLoading: loadingPatientData, fullName } = useFertiSmartPatient();
   const { isLoading: loadingCountries } = useFertiSmartCountries();
+  console.log("initial fullName", isLoading, loadingCountries, loadingPatientData, fullName);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">

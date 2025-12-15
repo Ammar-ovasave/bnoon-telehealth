@@ -32,6 +32,7 @@ interface InPersonFormProps {
 }
 
 export default function InPersonForm({ defaultValus }: InPersonFormProps) {
+  console.log("in person initial values", defaultValus);
   const t = useTranslations("InPersonAppointmentInfoPage");
   const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
   const { mutate: mutatePatient } = useFertiSmartPatient();

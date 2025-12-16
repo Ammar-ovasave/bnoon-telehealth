@@ -3,7 +3,12 @@ import { useMemo } from "react";
 import useSWR from "swr";
 
 export default function useFertiSmartPatient() {
-  const { data, error, isLoading, mutate } = useSWR<FertiSmartPatientModel>(`/api/get-patient`);
+  const { data, error, isLoading, mutate } = useSWR<FertiSmartPatientModel>(`/api/get-patient`, {
+    errorRetryCount: 0,
+    revalidateOnFocus: false,
+    revalidateIfStale: false,
+    revalidateOnMount: true,
+  });
 
   const fullName = useMemo(() => {
     let name = "";

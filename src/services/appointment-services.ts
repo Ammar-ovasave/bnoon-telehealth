@@ -40,7 +40,7 @@ export async function getAppointment(params: { appointmentId: string; baseAPIURL
 
 export async function getPatientAppointments(params: { mrn: string; baseAPIURL?: string }) {
   try {
-    const res = await axios.get<FertiSmartAppointmentModel>(
+    const res = await axios.get<FertiSmartAppointmentModel[]>(
       params.baseAPIURL ? `${params.baseAPIURL}/patients/${params.mrn}/appointments` : `/patients/${params.mrn}/appointments`
     );
     return res.data;

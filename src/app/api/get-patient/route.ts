@@ -7,7 +7,13 @@ export async function GET() {
     const cookiesStore = await cookies();
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const currentUser = await getCurrentUser();
+    if (!currentUser?.mrn) {
+      return Response.error();
+    }
     const patient = await getPatient({ mrn: currentUser?.mrn ?? "", baseAPIURL: baseAPIURL ?? null });
+    if (!patient) {
+      return Response.error();
+    }
     return Response.json(patient);
   } catch (error) {
     console.log("---- error getting patient", error);

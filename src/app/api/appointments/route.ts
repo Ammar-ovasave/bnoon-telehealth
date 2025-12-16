@@ -17,7 +17,7 @@ import { AUTH_TOKEN_NAME } from "@/constants";
 import { signJwt } from "@/services/signJwt";
 import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
-import { createNewAppointmentDB } from "@/firestore/appointments";
+// import { createNewAppointmentDB } from "@/firestore/appointments";
 import axios from "@/services/axios";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     const clinicBranch = clinicLocations.find((clinic) => clinic.apiUrl === baseAPIURL);
     const isVirtualAppointment = payload.description === "Virtual Visit";
     await Promise.all([
-      createNewAppointmentDB({ ...payload, id: createAppointmentResponse.data.id.toString() }),
+      // createNewAppointmentDB({ ...payload, id: createAppointmentResponse.data.id.toString() }),
       updateAppointmentServer({
         type: null,
         baseAPIURL: baseAPIURL,

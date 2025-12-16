@@ -71,7 +71,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
       ? existingPatients?.[0]
       : await createPatient({
           branchId: selectedBranch.id ?? 0,
-          patient: { contactNumber: fullPhoneNumber, firstName: "-", lastName: "-" },
+          patient: { contactNumber: fullPhoneNumber, firstName: "-", lastName: "-", middleName: "-" },
         });
     const mrnToUse = currentUserData?.mrn
       ? currentUserData.mrn

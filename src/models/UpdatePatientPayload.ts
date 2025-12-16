@@ -1,7 +1,7 @@
 export interface UpdatePatientPayload {
   mrn: string;
   firstName?: string;
-  middleName?: string;
+  middleName: string;
   lastName?: string;
   maidenName?: string;
   arabicName?: string;

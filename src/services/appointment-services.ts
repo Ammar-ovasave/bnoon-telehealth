@@ -9,7 +9,7 @@ import axios from "./axios";
 
 export async function createPatientServer(params: {
   baseAPIURL: string | null;
-  patient: { firstName: string; lastName: string; sex?: 0 | 1; contactNumber: string; middleName?: string; dob?: string };
+  patient: { firstName: string; lastName: string; sex?: 0 | 1; contactNumber: string; middleName: string; dob?: string };
   branchId: number;
 }) {
   try {

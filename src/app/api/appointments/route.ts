@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       const newPatient = await createPatientServer({
         baseAPIURL: baseAPIURL ?? null,
         branchId: fertiSmartBranches?.[0].id ?? 0,
-        patient: { contactNumber: payload.phoneNumber, firstName: payload.firstName || "-", lastName: payload.lastName || "-" },
+        patient: { contactNumber: payload.phoneNumber, firstName: payload.firstName || "-", lastName: payload.lastName || "-", middleName: payload.middleName || '-' },
       });
       patientToUse = newPatient ?? patient;
       console.log("--- create appointment get patient error");

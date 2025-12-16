@@ -220,7 +220,8 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
       const [createAppointmentResponse] = await Promise.all([
         createAppointment({
           firstName: splitName[0],
-          lastName: splitName.slice(1).join(" "),
+          middleName: splitName.length > 2 ? splitName[1] : "",
+          lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
           phoneNumber: currentUserData.contactNumber ?? "",
           email: formData.email,
           statusId: status.id ?? 0,
@@ -247,7 +248,8 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
         mrn: newCurrentUser?.mrn ?? "",
         emailAddress: formData.email,
         firstName: splitName[0],
-        lastName: splitName.slice(1).join(" "),
+        middleName: splitName.length > 2 ? splitName[1] : "",
+        lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
         identityId: formData.idNumber,
         nationalityId: nationalitiesData?.find((item) => item.name === formData.nationality)?.id,
         identityIdTypeId: Number(formData.idType),

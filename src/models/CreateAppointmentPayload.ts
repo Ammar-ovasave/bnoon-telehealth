@@ -11,4 +11,5 @@ export interface CreateAppointmentPayload {
   phoneNumber: string;
   firstName: string;
   lastName: string;
+  middleName: string;
 }

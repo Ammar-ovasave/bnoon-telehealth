@@ -118,7 +118,8 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
           email: null,
           phoneNumber: currentUserData.contactNumber ?? "",
           firstName: splitName[0],
-          lastName: splitName.slice(1).join(" "),
+          lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
+          middleName: splitName.length > 2 ? splitName[1] : "",
           statusId: status.id ?? 0,
           branchId: branchesData?.[0].id ?? 0,
           description: `In Clinic`,
@@ -142,7 +143,8 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
         arabicName: containsArabic(formData.fullName) ? formData.fullName : undefined,
         mrn: currentUserData.mrn,
         firstName: splitName[0],
-        lastName: splitName.slice(1).join(" "),
+        middleName: splitName.length > 2 ? splitName[1] : "",
+        lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
       });
       mutatePatient(undefined);
       mutateCurrentUser(undefined);

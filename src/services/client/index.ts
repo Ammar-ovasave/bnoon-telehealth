@@ -70,7 +70,7 @@ export async function createAppointment(params: CreateAppointmentPayload) {
 }
 
 export async function createPatient(params: {
-  patient: { firstName: string; lastName: string; sex?: 0 | 1; contactNumber: string; middleName?: string; dob?: string };
+  patient: { firstName: string; lastName: string; sex?: 0 | 1; contactNumber: string; middleName: string; dob?: string };
   branchId: number;
 }) {
   try {

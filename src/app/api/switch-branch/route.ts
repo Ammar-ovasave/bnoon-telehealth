@@ -43,7 +43,7 @@ export async function POST(request: Request) {
           contactNumber: currentUser?.contactNumber ?? "",
           firstName: currentUser?.firstName || "-",
           lastName: currentUser?.lastName || "-",
-          middleName: patientFromCurrentBranch?.middleName,
+          middleName: patientFromCurrentBranch?.middleName ?? '',
           dob: patientFromCurrentBranch?.dob,
           sex: patientFromCurrentBranch?.sex
         },

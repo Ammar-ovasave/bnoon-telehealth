@@ -39,3 +39,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+src/firestore/bnoon-476311-cf2969a052a4.json

@@ -17,7 +17,7 @@ import { AUTH_TOKEN_NAME } from "@/constants";
 import { signJwt } from "@/services/signJwt";
 import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
-// import { createNewAppointmentDB } from "@/firestore/appointments";
+import { createNewAppointmentDB } from "@/firestore/appointments";
 import axios from "@/services/axios";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
@@ -62,13 +62,13 @@ export async function POST(request: Request) {
     }
     const service = services?.find((item) => item.id === payload.serviceId);
     const url = new URL(request.url);
-    const appointmentLink = `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`;
+    const isVirtualAppointment = payload.description === "Virtual Visit";
+    const appointmentLink = isVirtualAppointment ? `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare` : `${url.origin}/manage-appointments`;
     const appointmentDate = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy");
     const appointmentTime = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a");
     const clinicBranch = clinicLocations.find((clinic) => clinic.apiUrl === baseAPIURL);
-    const isVirtualAppointment = payload.description === "Virtual Visit";
     await Promise.all([
-      // createNewAppointmentDB({ ...payload, id: createAppointmentResponse.data.id.toString() }),
+      createNewAppointmentDB({ ...payload, id: createAppointmentResponse.data.id.toString() }),
       updateAppointmentServer({
         type: null,
         baseAPIURL: baseAPIURL,
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
         location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
         patientEmail: payload.email ?? patientToUse.emailAddress ?? "",
         patientGender: patientToUse.sex === 0 ? "female" : "male",
-        patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${payload.lastName ?? patientToUse.lastName ?? ""
+        patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${payload.middleName ?? patientToUse.middleName ?? ""} ${payload.lastName ?? patientToUse.lastName ?? ""
           }`.trim(),
         serviceName: service?.name ?? "",
         clinicName: clinicBranch?.name ?? "",
@@ -95,7 +95,8 @@ export async function POST(request: Request) {
         locale: locale,
       }),
       sendNewAppointmentSMS({
-        fullName: `${payload.firstName ?? ""} ${payload.lastName ?? ""}`.trim(),
+        fullName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${payload.middleName ?? patientToUse.middleName ?? ""} ${payload.lastName ?? patientToUse.lastName ?? ""
+          }`.trim(),
         mrn: patientToUse.mrn ?? "",
         doctorName: doctorResource?.linkedUserFullName ?? "",
         appointmentDate: appointmentDate,

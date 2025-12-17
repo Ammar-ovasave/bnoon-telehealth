@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getAppointment, getSMSTemplates, sendEmail, sendSMS, updateAppointmentServer } from "@/services/appointment-services";
+import { getAppointment, getPatient, getSMSTemplates, sendEmail, sendSMS, updateAppointmentServer } from "@/services/appointment-services";
 import { getCurrentUser } from "../../current-user/_services";
 import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
 import { formatInTimeZone } from "date-fns-tz";
@@ -51,9 +51,11 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
     if (res === null) {
       return Response.error();
     }
+    const isVirtualAppointment = payload.description === "Virtual Visit";
+    const currentUserPatient = await getPatient({ mrn: currentUser.mrn, baseAPIURL: baseAPIURL ?? null })
     const url = new URL(request.url);
-    const patientFullName = `${currentUser.firstName ?? ""} ${currentUser.lastName ?? ""}`.trim();
-    const appointmentLink = `${url.origin}/video-call/${params.appointmentId}/prepare`;
+    const patientFullName = `${currentUser.firstName ?? ""} ${currentUserPatient?.middleName ?? ""} ${currentUser.lastName ?? ""}`.trim();
+    const appointmentLink = isVirtualAppointment ? `${url.origin}/video-call/${params.appointmentId}/prepare` : `${url.origin}/manage-appointments`;
     const doctorName = appointment.resources?.[0].linkedUserFullName || appointment.resources?.[0].name || "";
     const serviceName = appointment.service?.name ?? "";
     const location = appointment.description?.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic";

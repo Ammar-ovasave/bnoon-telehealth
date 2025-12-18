@@ -5,13 +5,16 @@ import { Spinner } from "@/components/ui/spinner";
 import ServiceCard from "@/components/ServiceCard";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { doctors } from "@/models/DoctorModel";
 
 export const PageContent: FC = () => {
   const { isLoading, data: servicesData } = useFertiSmartAPIServices();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedClinicLocationId = searchParams.get("selectedClinicLocation");
   const t = useTranslations("ServicesPage");
 
   return (
@@ -30,6 +33,12 @@ export const PageContent: FC = () => {
             {services
               .filter((service) => {
                 return servicesData?.some((s) => s.name?.toLocaleLowerCase().includes(service.title.toLocaleLowerCase()));
+              })
+              .filter((service) => {
+                const hasDoctors = doctors.some((doc) => {
+                  return doc.services.some((s) => s === service.id) && doc.branchId === selectedClinicLocationId;
+                });
+                return hasDoctors;
               })
               .map((service) => (
                 <div key={service.id} className="w-full sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-3rem)/3)]">

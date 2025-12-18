@@ -219,6 +219,8 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
       const splitName = formData.fullName.split(" ");
       const [createAppointmentResponse] = await Promise.all([
         createAppointment({
+          serviceName: selectedFertiSmartService?.name ?? "",
+          statusName: status.name ?? "",
           firstName: splitName[0],
           middleName: splitName.length > 2 ? splitName[1] : "",
           lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
@@ -266,26 +268,27 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
       setLoading(false);
     }
   }, [
+    validateForm,
+    currentUserData?.mrn,
+    currentUserData?.contactNumber,
+    statusesData,
     apiServicesData?.length,
     branchesData,
-    currentUserData?.contactNumber,
-    currentUserData?.mrn,
-    formData.email,
+    t,
     formData.fullName,
+    formData.email,
     formData.idNumber,
     formData.idType,
     formData.nationality,
-    isVirtualVisit,
-    mutateCurrentUser,
-    mutatePatient,
-    nationalitiesData,
-    router,
+    selectedFertiSmartService?.name,
     selectedFertiSmartService?.id,
+    isVirtualVisit,
     selectedResource?.id,
     selectedTimeSlot,
-    statusesData,
-    validateForm,
-    t,
+    nationalitiesData,
+    mutateCurrentUser,
+    mutatePatient,
+    router,
   ]);
 
   return (

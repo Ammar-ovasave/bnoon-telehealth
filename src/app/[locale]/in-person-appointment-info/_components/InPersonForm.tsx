@@ -115,6 +115,8 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
       const splitName = formData.fullName.split(" ");
       const [createAppointmentResponse] = await Promise.all([
         createAppointment({
+          statusName: status.name ?? "",
+          serviceName: selectedFertiSmartService?.name ?? "",
           email: null,
           phoneNumber: currentUserData.contactNumber ?? "",
           firstName: splitName[0],
@@ -166,6 +168,7 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
     branchesData,
     t,
     formData.fullName,
+    selectedFertiSmartService?.name,
     selectedFertiSmartService?.id,
     selectedResource?.id,
     selectedTimeSlot,

@@ -24,10 +24,7 @@ const KSA_TIMEZONE = "Asia/Riyadh";
 
 export async function POST(request: Request) {
   try {
-    const [cookiesStore, locale] = await Promise.all([
-      cookies(),
-      getLocale()
-    ]);
+    const [cookiesStore, locale] = await Promise.all([cookies(), getLocale()]);
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const payload: CreateAppointmentPayload = await request.json();
     const [patient, doctorResource, services] = await Promise.all([
@@ -42,7 +39,12 @@ export async function POST(request: Request) {
       const newPatient = await createPatientServer({
         baseAPIURL: baseAPIURL ?? null,
         branchId: fertiSmartBranches?.[0].id ?? 0,
-        patient: { contactNumber: payload.phoneNumber, firstName: payload.firstName || "-", lastName: payload.lastName || "-", middleName: payload.middleName || '-' },
+        patient: {
+          contactNumber: payload.phoneNumber,
+          firstName: payload.firstName || "-",
+          lastName: payload.lastName || "-",
+          middleName: payload.middleName || "-",
+        },
       });
       patientToUse = newPatient ?? patient;
       console.log("--- create appointment get patient error");
@@ -63,12 +65,18 @@ export async function POST(request: Request) {
     const service = services?.find((item) => item.id === payload.serviceId);
     const url = new URL(request.url);
     const isVirtualAppointment = payload.description === "Virtual Visit";
-    const appointmentLink = isVirtualAppointment ? `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare` : `${url.origin}/manage-appointments`;
+    const appointmentLink = isVirtualAppointment
+      ? `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`
+      : `${url.origin}/manage-appointments`;
     const appointmentDate = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy");
     const appointmentTime = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a");
     const clinicBranch = clinicLocations.find((clinic) => clinic.apiUrl === baseAPIURL);
     await Promise.all([
-      createNewAppointmentDB({ ...payload, id: createAppointmentResponse.data.id.toString() }),
+      createNewAppointmentDB({
+        ...payload,
+        id: createAppointmentResponse.data.id.toString(),
+        createdAt: new Date().toISOString(),
+      }),
       updateAppointmentServer({
         type: null,
         baseAPIURL: baseAPIURL,
@@ -83,8 +91,9 @@ export async function POST(request: Request) {
         location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
         patientEmail: payload.email ?? patientToUse.emailAddress ?? "",
         patientGender: patientToUse.sex === 0 ? "female" : "male",
-        patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${payload.middleName ?? patientToUse.middleName ?? ""} ${payload.lastName ?? patientToUse.lastName ?? ""
-          }`.trim(),
+        patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${
+          payload.middleName ?? patientToUse.middleName ?? ""
+        } ${payload.lastName ?? patientToUse.lastName ?? ""}`.trim(),
         serviceName: service?.name ?? "",
         clinicName: clinicBranch?.name ?? "",
         isVirtual: isVirtualAppointment,
@@ -95,8 +104,9 @@ export async function POST(request: Request) {
         locale: locale,
       }),
       sendNewAppointmentSMS({
-        fullName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${payload.middleName ?? patientToUse.middleName ?? ""} ${payload.lastName ?? patientToUse.lastName ?? ""
-          }`.trim(),
+        fullName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${payload.middleName ?? patientToUse.middleName ?? ""} ${
+          payload.lastName ?? patientToUse.lastName ?? ""
+        }`.trim(),
         mrn: patientToUse.mrn ?? "",
         doctorName: doctorResource?.linkedUserFullName ?? "",
         appointmentDate: appointmentDate,
@@ -178,7 +188,7 @@ async function sendNewAppointmentSMS(params: {
     const [cookiesStore, locale] = await Promise.all([cookies(), getLocale()]);
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    const templateText = templates?.new[locale as 'ar' | 'en'] || templates?.new.en || templates?.new.ar;
+    const templateText = templates?.new[locale as "ar" | "en"] || templates?.new.en || templates?.new.ar;
     if (!templateText) {
       return null;
     }

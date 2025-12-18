@@ -6,10 +6,12 @@ export interface CreateAppointmentPayload {
   endTime: string;
   branchId: number;
   statusId: number;
+  statusName: string;
   description: string;
   email: string | null;
   phoneNumber: string;
   firstName: string;
   lastName: string;
   middleName: string;
+  serviceName: string;
 }

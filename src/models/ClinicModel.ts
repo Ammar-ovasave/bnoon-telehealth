@@ -62,8 +62,7 @@ export const clinicLocations: ClinicLocation[] = [
     imageSrc: "/images/alahsa.jpg",
     contactEmail: "info.jeddah@bnoon.sa",
     contactNumber: "+966126800800",
-    isCommingSoon: true,
-    apiUrl: null,
+    apiUrl: "https://overhaughty-branda-dowerless.ngrok-free.dev",
     locationLink: "https://maps.app.goo.gl/UXqd59VG37ct38f38",
   },
 ];

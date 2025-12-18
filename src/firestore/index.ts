@@ -1,14 +1,16 @@
-import { initializeApp, cert, getApps, getApp, App } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import fs from 'fs'
-import path from 'path'
+import { initializeApp, cert, getApps, getApp, App } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
-const serviceAccount = JSON.parse(fs.readFileSync(path.join('src', 'firestore', 'bnoon-476311-cf2969a052a4.json'), 'utf8'));
+function getServiceAccount() {
+  return JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT ?? "");
+}
+
+const serviceAccount = getServiceAccount();
 
 export let firebaseApp: App | null = null;
 if (getApps().length === 0) {
   firebaseApp = initializeApp({
-    credential: cert(serviceAccount)
+    credential: cert(serviceAccount),
   });
 } else {
   firebaseApp = getApp();

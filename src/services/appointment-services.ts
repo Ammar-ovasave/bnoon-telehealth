@@ -202,7 +202,7 @@ export async function getPatientsByPhoneNumberServer({
     return null;
   }
 }
-// https://undeclarable-kolby-overgraciously.ngrok-free.dev
+
 export async function updateAppointmentServer(params: UpdateAppointmentPayload & { baseAPIURL?: string }) {
   try {
     const res = await axios.patch(

@@ -49,12 +49,14 @@ export async function updateAppointment(params: UpdateAppointmentPayload) {
 
 export async function cancelAppointment({
   appointmentId,
+  cancelStatusName,
   cancelledStatusId,
 }: {
+  cancelStatusName: string;
   appointmentId: number;
   cancelledStatusId: number;
 }) {
-  return await updateAppointment({ appointmentId, statusId: cancelledStatusId, type: "cancel" });
+  return await updateAppointment({ appointmentId, statusId: cancelledStatusId, type: "cancel", statusName: cancelStatusName });
 }
 
 export async function createAppointment(params: CreateAppointmentPayload) {

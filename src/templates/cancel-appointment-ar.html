@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>تم إلغاء الموعد</title>
+    <title>تم إلغاء موعدك في بنون</title>
     <!--[if mso]>
       <style type="text/css">
         body,
@@ -27,7 +27,14 @@
             cellpadding="0"
             border="0"
             width="600"
-            style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); direction: rtl; text-align: right;"
+            style="
+              max-width: 600px;
+              background-color: #ffffff;
+              border-radius: 8px;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              direction: rtl;
+              text-align: right;
+            "
           >
             <!-- Header -->
             <tr>
@@ -37,7 +44,7 @@
                   alt="Bnoon Logo"
                   style="max-width: 150px; margin-bottom: 20px"
                 />
-                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold">تم إلغاء الموعد</h1>
+                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold">تم إلغاء موعدك في بنون</h1>
               </td>
             </tr>
 
@@ -46,7 +53,7 @@
               <td style="padding: 30px 30px 20px">
                 <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">عزيزي/عزيزتي {{patientName}}،</p>
                 <p style="margin: 15px 0 0; color: #333333; font-size: 16px; line-height: 24px">
-                  تم إلغاء موعدك.
+                  تم إلغاء موعدكم للاستشارة في بنون. مرفق أدناه تفاصيل الموعد الخاص بك الذي تم إلغاؤه.
                 </p>
               </td>
             </tr>
@@ -54,7 +61,6 @@
             <!-- Cancelled Appointment Details Section -->
             <tr>
               <td style="padding: 0 30px 30px">
-                <h2 style="margin: 0 0 15px; color: #333333; font-size: 18px; font-weight: 600">تفاصيل الموعد الملغى</h2>
                 <table
                   role="presentation"
                   cellspacing="0"
@@ -66,83 +72,58 @@
                   <!-- Date & Time -->
                   <tr>
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">التاريخ والوقت (توقيت السعودية)</td>
-                        </tr>
-                        <tr>
-                          <td style="color: #666666; font-size: 16px; font-weight: 600">
-                            {{appointmentDate}} في {{appointmentTime}} KSA
-                          </td>
-                        </tr>
-                      </table>
+                      <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">
+                        <span style="color: #666666; font-size: 14px">التاريخ والوقت (توقيت السعودية) للموعد الذي تم إلغاؤه:</span
+                        ><br />
+                        <span style="color: #333333; font-size: 16px; font-weight: 600"
+                          >{{appointmentDate}} في {{appointmentTime}}</span
+                        >
+                      </p>
                     </td>
                   </tr>
 
                   <!-- Doctor Name -->
                   <tr>
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">الطبيب</td>
-                        </tr>
-                        <tr>
-                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{doctorName}}</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
-                  <!-- Service Name -->
-                  <tr>
-                    <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">الخدمة</td>
-                        </tr>
-                        <tr>
-                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{serviceName}}</td>
-                        </tr>
-                      </table>
+                      <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">
+                        <span style="color: #666666; font-size: 14px">اسم الطبيب:</span>
+                        <span style="color: #333333; font-size: 16px; font-weight: 600">{{doctorName}}</span>
+                      </p>
                     </td>
                   </tr>
 
                   <!-- Location -->
                   <tr>
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">الموقع</td>
-                        </tr>
-                        <tr>
-                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{location}}</td>
-                        </tr>
-                      </table>
+                      <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">
+                        <span style="color: #666666; font-size: 14px">موقع المركز:</span>
+                        <span style="color: #333333; font-size: 16px; font-weight: 600">{{location}} {{locationLink}}</span>
+                      </p>
                     </td>
                   </tr>
 
-                  <!-- Clinic Name -->
+                  <!-- Patient Name -->
                   <tr>
                     <td style="padding: 12px 0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">العيادة</td>
-                        </tr>
-                        <tr>
-                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{clinicName}}</td>
-                        </tr>
-                      </table>
+                      <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">
+                        <span style="color: #666666; font-size: 14px">اسم المريض:</span>
+                        <span style="color: #333333; font-size: 16px; font-weight: 600">{{patientName}}</span>
+                      </p>
                     </td>
                   </tr>
                 </table>
               </td>
             </tr>
 
-            <!-- Additional Message Section -->
+            <!-- Manage Your Appointments Section -->
             <tr>
-              <td style="padding: 0 30px 30px">
+              <td style="padding: 0 30px 20px">
+                <h2 style="margin: 0 0 15px; color: #333333; font-size: 18px; font-weight: 600">إدارة المواعيد</h2>
                 <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">
-                  إذا كنت ترغب في تحديد موعد جديد، يرجى الاتصال بنا أو زيارة نظام الحجز لدينا.
+                  إذا كنت بحاجة إلى حجز موعد جديد، يرجى النقر على الزر أعلاه أو زيارة بوابة المواعيد في الموقع الإلكتروني
+                  <a href="https://www.bnoon.sa" style="color: #d32f2f; text-decoration: none">www.bnoon.sa</a>. كما يمكنكم
+                  الاتصال بفريقنا على الرقم <a href="tel:920010022" style="color: #d32f2f; text-decoration: none">920010022</a> أو
+                  مراسلتنا على <a href="mailto:info@bnoon.sa" style="color: #d32f2f; text-decoration: none">info@bnoon.sa</a>.
                 </p>
               </td>
             </tr>
@@ -158,8 +139,12 @@
                   border-top: 1px solid #e0e0e0;
                 "
               >
-                <p style="margin: 0 0 10px; color: #666666; font-size: 12px; line-height: 18px">
-                  هذه رسالة تأكيد آلية. يرجى عدم الرد على هذه الرسالة.
+                <p style="margin: 0 0 10px; color: #666666; font-size: 14px; line-height: 20px">
+                  مع تمنياتنا لكم بدوام الصحة والعافية،<br />
+                  فريق بنون
+                </p>
+                <p style="margin: 15px 0 0; color: #666666; font-size: 12px; line-height: 18px">
+                  هذه الرسالة تلقائية. نرجو عدم الرد على هذه الرسالة.
                 </p>
               </td>
             </tr>

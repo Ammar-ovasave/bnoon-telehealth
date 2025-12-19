@@ -34,6 +34,31 @@ const helvetica = localFont({
   ],
 });
 
+const alexandria = localFont({
+  src: [
+    {
+      path: "../fonts/Alexandria/Alexandria-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Alexandria/Alexandria-Bold.ttf",
+      style: "normal",
+      weight: "700",
+    },
+    {
+      path: "../fonts/Alexandria/Alexandria-Light.ttf",
+      style: "normal",
+      weight: "300",
+    },
+    {
+      path: "../fonts/Alexandria/Alexandria-Medium.ttf",
+      style: "normal",
+      weight: "500",
+    },
+  ],
+});
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -59,7 +84,7 @@ export default async function RootLayout({
     <SWRProvider fallback={{ "/api/current-user": currentUser }}>
       <NextIntlClientProvider>
         <html lang={paramsResult.locale} dir={isAr ? "rtl" : "ltr"}>
-          <body className={`antialiased ${helvetica.className}`}>
+          <body className={`antialiased ${isAr ? alexandria.className : helvetica.className}`}>
             <NavHeader />
             {children}
             <Toaster />

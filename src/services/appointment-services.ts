@@ -4,8 +4,11 @@ import { FertiSmartBranchModel } from "@/models/FertiSmartBranchModel";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
+import ical, { ICalAttendeeStatus, ICalCalendarMethod, ICalEventStatus } from "ical-generator";
 import nodemailer from "nodemailer";
 import axios from "./axios";
+import { addMinutes } from "date-fns";
+import { Attachment } from "nodemailer/lib/mailer";
 
 export async function createPatientServer(params: {
   baseAPIURL: string | null;
@@ -60,12 +63,79 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+export function createVideoConsultationCalendarEvent({
+  orderId,
+  testName,
+  dateAndTime,
+  userEmail,
+  userName,
+  joinCallUrl,
+  callDurationInMinutes,
+  method = ICalCalendarMethod.REQUEST,
+  status = ICalEventStatus.CONFIRMED,
+  description = "Bnoon Appointment",
+}: {
+  callDurationInMinutes: number;
+  orderId: string;
+  testName: string;
+  dateAndTime: Date;
+  userEmail: string;
+  userName: string;
+  joinCallUrl: string;
+  method?: ICalCalendarMethod;
+  status?: ICalEventStatus;
+  attendeeStatus?: ICalAttendeeStatus;
+  description?: string;
+}) {
+  const endMoment = addMinutes(dateAndTime, callDurationInMinutes);
+  const timeZone = "Asia/Riyadh";
+  const calendar = ical({
+    name: testName,
+    timezone: timeZone,
+    source: joinCallUrl,
+    prodId: testName,
+    method: method,
+    url: joinCallUrl,
+    scale: "GREGORIAN",
+    description: description,
+  });
+  calendar.createEvent({
+    id: `consultation-${orderId}@bnoon.com`,
+    start: dateAndTime,
+    end: endMoment,
+    summary: description,
+    timezone: timeZone,
+    organizer: {
+      name: "Bnoon",
+      email: "info@bnoon.sa",
+    },
+    attendees: [
+      {
+        email: "info@bnoon.sa",
+        name: "Bnoon",
+        rsvp: true,
+      },
+      {
+        email: userEmail,
+        name: userName,
+        rsvp: true,
+      },
+    ],
+    status: status,
+    description: description,
+    location: joinCallUrl,
+    url: joinCallUrl,
+  });
+  return calendar;
+}
+
 export async function sendEmail(params: {
   email: string;
   subject: string;
   body: string;
   mrn: string;
   baseAPIURL: string | null;
+  attachments?: Attachment[];
 }) {
   try {
     const res = await transporter.sendMail({
@@ -73,6 +143,7 @@ export async function sendEmail(params: {
       to: params.email,
       subject: params.subject,
       html: params.body,
+      attachments: params.attachments,
     });
     // const res = await axios.post<{
     //   emailEnabled?: boolean;

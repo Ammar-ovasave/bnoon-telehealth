@@ -1,6 +1,7 @@
 import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
 import {
   createPatientServer,
+  createVideoConsultationCalendarEvent,
   getAppointmentServices,
   getBranches,
   getPatient,
@@ -13,7 +14,7 @@ import {
 import { cookies } from "next/headers";
 import { getConfirmAppointmentEmail } from "@/services/templates";
 import { formatInTimeZone } from "date-fns-tz";
-import { AUTH_TOKEN_NAME } from "@/constants";
+import { AUTH_TOKEN_NAME, VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { signJwt } from "@/services/signJwt";
 import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
@@ -87,6 +88,7 @@ export async function POST(request: Request) {
         appointmentDate,
         appointmentLink,
         appointmentTime,
+        startDateObj: new Date(payload.startTime),
         doctorName: doctorResource?.linkedUserFullName ?? "",
         location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
         patientEmail: payload.email ?? patientToUse.emailAddress ?? "",
@@ -136,6 +138,7 @@ async function sendConfirmAppointmentEmail(params: {
   appointmentDate: string;
   appointmentLink: string;
   appointmentTime: string;
+  startDateObj: Date;
   doctorName: string;
   location: string;
   patientEmail: string;
@@ -172,6 +175,22 @@ async function sendConfirmAppointmentEmail(params: {
     email: params.patientEmail,
     body: emailTemplate ?? `<p>Join appointment: <a href="${params.appointmentLink}"></a></p>`,
     subject: `Appointment Confirmed ${params.appointmentId}`,
+    attachments: [
+      {
+        filename: "invite.ics",
+        content: createVideoConsultationCalendarEvent({
+          callDurationInMinutes: VISIT_DURATION_IN_MINUTES,
+          dateAndTime: params.startDateObj,
+          joinCallUrl: params.appointmentLink,
+          orderId: params.appointmentId.toString(),
+          testName: params.serviceName,
+          userEmail: params.patientEmail,
+          userName: params.patientName,
+          description: `Bnoon - ${params.serviceName}`,
+        }).toString(),
+        contentType: "text/calendar; method=REQUEST",
+      },
+    ],
   });
 }
 

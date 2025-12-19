@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import {
+  createVideoConsultationCalendarEvent,
   getAppointment,
   getPatient,
   getSMSTemplates,
@@ -14,6 +15,7 @@ import { getCancelAppointmentEmail, getRescheduleAppointmentEmail } from "@/serv
 import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
 import { updateAppointmentDB } from "@/firestore/appointments";
+import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -116,6 +118,22 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
                 emailTemplate ??
                 `<p>Your appointment has been rescheduled to ${newDate} at ${newTime}. <a href="${appointmentLink}">Join Appointment</a></p>`,
               subject: `Appointment Rescheduled ${params.appointmentId}`,
+              attachments: [
+                {
+                  filename: "invite.ics",
+                  content: createVideoConsultationCalendarEvent({
+                    callDurationInMinutes: VISIT_DURATION_IN_MINUTES,
+                    dateAndTime: new Date(appointment.time?.start ?? ""),
+                    joinCallUrl: appointmentLink,
+                    orderId: params.appointmentId,
+                    testName: appointment.service?.name ?? "",
+                    userEmail: patientEmail,
+                    userName: `${currentUser.firstName ?? ""} ${currentUser.lastName ?? ""}`,
+                    description: `Bnoon - ${appointment.service?.name ?? ""}`,
+                  }).toString(),
+                  contentType: "text/calendar; method=REQUEST",
+                },
+              ],
             })
           : Promise.resolve(null),
       ]);
@@ -150,6 +168,22 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
               email: patientEmail,
               body: emailTemplate ?? `<p>Your appointment on ${oldDate} at ${oldTime} has been cancelled.</p>`,
               subject: `Appointment Cancelled ${params.appointmentId}`,
+              attachments: [
+                {
+                  filename: "invite.ics",
+                  content: createVideoConsultationCalendarEvent({
+                    callDurationInMinutes: VISIT_DURATION_IN_MINUTES,
+                    dateAndTime: new Date(appointment.time?.start ?? ""),
+                    joinCallUrl: appointmentLink,
+                    orderId: params.appointmentId,
+                    testName: appointment.service?.name ?? "",
+                    userEmail: patientEmail,
+                    userName: `${currentUser.firstName ?? ""} ${currentUser.lastName ?? ""}`,
+                    description: `Bnoon - ${appointment.service?.name ?? ""}`,
+                  }).toString(),
+                  contentType: "text/calendar; method=REQUEST",
+                },
+              ],
             })
           : Promise.resolve(null),
       ]);

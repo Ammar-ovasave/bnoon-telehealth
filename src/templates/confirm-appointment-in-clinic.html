@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Appointment Confirmation</title>
+    <title>Your Appointment at Bnoon is Confirmed</title>
     <!--[if mso]>
       <style type="text/css">
         body,
@@ -37,7 +37,19 @@
                   alt="Bnoon Logo"
                   style="max-width: 150px; margin-bottom: 20px"
                 />
-                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold">Appointment Confirmed</h1>
+                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold">
+                  Your Appointment at Bnoon is Confirmed
+                </h1>
+              </td>
+            </tr>
+
+            <!-- Message Section -->
+            <tr>
+              <td style="padding: 30px 30px 20px">
+                <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">Dear {{patientName}},</p>
+                <p style="margin: 15px 0 0; color: #333333; font-size: 16px; line-height: 24px">
+                  Your appointment at Bnoon has been successfully confirmed. Please find the details of your appointment below.
+                </p>
               </td>
             </tr>
 
@@ -57,11 +69,11 @@
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Date & Time (KSA Time)</td>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Date & Time (KSA Time):</td>
                         </tr>
                         <tr>
-                          <td style="color: #004e78; font-size: 16px; font-weight: bold">
-                            {{appointmentDate}} at {{appointmentTime}} KSA
+                          <td style="color: #333333; font-size: 16px; font-weight: 600">
+                            {{appointmentDate}} at {{appointmentTime}}
                           </td>
                         </tr>
                       </table>
@@ -73,7 +85,7 @@
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Doctor</td>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Doctor Name:</td>
                         </tr>
                         <tr>
                           <td style="color: #333333; font-size: 16px; font-weight: 600">{{doctorName}}</td>
@@ -82,58 +94,15 @@
                     </td>
                   </tr>
 
-                  <!-- Service Name -->
-                  <tr>
-                    <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Service</td>
-                        </tr>
-                        <tr>
-                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{serviceName}}</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
                   <!-- Location -->
-                  <tr>
-                    <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Location</td>
-                        </tr>
-                        <tr>
-                          <td style="color: #333333; font-size: 16px; font-weight: 600; padding-bottom: 8px">{{location}}</td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <a
-                              href="{{locationLink}}"
-                              style="
-                                display: inline-block;
-                                color: #004e78;
-                                text-decoration: underline;
-                                font-size: 14px;
-                                font-weight: 600;
-                              "
-                              >Click here for location</a
-                            >
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
-                  <!-- Clinic Name -->
                   <tr>
                     <td style="padding: 12px 0">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Clinic</td>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Location:</td>
                         </tr>
                         <tr>
-                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{clinicName}}</td>
+                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{location}} {{locationLink}}</td>
                         </tr>
                       </table>
                     </td>
@@ -156,35 +125,13 @@
                 >
                   <!-- Patient Name -->
                   <tr>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0">
+                    <td style="padding: 12px 0">
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; width: 120px">Name:</td>
-                          <td style="color: #333333; font-size: 14px; font-weight: 600">{{patientName}}</td>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Name:</td>
                         </tr>
-                      </table>
-                    </td>
-                  </tr>
-
-                  <!-- Patient Email -->
-                  <tr>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
-                          <td style="color: #666666; font-size: 14px; width: 120px">Email:</td>
-                          <td style="color: #333333; font-size: 14px">{{patientEmail}}</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-
-                  <!-- Patient Gender -->
-                  <tr>
-                    <td style="padding: 8px 0">
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                        <tr>
-                          <td style="color: #666666; font-size: 14px; width: 120px">Gender:</td>
-                          <td style="color: #333333; font-size: 14px">{{patientGender}}</td>
+                          <td style="color: #333333; font-size: 16px; font-weight: 600">{{patientName}}</td>
                         </tr>
                       </table>
                     </td>
@@ -193,36 +140,9 @@
               </td>
             </tr>
 
-            <!-- Important Information Section -->
+            <!-- Manage Your Appointments Button Section -->
             <tr>
-              <td style="padding: 0 30px 30px">
-                <table
-                  role="presentation"
-                  cellspacing="0"
-                  cellpadding="0"
-                  border="0"
-                  width="100%"
-                  style="background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px; padding: 20px"
-                >
-                  <tr>
-                    <td>
-                      <p style="margin: 0 0 10px; color: #856404; font-size: 14px; font-weight: 600; line-height: 20px">
-                        Important Reminders:
-                      </p>
-                      <ul style="margin: 0; padding-left: 20px; color: #856404; font-size: 14px; line-height: 24px">
-                        <li>Please arrive at least 15 minutes before your appointment time</li>
-                        <li>Bring a valid ID and your insurance card (if applicable)</li>
-                        <li>If you need to reschedule or cancel, please contact us at least 24 hours in advance</li>
-                      </ul>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <!-- View Appointment Button Section -->
-            <tr>
-              <td style="padding: 0 30px 30px; text-align: center">
+              <td style="padding: 0 30px 20px; text-align: center">
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                   <tr>
                     <td align="center" style="padding: 0">
@@ -240,13 +160,23 @@
                           text-align: center;
                           line-height: 1.5;
                         "
-                        >View Appointment Details</a
+                        >Manage Your Appointments</a
                       >
                     </td>
                   </tr>
                 </table>
-                <p style="margin: 15px 0 0; color: #666666; font-size: 14px; line-height: 20px">
-                  We look forward to seeing you at the clinic.
+              </td>
+            </tr>
+
+            <!-- Manage Your Appointments Section -->
+            <tr>
+              <td style="padding: 0 30px 20px">
+                <h2 style="margin: 0 0 15px; color: #333333; font-size: 18px; font-weight: 600">Manage Your Appointments</h2>
+                <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">
+                  If you would like to reschedule your appointment, please click the button above. Alternatively, you can contact
+                  us on
+                  <a href="tel:920010022" style="color: #004e78; text-decoration: none">920010022</a>, or email us at
+                  <a href="mailto:info@bnoon.sa" style="color: #004e78; text-decoration: none">info@bnoon.sa</a>.
                 </p>
               </td>
             </tr>
@@ -262,7 +192,11 @@
                   border-top: 1px solid #e0e0e0;
                 "
               >
-                <p style="margin: 0 0 10px; color: #666666; font-size: 12px; line-height: 18px">
+                <p style="margin: 0 0 10px; color: #666666; font-size: 14px; line-height: 20px">
+                  Best regards,<br />
+                  The Bnoon Team
+                </p>
+                <p style="margin: 15px 0 0; color: #666666; font-size: 12px; line-height: 18px">
                   This is an automated confirmation email. Please do not reply to this message.
                 </p>
               </td>

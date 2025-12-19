@@ -7,6 +7,7 @@ export interface DoctorModel {
   arName: string;
   specialty: string;
   photo: string;
+  imageClassName?: string;
   availability: {
     clinic: boolean;
     virtual: boolean;
@@ -40,6 +41,7 @@ export const doctors: DoctorModel[] = [
     languages: ["Arabic", "English"],
     name: "Dr. Bassam Nusair",
     photo: "/images/bassam-mohammed.jpg",
+    imageClassName: "object-top",
     services: ["having-child", "fertility-preservation", "general-fertility"],
     specialty: "Consultant, Obstetrics, Gynecology, Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery",
   },
@@ -49,6 +51,7 @@ export const doctors: DoctorModel[] = [
     availability: { clinic: true, virtual: true },
     branchId: "al-ahsa",
     languages: ["Arabic", "English"],
+    imageClassName: "object-top",
     name: "Dr. Rania Elsherify",
     photo: "/images/dr-rania-mohamed.jpg",
     services: ["having-child", "fertility-preservation", "general-fertility", "pregnancy-followup"],

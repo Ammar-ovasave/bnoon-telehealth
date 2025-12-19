@@ -182,9 +182,13 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 
   const { data: appointmentStatusData, isLoading: loadingAppointmentStatus } = useFertiSmartAppointmentStatuses();
 
-  const cancelledAppointmentStatusId = useMemo(() => {
-    return appointmentStatusData?.find((status) => status.name?.toLocaleLowerCase().includes("cancel"))?.id;
+  const cancelledStatus = useMemo(() => {
+    return appointmentStatusData?.find((status) => status.name?.toLocaleLowerCase().includes("cancel"));
   }, [appointmentStatusData]);
+
+  const cancelledAppointmentStatusId = useMemo(() => {
+    return cancelledStatus?.id;
+  }, [cancelledStatus?.id]);
 
   const dateFnsLocale = useMemo(() => {
     return locale === "ar" ? ar : enUS;
@@ -537,6 +541,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                   setIsCancelling(true);
                   if (!appointment.id) return;
                   await cancelAppointment({
+                    cancelStatusName: cancelledStatus?.name ?? "",
                     appointmentId: appointment.id,
                     cancelledStatusId: cancelledAppointmentStatusId ?? 0,
                   });

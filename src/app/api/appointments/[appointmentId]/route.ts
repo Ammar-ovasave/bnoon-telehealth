@@ -1,11 +1,19 @@
 import { cookies } from "next/headers";
-import { getAppointment, getPatient, getSMSTemplates, sendEmail, sendSMS, updateAppointmentServer } from "@/services/appointment-services";
+import {
+  getAppointment,
+  getPatient,
+  getSMSTemplates,
+  sendEmail,
+  sendSMS,
+  updateAppointmentServer,
+} from "@/services/appointment-services";
 import { getCurrentUser } from "../../current-user/_services";
 import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
 import { formatInTimeZone } from "date-fns-tz";
 import { getCancelAppointmentEmail, getRescheduleAppointmentEmail } from "@/services/templates";
 import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
+import { updateAppointmentDB } from "@/firestore/appointments";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -52,10 +60,17 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
       return Response.error();
     }
     const isVirtualAppointment = payload.description === "Virtual Visit";
-    const currentUserPatient = await getPatient({ mrn: currentUser.mrn, baseAPIURL: baseAPIURL ?? null })
+    const [currentUserPatient] = await Promise.all([
+      getPatient({ mrn: currentUser.mrn, baseAPIURL: baseAPIURL ?? null }),
+      updateAppointmentDB(params.appointmentId, payload),
+    ]);
     const url = new URL(request.url);
-    const patientFullName = `${currentUser.firstName ?? ""} ${currentUserPatient?.middleName ?? ""} ${currentUser.lastName ?? ""}`.trim();
-    const appointmentLink = isVirtualAppointment ? `${url.origin}/video-call/${params.appointmentId}/prepare` : `${url.origin}/manage-appointments`;
+    const patientFullName = `${currentUser.firstName ?? ""} ${currentUserPatient?.middleName ?? ""} ${
+      currentUser.lastName ?? ""
+    }`.trim();
+    const appointmentLink = isVirtualAppointment
+      ? `${url.origin}/video-call/${params.appointmentId}/prepare`
+      : `${url.origin}/manage-appointments`;
     const doctorName = appointment.resources?.[0].linkedUserFullName || appointment.resources?.[0].name || "";
     const serviceName = appointment.service?.name ?? "";
     const location = appointment.description?.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic";
@@ -94,25 +109,29 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         }),
         patientEmail
           ? sendEmail({
-            baseAPIURL: baseAPIURL ?? null,
-            mrn: currentUser.mrn ?? "",
-            email: patientEmail,
-            body:
-              emailTemplate ??
-              `<p>Your appointment has been rescheduled to ${newDate} at ${newTime}. <a href="${appointmentLink}">Join Appointment</a></p>`,
-            subject: `Appointment Rescheduled ${params.appointmentId}`,
-          })
+              baseAPIURL: baseAPIURL ?? null,
+              mrn: currentUser.mrn ?? "",
+              email: patientEmail,
+              body:
+                emailTemplate ??
+                `<p>Your appointment has been rescheduled to ${newDate} at ${newTime}. <a href="${appointmentLink}">Join Appointment</a></p>`,
+              subject: `Appointment Rescheduled ${params.appointmentId}`,
+            })
           : Promise.resolve(null),
       ]);
     } else if (payload.type === "cancel") {
+      const locationText = clinicBranch?.name ?? location;
+      const mapsLinkText = locale === "ar" ? "خرائط جوجل" : "Google Maps";
+      const locationLink = clinicBranch?.locationLink
+        ? ` <a href="${clinicBranch.locationLink}" style="color: #d32f2f; text-decoration: none">${mapsLinkText}</a>`
+        : "";
       const emailTemplate = await getCancelAppointmentEmail({
         patientName: patientFullName,
-        doctorName: doctorName,
         appointmentDate: oldDate,
         appointmentTime: oldTime,
-        serviceName: serviceName,
-        location: location,
-        clinicName: clinicBranch?.name ?? "",
+        location: locationText,
+        locationLink: locationLink,
+        doctorName: doctorName,
         locale: locale,
       });
       await Promise.all([
@@ -126,12 +145,12 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
         }),
         patientEmail
           ? sendEmail({
-            baseAPIURL: baseAPIURL ?? null,
-            mrn: currentUser.mrn ?? "",
-            email: patientEmail,
-            body: emailTemplate ?? `<p>Your appointment on ${oldDate} at ${oldTime} has been cancelled.</p>`,
-            subject: `Appointment Cancelled ${params.appointmentId}`,
-          })
+              baseAPIURL: baseAPIURL ?? null,
+              mrn: currentUser.mrn ?? "",
+              email: patientEmail,
+              body: emailTemplate ?? `<p>Your appointment on ${oldDate} at ${oldTime} has been cancelled.</p>`,
+              subject: `Appointment Cancelled ${params.appointmentId}`,
+            })
           : Promise.resolve(null),
       ]);
     }
@@ -154,13 +173,10 @@ async function sendUpdatedAppointmentSMS(params: {
   mobileNumber: string;
 }) {
   try {
-    const [cookiesStore, locale] = await Promise.all([
-      cookies(),
-      getLocale()
-    ])
+    const [cookiesStore, locale] = await Promise.all([cookies(), getLocale()]);
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    const templateText = templates?.new[locale as 'ar' | 'en'] || templates?.new.en || templates?.new.ar;
+    const templateText = templates?.new[locale as "ar" | "en"] || templates?.new.en || templates?.new.ar;
     if (!templateText) {
       return null;
     }
@@ -195,13 +211,10 @@ async function sendCancelledAppointmentSMS(params: {
   mobileNumber: string;
 }) {
   try {
-    const [cookiesStore, locale] = await Promise.all([
-      cookies(),
-      getLocale()
-    ])
+    const [cookiesStore, locale] = await Promise.all([cookies(), getLocale()]);
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    const templateText = templates?.cancelled[locale as 'ar' | 'en'] || templates?.cancelled.en || templates?.cancelled.ar;
+    const templateText = templates?.cancelled[locale as "ar" | "en"] || templates?.cancelled.en || templates?.cancelled.ar;
     if (!templateText) {
       return null;
     }

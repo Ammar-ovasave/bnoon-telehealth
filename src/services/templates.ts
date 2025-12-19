@@ -92,25 +92,31 @@ export async function getRescheduleAppointmentEmail(params: {
 
 export async function getCancelAppointmentEmail(params: {
   patientName: string;
-  doctorName: string;
   appointmentDate: string;
   appointmentTime: string;
-  serviceName: string;
   location: string;
-  clinicName: string;
+  locationLink?: string;
+  doctorName?: string;
   locale?: string;
 }) {
   try {
     const templateFileName = getTemplateName("cancel-appointment.html", params.locale);
     const file = await fs.readFile(path.resolve("src", "templates", templateFileName), { encoding: "utf-8" });
-    const html = file
+    let html = file
       .replace(/{{patientName}}/g, params.patientName)
-      .replace(/{{doctorName}}/g, params.doctorName)
       .replace(/{{appointmentDate}}/g, params.appointmentDate)
       .replace(/{{appointmentTime}}/g, params.appointmentTime)
-      .replace(/{{serviceName}}/g, params.serviceName)
-      .replace(/{{location}}/g, params.location)
-      .replace(/{{clinicName}}/g, params.clinicName);
+      .replace(/{{location}}/g, params.location);
+    if (params.locationLink) {
+      html = html.replace(/{{locationLink}}/g, params.locationLink);
+    } else {
+      html = html.replace(/{{locationLink}}/g, "");
+    }
+    if (params.doctorName) {
+      html = html.replace(/{{doctorName}}/g, params.doctorName);
+    } else {
+      html = html.replace(/{{doctorName}}/g, "");
+    }
     return html;
   } catch (error) {
     console.log("--- error getCancelAppointmentEmail", error);

@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "./ui/button";
 import { useTranslations, useLocale } from "next-intl";
 import { getDoctorName } from "@/lib/getDoctorName";
+import clsx from "clsx";
 
 interface DoctorCardProps {
   doctor: DoctorModel;
@@ -59,7 +60,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
             src={doctor.photo}
             alt={`${doctorName} photo`}
             fill
-            className="object-cover rounded-full border-4 border-white shadow-lg"
+            className={clsx("object-cover rounded-full border-4 border-white shadow-lg", doctor.imageClassName)}
             sizes="96px"
           />
         </div>

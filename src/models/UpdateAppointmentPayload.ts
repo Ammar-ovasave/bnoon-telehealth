@@ -1,10 +1,5 @@
-export type UpdateAppointmentPayload = {
-  startTime?: string;
-  endTime?: string;
-  resourceIds?: number[];
-  branchId?: number;
-  statusId?: number;
-  appointmentId: number;
-  description?: string;
-  type: "cancel" | "reschedule" | null;
-};
+import { CreateAppointmentPayload } from "./CreateAppointmentPayload";
+
+export type UpdateAppointmentPayload = Partial<
+  Pick<CreateAppointmentPayload, "startTime" | "endTime" | "resourceIds" | "branchId" | "statusId" | "statusName" | "description">
+> & { appointmentId: number; type: "cancel" | "reschedule" | null };

@@ -75,6 +75,9 @@
     }
   },
   "DoctorsPage": {
+    "English": "English",
+    "Arabic": "Arabic",
+    "French": "French",
     "title": "Select Your Doctor",
     "description": "Choose from our trusted team of experts — highly qualified, board-certified consultants dedicated to providing expert guidance, advanced treatments, and innovative, personalized care.",
     "visitType": {

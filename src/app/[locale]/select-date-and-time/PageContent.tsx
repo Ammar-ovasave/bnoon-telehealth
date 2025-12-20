@@ -18,6 +18,16 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 
+const formatArabicWeekDayName: { [name: string]: string } = {
+  سبت: "السبت",
+  أحد: "الأحد",
+  اثنين: "الاثنين",
+  ثلاثاء: "الثلاثاء",
+  أربعاء: "الأربعاء",
+  خميس: "الخميس",
+  جمعة: "الجمعة",
+};
+
 export default function SelectDateAndTimePage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>();
@@ -28,6 +38,13 @@ export default function SelectDateAndTimePage() {
   const dateFnsLocale = useMemo(() => {
     return locale === "ar" ? ar : enUS;
   }, [locale]);
+
+  const weekdayFormatter = useMemo(() => {
+    return (date: Date) => {
+      const value = format(date, "EEE", { locale: dateFnsLocale });
+      return formatArabicWeekDayName[value] ?? value;
+    };
+  }, [dateFnsLocale]);
 
   const searchParams = useSearchParams();
   const selectedDoctorId = searchParams.get("selectedDoctor");
@@ -148,8 +165,14 @@ export default function SelectDateAndTimePage() {
                 disabled={isDateDisabled}
                 locale={dateFnsLocale}
                 className="rounded-md border"
+                formatters={{
+                  formatWeekdayName: weekdayFormatter,
+                }}
                 classNames={{
-                  day: "hover:bg-green-50 dark:hover:bg-green-900/20",
+                  weekdays: "gap-3",
+                  weekday: "text-[10px] px-2",
+                  week: "gap-2 mt-3",
+                  day: "hover:bg-green-50 dark:hover:bg-green-900/20 p-1",
                   day_selected: "bg-green-600 text-white hover:bg-green-700",
                   day_today: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
                   button_next: "bg-primary cursor-pointer text-white p-1 rounded-sm",
@@ -266,7 +289,7 @@ export default function SelectDateAndTimePage() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">{t("summary.date")}</p>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {selectedDate
-                    ? format(selectedDate, "EEEE, MMMM do, yyyy", { locale: dateFnsLocale })
+                    ? format(selectedDate, locale === "ar" ? "dd MMMM yyyy" : "EEEE, MMMM do, yyyy", { locale: dateFnsLocale })
                     : t("messages.notSelected")}
                 </p>
                 {/* {selectedDate && !isKSA && (

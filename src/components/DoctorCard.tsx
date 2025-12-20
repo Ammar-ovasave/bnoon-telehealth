@@ -75,7 +75,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 text-sm">
               <Image src={`/icons/Language.png`} alt="Languages" width={25} height={20} className="size-[30px] object-cover" />
-              <span>{doctor.languages.join(", ")}</span>
+              <span>{doctor.languages.map((lang) => t(lang)).join(", ")}</span>
             </div>
           </div>
           {/* Availability */}

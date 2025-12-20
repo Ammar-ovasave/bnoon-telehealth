@@ -19,7 +19,7 @@ import { signJwt } from "@/services/signJwt";
 import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
 import { createNewAppointmentDB } from "@/firestore/appointments";
-import axios from "@/services/axios";
+import axios, { branchURLs } from "@/services/axios";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -77,6 +77,7 @@ export async function POST(request: Request) {
         ...payload,
         id: createAppointmentResponse.data.id.toString(),
         createdAt: new Date().toISOString(),
+        baseAPIURL: baseAPIURL ?? branchURLs[0],
       }),
       updateAppointmentServer({
         type: null,

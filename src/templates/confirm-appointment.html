@@ -67,11 +67,16 @@
                   <!-- Date & Time -->
                   <tr>
                     <td style="padding: 12px 0; border-bottom: 1px solid #e0e0e0">
-                      <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">
-                        <span style="color: #333333; font-size: 16px; font-weight: 600"
-                          >{{appointmentDate}} at {{appointmentTime}}</span
-                        >
-                      </p>
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                        <tr>
+                          <td style="color: #666666; font-size: 14px; padding-bottom: 4px">Date & Time (KSA Time):</td>
+                        </tr>
+                        <tr>
+                          <td style="color: #333333; font-size: 16px; font-weight: 600">
+                            {{appointmentDate}} at {{appointmentTime}}
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
 

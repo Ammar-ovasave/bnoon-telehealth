@@ -10,7 +10,8 @@ import {
 } from "@/services/appointment-services";
 import { getCurrentUser } from "../../current-user/_services";
 import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
-import { formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone, toZonedTime } from "date-fns-tz";
+import { parseISO } from "date-fns";
 import { getCancelAppointmentEmail, getRescheduleAppointmentEmail } from "@/services/templates";
 import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
@@ -83,6 +84,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
     if (payload.type === "reschedule") {
       const newDate = formatInTimeZone(payload.startTime ?? "", KSA_TIMEZONE, "dd-MM-yyyy");
       const newTime = formatInTimeZone(payload.startTime ?? "", KSA_TIMEZONE, "hh:mm a");
+      const newStartTimeForCalendar = payload.startTime ? toZonedTime(parseISO(payload.startTime), KSA_TIMEZONE) : new Date();
       const emailTemplate = await getRescheduleAppointmentEmail({
         patientName: patientFullName,
         doctorName: doctorName,
@@ -123,7 +125,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
                   filename: "invite.ics",
                   content: createVideoConsultationCalendarEvent({
                     callDurationInMinutes: VISIT_DURATION_IN_MINUTES,
-                    dateAndTime: new Date(appointment.time?.start ?? ""),
+                    dateAndTime: newStartTimeForCalendar,
                     joinCallUrl: appointmentLink,
                     orderId: params.appointmentId,
                     testName: appointment.service?.name ?? "",
@@ -143,6 +145,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
       const locationLink = clinicBranch?.locationLink
         ? ` <a href="${clinicBranch.locationLink}" style="color: #d32f2f; text-decoration: none">${mapsLinkText}</a>`
         : "";
+      const oldStartTimeForCalendar = appointment.time?.start
+        ? toZonedTime(parseISO(appointment.time.start), KSA_TIMEZONE)
+        : new Date();
       const emailTemplate = await getCancelAppointmentEmail({
         patientName: patientFullName,
         appointmentDate: oldDate,
@@ -173,7 +178,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
                   filename: "invite.ics",
                   content: createVideoConsultationCalendarEvent({
                     callDurationInMinutes: VISIT_DURATION_IN_MINUTES,
-                    dateAndTime: new Date(appointment.time?.start ?? ""),
+                    dateAndTime: oldStartTimeForCalendar,
                     joinCallUrl: appointmentLink,
                     orderId: params.appointmentId,
                     testName: appointment.service?.name ?? "",

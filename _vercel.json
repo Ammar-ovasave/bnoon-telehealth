@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/daily",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/api-key",
+      "schedule": "0 0 1 * *"
     }
   ]
 }

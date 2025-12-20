@@ -11,7 +11,8 @@
     "idTypes": "رقم الهوية",
     "National Id": "رقم الهوية",
     "Iqama No": "رقم الإقامة",
-    "Passport": "جواز السفر"
+    "Passport": "جواز السفر",
+    "License Number": "رقم رخصة القيادة"
   },
   "HomePage": {
     "title": "اختر أقرب عيادة بنون إليك",

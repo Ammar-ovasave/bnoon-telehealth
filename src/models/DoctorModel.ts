@@ -42,7 +42,7 @@ export const doctors: DoctorModel[] = [
     name: "Dr. Bassam Nusair",
     photo: "/images/bassam-mohammed.jpg",
     imageClassName: "object-top",
-    services: ["having-child", "fertility-preservation", "general-fertility"],
+    services: ["fertility-preservation", "general-fertility", "having-child", "pregnancy-followup"],
     specialty: "Consultant, Obstetrics, Gynecology, Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery",
   },
   {
@@ -54,7 +54,7 @@ export const doctors: DoctorModel[] = [
     imageClassName: "object-top",
     name: "Dr. Rania Elsherify",
     photo: "/images/dr-rania-mohamed.jpg",
-    services: ["having-child", "fertility-preservation", "general-fertility", "pregnancy-followup"],
+    services: ["fertility-preservation", "general-fertility", "having-child", "pregnancy-followup"],
     specialty: "Consultant, Obstetrics, Gynecology & Delayed Pregnancy",
   },
   {
@@ -236,7 +236,7 @@ export const doctors: DoctorModel[] = [
     languages: ["Arabic", "English"],
     name: "Dr. Ahmed Al-Nowasser",
     photo: "/images/dr-ahmed-al-nuaiser.jpg",
-    services: [],
+    services: ["fertility-preservation", "general-fertility", "having-child", "pregnancy-followup"],
     specialty: "Consultant, Obstetrics, Gynecology, Reproductive Endocrinology, Infertility (IVF) & Minimally Invasive Surgery",
   },
   {
@@ -250,7 +250,7 @@ export const doctors: DoctorModel[] = [
     languages: ["Arabic", "English"],
     name: "Dr. Median Alkhalaf",
     photo: "/images/dr-madian-al-khalaf.jpg",
-    services: [],
+    services: ["fertility-preservation", "general-fertility", "having-child", "pregnancy-followup"],
     specialty: "Consultant, Obstetrics & Gynecology",
   },
 ];

@@ -13,7 +13,8 @@ import {
 } from "@/services/appointment-services";
 import { cookies } from "next/headers";
 import { getConfirmAppointmentEmail } from "@/services/templates";
-import { formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone, toZonedTime } from "date-fns-tz";
+import { parseISO } from "date-fns";
 import { AUTH_TOKEN_NAME, VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { signJwt } from "@/services/signJwt";
 import { clinicLocations } from "@/models/ClinicModel";
@@ -71,6 +72,11 @@ export async function POST(request: Request) {
       : `${url.origin}/manage-appointments`;
     const appointmentDate = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy");
     const appointmentTime = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a");
+    // Parse the startTime - payload.startTime is always in UTC format (ends with Z)
+    // parseISO correctly parses UTC dates. We convert it to represent the KSA local time
+    // so that when the ical library interprets it with the KSA timezone, it displays correctly
+    const utcDate = parseISO(payload.startTime);
+    const startDateForCalendar = toZonedTime(utcDate, KSA_TIMEZONE);
     const clinicBranch = clinicLocations.find((clinic) => clinic.apiUrl === baseAPIURL);
     await Promise.all([
       createNewAppointmentDB({
@@ -89,7 +95,7 @@ export async function POST(request: Request) {
         appointmentDate,
         appointmentLink,
         appointmentTime,
-        startDateObj: new Date(payload.startTime),
+        startDateObj: startDateForCalendar,
         doctorName: doctorResource?.linkedUserFullName ?? "",
         location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
         patientEmail: payload.email ?? patientToUse.emailAddress ?? "",

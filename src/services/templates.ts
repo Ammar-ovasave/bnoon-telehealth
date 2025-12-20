@@ -123,3 +123,67 @@ export async function getCancelAppointmentEmail(params: {
     return null;
   }
 }
+
+export async function getAppointmentReminderEmail(params: {
+  appointmentDate: string;
+  appointmentTime: string;
+  doctorName: string;
+  location: string;
+  serviceName: string;
+  patientName: string;
+  patientEmail: string;
+  appointmentLink: string;
+  clinicName: string;
+  isVirtual?: boolean;
+  locationLink?: string;
+}) {
+  try {
+    const file = await fs.readFile(path.resolve("src", "templates", "appointment-reminder.html"), { encoding: "utf-8" });
+    let virtualVisitSection = "";
+    if (params.isVirtual) {
+      virtualVisitSection = `
+            <tr>
+              <td style="padding: 0 30px 20px">
+                <p style="margin: 0 0 15px; color: #333333; font-size: 16px; line-height: 24px">Join the call on below link:</p>
+                <p style="margin: 0; color: #333333; font-size: 16px; line-height: 24px">
+                  <a href="${params.appointmentLink}" style="color: #004e78; text-decoration: underline; word-break: break-all"
+                    >${params.appointmentLink}</a
+                  >
+                </p>
+              </td>
+            </tr>`;
+    }
+    let importantInfoItems = "";
+    if (params.isVirtual) {
+      importantInfoItems = `
+                        <li style="margin-bottom: 10px">Please ensure you have a stable internet connection</li>
+                        <li style="margin-bottom: 10px">Join the consultation 5 minutes before the scheduled time</li>
+                        <li>Please note that any delay in joining the call can result in the cancellation of the appointment.</li>`;
+    } else {
+      importantInfoItems = `
+                        <li style="margin-bottom: 10px">Please arrive 10 minutes before your scheduled appointment time</li>
+                        <li style="margin-bottom: 10px">Bring a valid ID and any relevant medical documents</li>
+                        <li>If you need to reschedule or cancel, please do so at least 24 hours in advance</li>`;
+    }
+    let html = file
+      .replace(/{{patientName}}/g, params.patientName)
+      .replace(/{{appointmentDate}}/g, params.appointmentDate)
+      .replace(/{{appointmentTime}}/g, params.appointmentTime)
+      .replace(/{{doctorName}}/g, params.doctorName)
+      .replace(/{{serviceName}}/g, params.serviceName)
+      .replace(/{{location}}/g, params.location)
+      .replace(/{{appointmentLink}}/g, params.appointmentLink)
+      .replace(/{{clinicName}}/g, params.clinicName)
+      .replace(/{{virtualVisitSection}}/g, virtualVisitSection)
+      .replace(/{{importantInfoItems}}/g, importantInfoItems);
+    if (params.locationLink) {
+      html = html.replace(/{{locationLink}}/g, params.locationLink);
+    } else {
+      html = html.replace(/{{locationLink}}/g, "");
+    }
+    return html;
+  } catch (error) {
+    console.log("--- error getAppointmentReminderEmail", error);
+    return null;
+  }
+}

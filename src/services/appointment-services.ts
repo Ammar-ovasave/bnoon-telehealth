@@ -303,3 +303,13 @@ export async function getSMSTemplates(params: { baseAPIURL?: string }) {
     return null;
   }
 }
+
+export async function createNewAPIKey(params: { baseAPIURL?: string }) {
+  try {
+    const res = await axios.post<{ apiKey?: string }>(params.baseAPIURL ? `${params.baseAPIURL}/api-keys` : `/api-keys`);
+    return res.data;
+  } catch (error) {
+    console.log("--- createNewAPIKey error", error);
+    return null;
+  }
+}

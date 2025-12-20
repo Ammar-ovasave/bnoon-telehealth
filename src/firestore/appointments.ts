@@ -4,7 +4,7 @@ import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
 
 const APPOINTMENTS_COLLECTION_NAME = "appointments";
 
-type CreateDBAppointmentParamsType = CreateAppointmentPayload & { id: string; createdAt: string };
+export type CreateDBAppointmentParamsType = CreateAppointmentPayload & { id: string; createdAt: string; baseAPIURL: string };
 
 export async function createNewAppointmentDB(params: CreateDBAppointmentParamsType) {
   try {
@@ -23,5 +23,30 @@ export async function updateAppointmentDB(appointmentId: string, updateData: Upd
   } catch (error) {
     console.log("--- updateAppointmentDB error", error);
     return null;
+  }
+}
+
+export async function getAppointmentsForReminder(params: { startTimeFrom: string; startTimeTo: string; statusName?: string }) {
+  try {
+    let query = db
+      .collection(APPOINTMENTS_COLLECTION_NAME)
+      .where("startTime", ">=", params.startTimeFrom)
+      .where("startTime", "<=", params.startTimeTo);
+    if (params.statusName) {
+      query = query.where("statusName", "==", params.statusName);
+    }
+    const snapshot = await query.get();
+    const appointments: CreateDBAppointmentParamsType[] = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (!params.statusName && data.statusName === "Cancelled") {
+        return;
+      }
+      appointments.push({ id: doc.id, ...data } as CreateDBAppointmentParamsType);
+    });
+    return appointments;
+  } catch (error) {
+    console.log("--- getAppointmentsForReminder error", error);
+    return [];
   }
 }

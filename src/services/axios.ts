@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getAPIKey as getAPIKeyFromDB } from "../firestore/api_keys";
 
 const instance = axios.create({
   baseURL: process.env.BASE_URL,
@@ -9,23 +10,26 @@ const instance = axios.create({
 });
 
 const mapAPIKeys: { [url: string]: string } = {
-  "https://unvaunted-weedily-jannie.ngrok-free.dev": "3m-6g7STlEVBTjCGK_dKP3bsbpu2qPqothaQZJOc",
+  "https://unvaunted-weedily-jannie.ngrok-free.dev": "AMpEg6pwR1VKgjnJQ4NUgJ2Sy3gVi77yBfjqL74q",
   "https://undeclarable-kolby-overgraciously.ngrok-free.dev": "-2VY--ga7Nm3RqxkKrj6IJUynVv0w1acifsgB9Cw",
   "https://overhaughty-branda-dowerless.ngrok-free.dev": "qG9SnfSGQsSG4YbvsmjS1QgPDTGgZwsmLxp1fZ3x",
 };
 
-function getAPIKey({ url }: { url: string }) {
+export const branchURLs = Object.keys(mapAPIKeys);
+
+async function getAPIKey({ url }: { url: string }) {
   try {
     const urlObj = new URL(url);
-    return mapAPIKeys[urlObj.origin] ?? Object.values(mapAPIKeys)[0];
+    const apiKeyDoc = await getAPIKeyFromDB({ apiURL: urlObj.origin });
+    return apiKeyDoc?.key ?? mapAPIKeys[urlObj.origin] ?? Object.values(mapAPIKeys)[0];
   } catch (e) {
     console.log("--- getAPIKey error", e);
     return Object.values(mapAPIKeys)[0];
   }
 }
 
-instance.interceptors.request.use((config) => {
-  const apiKey = getAPIKey({ url: config.url ?? "" });
+instance.interceptors.request.use(async (config) => {
+  const apiKey = await getAPIKey({ url: config.url ?? "" });
   // console.log("--- server request", apiKey, config.url, config.baseURL);
   config.headers["x-api-key"] = apiKey;
   return config;

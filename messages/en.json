@@ -11,7 +11,8 @@
     "idTypes": "ID Number",
     "National Id": "National ID",
     "Iqama No": "Iqama No",
-    "Passport": "Passport"
+    "Passport": "Passport",
+    "License Number": "License Number"
   },
   "HomePage": {
     "title": "Select Your Nearest Bnoon Clinic",

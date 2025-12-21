@@ -17,6 +17,7 @@ import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
 import { updateAppointmentDB } from "@/firestore/appointments";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
+import { ICalAttendeeStatus, ICalCalendarMethod, ICalEventStatus } from "ical-generator";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -182,6 +183,9 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
                     joinCallUrl: appointmentLink,
                     orderId: params.appointmentId,
                     testName: appointment.service?.name ?? "",
+                    status: ICalEventStatus.CANCELLED,
+                    attendeeStatus: ICalAttendeeStatus.DECLINED,
+                    method: ICalCalendarMethod.CANCEL,
                     userEmail: patientEmail,
                     userName: `${currentUser.firstName ?? ""} ${currentUser.lastName ?? ""}`,
                     description: `Bnoon - ${appointment.service?.name ?? ""}`,

@@ -241,10 +241,10 @@ export default function SelectDateAndTimePage() {
               <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
                 <p className="text-sm text-primary dark:text-primary-200">
                   {t("messages.selected")}{" "}
-                  <span dir="ltr" className="font-medium">
+                  <span className="font-medium">
                     {format(
                       availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
-                      "EEEE, MMMM do, yyyy hh:mm aa",
+                      locale === "ar" ? "dd MMMM yyyy hh:mm aa" : "EEEE, MMMM do, yyyy hh:mm aa",
                       { locale: dateFnsLocale }
                     )}
                   </span>{" "}

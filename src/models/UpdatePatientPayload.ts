@@ -1,4 +1,6 @@
 export interface UpdatePatientPayload {
+  // 0 female, 1 male
+  gender: 1 | 0;
   mrn: string;
   firstName?: string;
   middleName: string;

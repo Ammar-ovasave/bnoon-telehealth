@@ -64,8 +64,8 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
             sizes="96px"
           />
         </div>
-        <CardTitle className="text-xl font-bold text-gray-900 dark:text-white mb-1">{doctorName}</CardTitle>
-        <CardDescription className="text-primary text-sm font-semibold mb-2">
+        <CardTitle className="text-xl rtl:text-lg font-bold text-gray-900 dark:text-white mb-1">{doctorName}</CardTitle>
+        <CardDescription className="text-primary text-sm rtl:text-xs font-semibold mb-2">
           {t(`doctors.${doctor.id}.specialty`)}
         </CardDescription>
       </CardHeader>

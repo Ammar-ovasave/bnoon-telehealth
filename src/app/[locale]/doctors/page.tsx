@@ -94,8 +94,8 @@ export default function DoctorsListPage() {
       ) : (
         <div className="mx-auto px-4 py-8 max-w-5xl pb-30">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
+            <h1 className="text-4xl rtl:text-3xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+            <p className="text-lg rtl:text-sm text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
           </div>
           <div>
             {!availabilityFilter ? (
@@ -120,8 +120,8 @@ export default function DoctorsListPage() {
               <div className="text-center py-12">
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-sm border border-gray-200 dark:border-gray-700">
                   <Filter className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{t("noDoctorsFound.title")}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">{t("noDoctorsFound.description")}</p>
+                  <h3 className="ltr:text-lg font-semibold text-gray-900 dark:text-white mb-2">{t("noDoctorsFound.title")}</h3>
+                  <p className="text-gray-600 rtl:text-sm dark:text-gray-300 mb-4">{t("noDoctorsFound.description")}</p>
                 </div>
               </div>
             )}

@@ -26,8 +26,10 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
     <section className="bg-white dark:bg-gray-800 rounded-lg p-6 md:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
       <div className="text-center max-w-2xl mx-auto mb-6">
         {eyebrow && <p className="text-sm font-medium text-primary uppercase tracking-wide">{eyebrow}</p>}
-        <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-2">{title ?? "Pick a visit type"}</h2>
-        <p className="text-gray-600 dark:text-gray-300 mt-3">
+        <h2 className="text-2xl md:text-3xl rtl:text-xl font-semibold text-gray-900 dark:text-white mt-2">
+          {title ?? "Pick a visit type"}
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300 mt-3 rtl:text-sm">
           {description ??
             "Select in-clinic or virtual care to see doctors who are available for your preferred appointment type."}
         </p>

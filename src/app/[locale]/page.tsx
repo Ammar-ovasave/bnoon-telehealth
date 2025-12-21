@@ -32,8 +32,8 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">{t("description")}</p>
+          <h1 className="text-4xl font-bold rtl:text-3xl text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+          <p className="text-lg rtl:text-sm text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">{t("description")}</p>
         </div>
         {/* Mobile */}
         <div className="md:hidden space-y-6">

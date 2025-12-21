@@ -38,7 +38,7 @@ export default function ManageAppointmentPageContent() {
               />
             </div>
           </div>
-          <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-4xl">{t("title")}</h1>
+          <h1 className="mb-4 text-2xl rtl:text-xl font-bold text-gray-900 dark:text-white md:text-4xl">{t("title")}</h1>
           <p className="mx-auto max-w-3xl text-gray-600 dark:text-gray-300 md:text-lg">{t("description")}</p>
         </div>
         <ClinicBranchSelect className="mb-10" />

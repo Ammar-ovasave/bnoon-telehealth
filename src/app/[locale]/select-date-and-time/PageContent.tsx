@@ -121,7 +121,7 @@ export default function SelectDateAndTimePage() {
       <div className="container mx-auto px-4 py-8 max-w-6xl pb-40">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+          <h1 className="text-4xl font-bold text-gray-900 rtl:text-3xl dark:text-white mb-4">{t("title")}</h1>
           {selectedVisitType && (
             <div className="flex justify-center mb-4">
               <div
@@ -144,7 +144,7 @@ export default function SelectDateAndTimePage() {
               </div>
             </div>
           )}
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
+          <p className="ltr:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

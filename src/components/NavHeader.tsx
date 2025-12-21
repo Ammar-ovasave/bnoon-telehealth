@@ -50,7 +50,7 @@ const BranchName: FC = () => {
 
   const branchName = t(`clinics.${data.branch.id}.name`);
 
-  return <Badge className="hidden sm:block">{branchName}</Badge>;
+  return <Badge>{branchName}</Badge>;
 };
 
 const LogoutButton: FC = () => {

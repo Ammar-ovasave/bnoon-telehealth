@@ -147,6 +147,7 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
         firstName: splitName[0],
         middleName: splitName.length > 2 ? splitName[1] : "",
         lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
+        gender: 0,
       });
       mutatePatient(undefined);
       mutateCurrentUser(undefined);

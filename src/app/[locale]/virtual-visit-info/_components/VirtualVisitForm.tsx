@@ -25,7 +25,7 @@ interface FormData {
   fullName: string;
   email: string;
   nationality: string;
-  gender: string;
+  gender: "male" | "female";
   idType?: string;
   idNumber: string;
 }
@@ -253,6 +253,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
         middleName: splitName.length > 2 ? splitName[1] : "",
         lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
         identityId: formData.idNumber,
+        gender: formData.gender === "female" ? 0 : 1,
         nationalityId: nationalitiesData?.find((item) => item.name === formData.nationality)?.id,
         identityIdTypeId: Number(formData.idType),
       });
@@ -278,6 +279,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
     formData.fullName,
     formData.email,
     formData.idNumber,
+    formData.gender,
     formData.idType,
     formData.nationality,
     selectedFertiSmartService?.name,

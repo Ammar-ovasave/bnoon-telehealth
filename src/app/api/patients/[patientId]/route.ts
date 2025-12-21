@@ -39,14 +39,29 @@ export async function PATCH(request: Request) {
 
 async function updatePatient(params: UpdatePatientPayload & { baseAPIURL?: string }) {
   try {
-    console.log("--- update patient", params);
+    const [res] = await Promise.all([
+      axios.patch<{ id?: number }>(
+        params.baseAPIURL ? `${params.baseAPIURL}/patients/${params.mrn}` : `/patients/${params.mrn}`,
+        params
+      ),
+      updatePatientGender({ mrn: params.mrn, sex: params.gender, baseAPIURL: params.baseAPIURL }),
+    ]);
+    return res.data;
+  } catch (error) {
+    console.log("--- updatePatient error", error);
+    return null;
+  }
+}
+
+async function updatePatientGender(params: { sex: 0 | 1; baseAPIURL?: string; mrn: string }) {
+  try {
     const res = await axios.patch<{ id?: number }>(
-      params.baseAPIURL ? `${params.baseAPIURL}/patients/${params.mrn}` : `/patients/${params.mrn}`,
+      params.baseAPIURL ? `${params.baseAPIURL}/patients/${params.mrn}/sex` : `/patients/${params.mrn}/sex`,
       params
     );
     return res.data;
   } catch (error) {
-    console.log("--- updatePatient error", error);
+    console.log("--- updatePatientGender error", error);
     return null;
   }
 }

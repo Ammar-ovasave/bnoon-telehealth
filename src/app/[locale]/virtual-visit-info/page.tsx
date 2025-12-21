@@ -25,8 +25,8 @@ export default function VirtualVisitInfoPage() {
               <User className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
+          <h1 className="text-4xl rtl:text-3xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+          <p className="ltr:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
         </div>
         {/* Form */}
         {isLoading || loadingPatientData || loadingCountries || loadingIdTypes ? (

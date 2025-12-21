@@ -21,8 +21,8 @@ export const PageContent: FC = () => {
     <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8 max-w-4xl pb-30">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
+          <h1 className="text-4xl rtl:text-3xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
+          <p className="text-lg rtl:text-sm text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
         </div>
         {isLoading ? (
           <div className="py-10 flex justify-center">

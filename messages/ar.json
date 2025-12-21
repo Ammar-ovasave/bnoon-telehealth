@@ -95,9 +95,9 @@
       }
     },
     "availability": {
-      "clinicAndVirtual": "عيادة وافتراضية",
+      "clinicAndVirtual": "زيارة العيادة او استشارة عن بعد",
       "clinicOnly": "عيادة فقط",
-      "virtualOnly": "افتراضية فقط"
+      "virtualOnly": "استشارة عن بعد فقط"
     },
     "buttons": {
       "bookAppointment": "احجز موعد",

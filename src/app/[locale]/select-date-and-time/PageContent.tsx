@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { ArrowLeft, ArrowRight, MapPin, Video } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { add, format } from "date-fns";
+import { add, addMonths, format } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
@@ -78,10 +78,11 @@ export default function SelectDateAndTimePage() {
     setSelectedTimeSlot(timeSlotId);
   };
 
+  const after6Month = addMonths(new Date(), 6);
   const isDateDisabled = (date: Date) => {
     const today = add(new Date(), { days: 1 });
     today.setHours(0, 0, 0, 0);
-    return date < today;
+    return date < today || date > after6Month;
   };
 
   const newUrlSearchParams = useMemo(() => {

@@ -27,7 +27,7 @@ export const doctors: DoctorModel[] = [
     photo: "/images/dr_ abdulaziz.jpg",
     availability: {
       clinic: true,
-      virtual: true,
+      virtual: false,
     },
     languages: ["Arabic", "English"],
     branchId: "riyadh-granada",

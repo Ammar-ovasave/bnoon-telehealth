@@ -82,6 +82,8 @@ export async function getRescheduleAppointmentEmail(params: {
       .replace(/{{clinicName}}/g, params.clinicName);
     if (params.locationLink) {
       html = html.replace(/{{locationLink}}/g, params.locationLink);
+    } else {
+      html = html.replace(/{{locationLink}}/g, "");
     }
     return html;
   } catch (error) {

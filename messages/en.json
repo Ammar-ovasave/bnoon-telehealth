@@ -419,6 +419,7 @@
     "bnoon": "Bnoon",
     "myAppointments": "My Appointments",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "guest": "Guest"
   }
 }

@@ -13,9 +13,10 @@ interface DoctorCardProps {
   doctor: DoctorModel;
   selectedDoctor: string;
   setSelectedDoctor: (doctor: string) => void;
+  disabled?: boolean;
 }
 
-const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDoctor }) => {
+const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDoctor, disabled = false }) => {
   const t = useTranslations("DoctorsPage");
   const locale = useLocale();
   const doctorName = getDoctorName(doctor, locale);
@@ -62,12 +63,15 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
   return (
     <Card
       className={cn(
-        "cursor-pointer gap-0 relative transition-all duration-300 overflow-hidden h-full py-0 border-0 shadow-md hover:shadow-xl group",
-        isSelected
+        "gap-0 relative transition-all duration-300 overflow-hidden h-full py-0 border-0 shadow-md group",
+        disabled
+          ? "opacity-50 cursor-not-allowed grayscale"
+          : "cursor-pointer hover:shadow-xl",
+        isSelected && !disabled
           ? "ring-2 ring-bnoon-teal bg-bnoon-teal/5 shadow-lg shadow-bnoon-teal/10"
-          : "hover:-translate-y-1"
+          : !disabled && "hover:-translate-y-1"
       )}
-      onClick={() => setSelectedDoctor(doctor.id)}
+      onClick={() => !disabled && setSelectedDoctor(doctor.id)}
     >
       {/* Selected Indicator */}
       {isSelected && (
@@ -131,12 +135,13 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
           <Button
             className={cn(
               "w-full mt-auto group/btn",
-              isSelected
+              isSelected && !disabled
                 ? "bg-bnoon-teal hover:bg-bnoon-teal/90"
                 : "bg-bnoon-navy hover:bg-bnoon-navy/90"
             )}
             variant="default"
-            onClick={() => setSelectedDoctor(doctor.id)}
+            disabled={disabled}
+            onClick={() => !disabled && setSelectedDoctor(doctor.id)}
           >
             {t("buttons.bookAppointment")}
             <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1 rtl:scale-x-[-1] rtl:group-hover/btn:-translate-x-1" />

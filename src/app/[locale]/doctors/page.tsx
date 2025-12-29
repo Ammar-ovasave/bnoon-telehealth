@@ -3,14 +3,14 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { doctors as fullDoctorsList } from "@/models/DoctorModel";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Filter, Stethoscope } from "lucide-react";
+import { ArrowLeft, Filter, Stethoscope, Building2, Video, Check } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { AvailabilityFilter } from "@/models/VisitTypeModel";
-import AvailabilityPicker, { AvailabilityOption } from "@/components/AvailabilityPicker";
 import DoctorCard from "@/components/DoctorCard";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
+import { cn } from "@/lib/utils";
 
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
@@ -56,34 +56,22 @@ export default function DoctorsListPage() {
       });
   }, [resourcesData, searchParams]);
 
-  const filteredDoctors = useMemo(() => {
-    if (!availabilityFilter) return [];
-    return doctors.filter((doctor) => {
-      switch (availabilityFilter) {
-        case "clinic":
-          return doctor.availability.clinic;
-        case "virtual":
-          return doctor.availability.virtual;
-        default:
-          return true;
-      }
-    });
-  }, [availabilityFilter, doctors]);
+  // Check if doctor is available for selected visit type
+  const isDoctorAvailable = (doctor: typeof doctors[0]) => {
+    if (!availabilityFilter) return false;
+    switch (availabilityFilter) {
+      case "clinic":
+        return doctor.availability.clinic;
+      case "virtual":
+        return doctor.availability.virtual;
+      default:
+        return true;
+    }
+  };
 
-  const availabilityOptions: AvailabilityOption[] = [
-    {
-      value: "clinic",
-      title: t("visitType.clinic.title"),
-      description: t("visitType.clinic.description"),
-      icon: <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={25} height={25} />,
-    },
-    {
-      value: "virtual",
-      title: t("visitType.virtual.title"),
-      description: t("visitType.virtual.description"),
-      icon: <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={25} height={25} />,
-    },
-  ];
+  // Count available doctors for each type
+  const clinicDoctorsCount = doctors.filter((d) => d.availability.clinic).length;
+  const virtualDoctorsCount = doctors.filter((d) => d.availability.virtual).length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
@@ -118,18 +106,94 @@ export default function DoctorsListPage() {
             </p>
           </div>
 
-          {/* Content */}
-          <div className="animate-fade-in-up animation-delay-200">
-            {!availabilityFilter ? (
-              <AvailabilityPicker
-                options={availabilityOptions}
-                onSelect={handleSetAvailabilityFilter}
-                title={t("visitType.title")}
-                description={t("visitType.description")}
-              />
-            ) : filteredDoctors.length > 0 ? (
+          {/* Visit Type Selector - Compact Pills */}
+          <div className="animate-fade-in-up animation-delay-200 mb-8">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-bold text-bnoon-navy mb-1">{t("visitType.title")}</h2>
+                  <p className="text-sm text-gray-500">{t("visitType.description")}</p>
+                </div>
+
+                {/* Visit Type Pills */}
+                <div className="flex gap-3">
+                  {/* Clinic Visit Pill */}
+                  <button
+                    onClick={() => handleSetAvailabilityFilter("clinic")}
+                    disabled={clinicDoctorsCount === 0}
+                    className={cn(
+                      "flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border-2 cursor-pointer",
+                      "hover:scale-[1.02] active:scale-[0.98]",
+                      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bnoon-teal/50",
+                      availabilityFilter === "clinic"
+                        ? "bg-bnoon-teal text-white border-bnoon-teal shadow-lg shadow-bnoon-teal/30"
+                        : "bg-white text-gray-700 border-gray-200 shadow-sm hover:border-bnoon-teal hover:bg-bnoon-teal/5 hover:shadow-md",
+                      clinicDoctorsCount === 0 && "opacity-50 cursor-not-allowed hover:scale-100 active:scale-100"
+                    )}
+                  >
+                    {availabilityFilter === "clinic" ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <Building2 className="w-4 h-4" />
+                    )}
+                    <span>{t("visitType.clinic.title")}</span>
+                    <span className={cn(
+                      "text-xs px-2 py-0.5 rounded-full font-bold",
+                      availabilityFilter === "clinic" ? "bg-white/20" : "bg-bnoon-teal/10 text-bnoon-teal"
+                    )}>
+                      {clinicDoctorsCount}
+                    </span>
+                  </button>
+
+                  {/* Virtual Visit Pill */}
+                  <button
+                    onClick={() => handleSetAvailabilityFilter("virtual")}
+                    disabled={virtualDoctorsCount === 0}
+                    className={cn(
+                      "flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border-2 cursor-pointer",
+                      "hover:scale-[1.02] active:scale-[0.98]",
+                      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bnoon-navy/50",
+                      availabilityFilter === "virtual"
+                        ? "bg-bnoon-navy text-white border-bnoon-navy shadow-lg shadow-bnoon-navy/30"
+                        : "bg-white text-gray-700 border-gray-200 shadow-sm hover:border-bnoon-navy hover:bg-bnoon-navy/5 hover:shadow-md",
+                      virtualDoctorsCount === 0 && "opacity-50 cursor-not-allowed hover:scale-100 active:scale-100"
+                    )}
+                  >
+                    {availabilityFilter === "virtual" ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <Video className="w-4 h-4" />
+                    )}
+                    <span>{t("visitType.virtual.title")}</span>
+                    <span className={cn(
+                      "text-xs px-2 py-0.5 rounded-full font-bold",
+                      availabilityFilter === "virtual" ? "bg-white/20" : "bg-bnoon-navy/10 text-bnoon-navy"
+                    )}>
+                      {virtualDoctorsCount}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Hint message when no type selected */}
+              {!availabilityFilter && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <p className="text-sm text-amber-600 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                    {locale === "ar"
+                      ? "يرجى اختيار نوع الزيارة لتتمكن من حجز موعد مع الطبيب"
+                      : "Please select a visit type to book an appointment with a doctor"}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Doctors Grid - Always Visible */}
+          <div className="animate-fade-in-up animation-delay-300">
+            {doctors.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredDoctors.map((doctor, index) => (
+                {doctors.map((doctor, index) => (
                   <div
                     key={doctor.id}
                     className={`animate-fade-in-up animation-delay-${(index % 6) * 100}`}
@@ -138,6 +202,7 @@ export default function DoctorsListPage() {
                       doctor={doctor}
                       selectedDoctor={selectedDoctor}
                       setSelectedDoctor={handleDoctorChange}
+                      disabled={!isDoctorAvailable(doctor)}
                     />
                   </div>
                 ))}

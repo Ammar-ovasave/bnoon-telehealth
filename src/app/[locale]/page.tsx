@@ -4,7 +4,7 @@ import { groupClinicsByCity } from "@/models/ClinicModel";
 import ClinicCard from "@/components/ClinicCard";
 import LoadingPage from "./loading";
 import { useTranslations, useLocale } from "next-intl";
-import { MapPin, Heart, Users, Shield } from "lucide-react";
+import { Heart, Users, Shield, Sparkles } from "lucide-react";
 
 export default function Home() {
   const t = useTranslations("HomePage");
@@ -39,7 +39,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
+    <div className="bg-gradient-to-b from-white via-bnoon-light to-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Decorative Elements */}
@@ -51,15 +51,21 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
           {/* Header Content */}
           <div className="text-center mb-12 md:mb-16 animate-fade-in-up">
+            {/* Brand Tagline Badge */}
             <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <MapPin className="w-4 h-4" />
-              <span>{locale === "ar" ? "اختر مركزك" : "Choose Your Center"}</span>
+              <span>{locale === "ar" ? "مستقبل الخصوبة هنا" : "The Future of Fertility is Here"}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-bnoon-navy mb-6 leading-tight">
-              {t("title")}
+              {locale === "ar" ? "نساعدك في بناء المستقبل الذي تستحقه" : "Helping You Build the Future You Deserve"}
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              {t("description")}
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-4">
+              {locale === "ar" 
+                ? "الجيل القادم من رعاية الخصوبة—حيث يجتمع العلم المتقدم والتكنولوجيا الذكية والتعاطف والخبرة لمنح كل عائلة أفضل بداية ممكنة."
+                : "The next generation of fertility care—where advanced science, smart technology, compassion and expertise come together to give every family the best possible start."}
+            </p>
+            {/* Secondary Tagline */}
+            <p className="text-sm text-bnoon-teal font-semibold">
+              {locale === "ar" ? "أكثر من ٢٠ عامًا من الرعاية الموثوقة • أكثر من ٥٠٠٠ عائلة سعيدة سنويًا" : "20+ Years of Trusted Care • 5,000+ Happy Families Annually"}
             </p>
           </div>
 
@@ -133,13 +139,17 @@ export default function Home() {
       {/* Bottom CTA Section */}
       <section className="bg-gradient-to-r from-bnoon-teal to-cyan-600 py-12 md:py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+            <Sparkles className="w-4 h-4" />
+            <span>{locale === "ar" ? "رعاية خصوبة عالمية المستوى، متاحة الآن محليًا" : "World-Class Fertility Care, Available Now Locally"}</span>
+          </div>
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            {locale === "ar" ? "نحن هنا لمساعدتك" : "We're Here to Help"}
+            {locale === "ar" ? "كبّر عائلتك مع بنون" : "Grow Your Family with Bnoon"}
           </h2>
           <p className="text-white/90 text-base md:text-lg mb-8">
             {locale === "ar"
-              ? "فريقنا المتخصص جاهز للإجابة على جميع استفساراتكم"
-              : "Our specialized team is ready to answer all your questions"}
+              ? "نحول الأمل إلى بدايات جديدة. فريقنا المتخصص جاهز لمرافقتك في كل خطوة."
+              : "Turning hope into new beginnings. Our specialized team is ready to accompany you every step of the way."}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a

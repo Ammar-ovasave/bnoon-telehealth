@@ -7,12 +7,19 @@ import { notFound } from "next/navigation";
 import localFont from "next/font/local";
 import SWRProvider from "@/providers/SWRProvider";
 import NavHeader from "@/components/NavHeader";
+import Footer from "@/components/Footer";
 import { setRequestLocale } from "next-intl/server";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Bnoon",
-  description: "Bnoon",
+  title: "Bnoon | The Fertility & Women's Health Center",
+  description: "Bnoon is the next generation of fertility care—where advanced science, smart technology, compassion and expertise come together to give every family the best possible start. Part of Global Fertility Network.",
+  keywords: ["fertility", "IVF", "women's health", "reproductive genetics", "Saudi Arabia", "Riyadh", "Jeddah"],
+  openGraph: {
+    title: "Bnoon | The Fertility & Women's Health Center",
+    description: "The future of fertility is here. World-class fertility care, available now locally.",
+    siteName: "Bnoon",
+  },
 };
 
 const helvetica = localFont({
@@ -86,7 +93,8 @@ export default async function RootLayout({
         <html lang={paramsResult.locale} dir={isAr ? "rtl" : "ltr"}>
           <body className={`antialiased ${isAr ? alexandria.className : helvetica.className}`}>
             <NavHeader />
-            {children}
+            <main className="min-h-screen">{children}</main>
+            <Footer />
             <Toaster />
           </body>
         </html>

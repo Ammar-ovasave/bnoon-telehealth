@@ -7,7 +7,6 @@ import { MapPin, ArrowRight, Clock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import useSwitchBranch from "@/hooks/useSwitchBranch";
-import LoadingOverlay from "./LoadingOverlay";
 import { useTranslations, useLocale } from "next-intl";
 
 const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
@@ -25,19 +24,35 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
   }, [clinic.id, searchParams]);
 
   const handleSelectClinic = async () => {
-    if (clinic.isCommingSoon) return;
+    if (clinic.isCommingSoon || loadingSwitchBranch) return;
     await handleSwitchBranch({ payload: { branchId: clinic.id } });
     router.push(`/interest?${newUrlSearchParams.toString()}`);
   };
 
   return (
-    <LoadingOverlay visible={loadingSwitchBranch}>
+    <div className={`relative clinic-card-wrapper ${loadingSwitchBranch ? "clinic-card-loading" : ""}`}>
+      {/* Apple Intelligence Glow Effect - Only visible during loading */}
+      <div 
+        className="apple-glow-outer absolute -inset-[3px] rounded-[20px] transition-opacity duration-300 ease-out"
+        aria-hidden="true"
+      />
+      <div 
+        className="apple-glow-border absolute -inset-[1px] rounded-[18px] transition-opacity duration-300 ease-out"
+        aria-hidden="true"
+      />
+      
       <Card
         key={clinic.id}
         onClick={handleSelectClinic}
-        className={`gap-0 cursor-pointer relative h-[420px] w-full transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 overflow-hidden p-0 border-0 group ${
-          clinic.isCommingSoon ? "opacity-80" : ""
-        }`}
+        className={`
+          gap-0 cursor-pointer relative h-[420px] w-full 
+          transition-all duration-500 ease-out
+          hover:shadow-2xl hover:-translate-y-2 
+          overflow-hidden p-0 border-0 group
+          ${clinic.isCommingSoon ? "opacity-80" : ""}
+          ${loadingSwitchBranch ? "pointer-events-none" : ""}
+        `}
+        style={{ zIndex: 1 }}
       >
         {/* Image Container */}
         <div className="relative h-56 overflow-hidden">
@@ -45,7 +60,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
             src={clinic.imageSrc}
             alt={`${clinic.name} clinic`}
             fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
+            className="object-cover transition-all duration-700 group-hover:scale-110"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
           {/* Gradient Overlay */}
@@ -74,11 +89,19 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
         </div>
 
         {/* Content Section */}
-        <div className="p-5 flex flex-col flex-1 bg-white">
-          {/* Decorative Line */}
-          <div className="w-12 h-1 bg-gradient-to-r from-bnoon-teal to-cyan-400 rounded-full mb-4" />
+        <div className="p-5 flex flex-col flex-1 bg-white relative z-10">
+          {/* Decorative Line - Animates during loading */}
+          <div 
+            className={`
+              h-1 rounded-full mb-4 transition-all duration-500
+              ${loadingSwitchBranch 
+                ? "w-full bg-gradient-to-r from-bnoon-teal via-cyan-400 to-bnoon-teal animate-pulse" 
+                : "w-12 bg-gradient-to-r from-bnoon-teal to-cyan-400"
+              }
+            `} 
+          />
           
-          {/* Description or Features */}
+          {/* Description */}
           <p className="text-gray-600 text-sm leading-relaxed flex-1 line-clamp-2">
             {locale === "ar"
               ? "مركز متخصص في علاجات الخصوبة وصحة المرأة مع أحدث التقنيات الطبية"
@@ -90,14 +113,21 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
             <Button
               onClick={handleSelectClinic}
               disabled={clinic.isCommingSoon || loadingSwitchBranch}
-              className={`w-full mt-4 group/btn ${
-                clinic.isCommingSoon
+              className={`
+                w-full mt-4 group/btn transition-all duration-300
+                ${clinic.isCommingSoon
                   ? "bg-gray-100 text-gray-500 hover:bg-gray-100 cursor-not-allowed"
                   : "bg-bnoon-teal hover:bg-bnoon-teal/90 text-white"
-              }`}
+                }
+              `}
               size="lg"
             >
-              {clinic.isCommingSoon ? (
+              {loadingSwitchBranch ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  {locale === "ar" ? "جاري التحميل..." : "Loading..."}
+                </span>
+              ) : clinic.isCommingSoon ? (
                 t("buttons.openingSoon")
               ) : (
                 <>
@@ -109,7 +139,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
           )}
         </div>
       </Card>
-    </LoadingOverlay>
+    </div>
   );
 };
 

@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, User, Mail, Globe, Users, CreditCard, CalendarDays } from "lucide-react";
+import { CheckCircle, User, Mail, Globe, Users, CreditCard, CalendarDays, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { clinicLocations } from "@/models/ClinicModel";
 import { services } from "@/models/ServiceModel";
@@ -112,117 +112,134 @@ export const PageContent: FC = () => {
   const doctor = useMemo(() => doctors.find((doc) => doc.id === selectedDoctor), [selectedDoctor]);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
+      {/* Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-emerald-500/5 rounded-full blur-3xl" />
+      </div>
+
       {loadingAppointment || loadingCurrentUser || loadingPatient || loadingCountries ? (
         <LoadingPage />
       ) : (
-        <div className="mx-auto px-4 py-8 max-w-4xl">
+        <div className="relative mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-4xl">
           {/* Success Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-10 animate-fade-in-up">
             <div className="flex justify-center mb-6">
-              <div className="bg-primary/10 p-4 rounded-full">
-                <CheckCircle className="h-12 w-12 text-primary" />
+              <div className="relative">
+                <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl animate-pulse" />
+                <div className="relative w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                  <CheckCircle className="h-10 w-10 text-white" />
+                </div>
               </div>
             </div>
-            <h1 className="text-4xl rtl:text-3xl font-bold text-gray-900 dark:text-white mb-4">{t("title")}</h1>
-            <p className="lrt:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
-            <div className="mt-4 bg-primary/10 rounded-lg p-4 border border-primary">
-              <p className="text-primary font-medium">
-                {t("confirmationNumber")}: <span className="font-bold">{confirmationNumber}</span>
-              </p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy mb-4">{t("title")}</h1>
+            <p className="text-base text-gray-600 max-w-xl mx-auto leading-relaxed">{t("description")}</p>
+            
+            {/* Confirmation Badge */}
+            <div className="mt-6 inline-flex items-center gap-3 bg-bnoon-teal/10 rounded-2xl px-6 py-4 border border-bnoon-teal/20">
+              <Sparkles className="w-5 h-5 text-bnoon-teal" />
+              <div className="text-left">
+                <p className="text-xs text-bnoon-teal font-medium">{t("confirmationNumber")}</p>
+                <p className="text-lg font-bold text-bnoon-navy">{confirmationNumber}</p>
+              </div>
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-6 animate-fade-in-up animation-delay-200">
             {/* Appointment Details */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                <Image
-                  src={"/icons/Calender.png"}
-                  alt={t("appointmentDetails.title")}
-                  width={40}
-                  height={40}
-                  className="h-[30px] w-[20px] object-cover"
-                />
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+              <h2 className="text-lg font-bold text-bnoon-navy mb-6 flex items-center gap-3">
+                <div className="w-10 h-10 bg-bnoon-teal/10 rounded-xl flex items-center justify-center">
+                  <Image
+                    src={"/icons/Calender.png"}
+                    alt={t("appointmentDetails.title")}
+                    width={40}
+                    height={40}
+                    className="h-5 w-5 object-contain"
+                  />
+                </div>
                 {t("appointmentDetails.title")}
               </h2>
               <div className="space-y-4">
-                <div className="flex justify-between items-start py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.dateTime")}</span>
+                <div className="flex justify-between items-start py-3 border-b border-gray-100">
+                  <span className="text-gray-500 text-sm">{t("appointmentDetails.dateTime")}</span>
                   <div className="text-right">
-                    <span className="font-medium text-gray-900 dark:text-white">{selectedTimeSlot}</span>
+                    <span className="font-semibold text-bnoon-navy">{selectedTimeSlot}</span>
                     {selectedTimeSlotKSA && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-1">
                         {t("appointmentDetails.ksaTime")}: {selectedTimeSlotKSA}
                       </p>
                     )}
                   </div>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.visitType")}</span>
-                  <span className="font-medium text-gray-900 dark:text-white capitalize">{tVisitTypes(selectedVisitType)}</span>
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-500 text-sm">{t("appointmentDetails.visitType")}</span>
+                  <span className="font-semibold text-bnoon-navy capitalize">{tVisitTypes(selectedVisitType)}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.doctor")}</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{getDoctorName(doctor, locale)}</span>
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-500 text-sm">{t("appointmentDetails.doctor")}</span>
+                  <span className="font-semibold text-bnoon-navy">{getDoctorName(doctor, locale)}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.service")}</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{serviceTitle}</span>
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-500 text-sm">{t("appointmentDetails.service")}</span>
+                  <span className="font-semibold text-bnoon-navy">{serviceTitle}</span>
                 </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600 dark:text-gray-400">{t("appointmentDetails.location")}</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{clinicName}</span>
+                <div className="flex justify-between items-center py-3">
+                  <span className="text-gray-500 text-sm">{t("appointmentDetails.location")}</span>
+                  <span className="font-semibold text-bnoon-navy">{clinicName}</span>
                 </div>
               </div>
             </div>
 
             {/* Patient Information */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                <User className="h-5 w-5 text-primary" />
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+              <h2 className="text-lg font-bold text-bnoon-navy mb-6 flex items-center gap-3">
+                <div className="w-10 h-10 bg-bnoon-teal/10 rounded-xl flex items-center justify-center">
+                  <User className="h-5 w-5 text-bnoon-teal" />
+                </div>
                 {t("patientInformation.title")}
               </h2>
               <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-500 text-sm flex items-center gap-2">
                     <User className="h-4 w-4" />
                     {t("patientInformation.fullName")}
                   </span>
-                  <span className="font-medium text-gray-900 dark:text-white">{fullName}</span>
+                  <span className="font-semibold text-bnoon-navy">{fullName}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-500 text-sm flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     {t("patientInformation.mobileNumber")}
                   </span>
-                  <span dir="ltr" className="font-medium text-gray-900 dark:text-white">
+                  <span dir="ltr" className="font-semibold text-bnoon-navy">
                     {currentUserData?.contactNumber}
                   </span>
                 </div>
                 {patientCountry?.name && (
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                  <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                    <span className="text-gray-500 text-sm flex items-center gap-2">
                       <Globe className="h-4 w-4" />
                       {t("patientInformation.nationality")}
                     </span>
-                    <span className="font-medium text-gray-900 dark:text-white">{patientCountry?.name ?? "-"}</span>
+                    <span className="font-semibold text-bnoon-navy">{patientCountry?.name ?? "-"}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
-                  <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-500 text-sm flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     {t("patientInformation.gender")}
                   </span>
-                  <span className="font-medium text-gray-900 dark:text-white">{gender}</span>
+                  <span className="font-semibold text-bnoon-navy">{gender}</span>
                 </div>
                 {idType || idNumber ? (
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                  <div className="flex justify-between items-center py-3">
+                    <span className="text-gray-500 text-sm flex items-center gap-2">
                       <CreditCard className="h-4 w-4" />
                       {idType}
                     </span>
-                    <span className="font-medium text-gray-900 dark:text-white">{idNumber}</span>
+                    <span className="font-semibold text-bnoon-navy">{idNumber}</span>
                   </div>
                 ) : null}
               </div>
@@ -230,20 +247,29 @@ export const PageContent: FC = () => {
           </div>
 
           {/* Next Steps */}
-          <div className="mt-8 bg-primary/10 rounded-lg p-6 border border-primary">
-            <h3 className="text-lg font-semibold text-primary dark:text-primary mb-3">{t("nextSteps.title")}</h3>
-            <div className="space-y-2 text-primary">
-              <p>• {t("nextSteps.confirmationMessage")}</p>
-              <p>• {t("nextSteps.virtualVisitMessage")}</p>
-              <p>• {t("nextSteps.inPersonVisitMessage")}</p>
+          <div className="mt-8 bg-gradient-to-r from-bnoon-teal/10 to-cyan-500/10 rounded-2xl p-6 border border-bnoon-teal/20 animate-fade-in-up animation-delay-300">
+            <h3 className="text-lg font-bold text-bnoon-navy mb-4">{t("nextSteps.title")}</h3>
+            <div className="space-y-3 text-gray-700">
+              <p className="flex items-start gap-2">
+                <span className="w-2 h-2 bg-bnoon-teal rounded-full mt-2 flex-shrink-0" />
+                {t("nextSteps.confirmationMessage")}
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="w-2 h-2 bg-bnoon-teal rounded-full mt-2 flex-shrink-0" />
+                {t("nextSteps.virtualVisitMessage")}
+              </p>
+              <p className="flex items-start gap-2">
+                <span className="w-2 h-2 bg-bnoon-teal rounded-full mt-2 flex-shrink-0" />
+                {t("nextSteps.inPersonVisitMessage")}
+              </p>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col items-center sm:flex-row gap-4 justify-center mt-8">
+          <div className="flex flex-col items-center sm:flex-row gap-4 justify-center mt-10 animate-fade-in-up animation-delay-400">
             <Link href="/manage-appointments">
-              <Button size="lg" className="px-8 py-3">
-                <CalendarDays className="h-4 w-4 mr-2" />
+              <Button size="lg" className="px-8">
+                <CalendarDays className="h-4 w-4" />
                 {t("buttons.manageAppointments")}
               </Button>
             </Link>

@@ -17,6 +17,7 @@ import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvai
 import useCurrentUser from "@/hooks/useCurrentUser";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
+import { getDoctorName } from "@/lib/getDoctorName";
 
 const formatArabicWeekDayName: { [name: string]: string } = {
   سبت: "السبت",
@@ -33,6 +34,7 @@ export default function SelectDateAndTimePage() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>();
   const router = useRouter();
   const t = useTranslations("SelectDateAndTimePage");
+  const tDoctors = useTranslations("DoctorsPage");
   const locale = useLocale();
 
   const dateFnsLocale = useMemo(() => {
@@ -158,6 +160,38 @@ export default function SelectDateAndTimePage() {
               </div>
             </div>
           )}
+
+          {/* Doctor Info Card */}
+          {selectedDoctor && (
+            <div className="flex justify-center mb-6">
+              <div className="inline-flex items-center gap-4 bg-white px-5 py-3 rounded-2xl shadow-md border border-gray-100">
+                {/* Doctor Photo */}
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-bnoon-teal to-bnoon-navy p-[2px]">
+                    <div className="w-full h-full rounded-full overflow-hidden bg-white">
+                      <Image
+                        src={selectedDoctor.photo}
+                        alt={getDoctorName(selectedDoctor, locale)}
+                        fill
+                        className={cn("object-cover", selectedDoctor.imageClassName)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Doctor Info */}
+                <div className="text-start rtl:text-right">
+                  <h3 className="font-bold text-bnoon-navy text-base sm:text-lg">
+                    {getDoctorName(selectedDoctor, locale)}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-0.5 max-w-[200px] sm:max-w-[280px] line-clamp-2">
+                    {tDoctors(`doctors.${selectedDoctor.id}.specialty`) || selectedDoctor.specialty}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">{t("description")}</p>
         </div>
 

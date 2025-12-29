@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, User, Mail, Globe, Users, CreditCard } from "lucide-react";
+import { ArrowLeft, ArrowRight, User, Mail, Globe, Users, CreditCard, Lock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import useCurrentUser from "@/hooks/useCurrentUser";
@@ -53,6 +53,16 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
   const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
   const { nationalities, data: nationalitiesData } = useFertiSmartCountries();
   const { data: patientData, mutate: mutatePatient } = useFertiSmartPatient();
+
+  // Check if user is registered (has existing profile with identity data)
+  // Registered users should not be able to edit their identity fields
+  const isRegisteredUser = useMemo(() => {
+    return !!(
+      patientData?.identityId &&
+      patientData?.nationality?.name &&
+      patientData?.sex !== undefined
+    );
+  }, [patientData?.identityId, patientData?.nationality?.name, patientData?.sex]);
 
   const genders = [
     { id: "male", label: t("genders.male") },
@@ -301,6 +311,26 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
       }}
     >
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+        {/* Registered user notice */}
+        {isRegisteredUser && (
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-start gap-3">
+              <Lock className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  {t("registeredUserNotice.message")}
+                </p>
+                <a
+                  href="mailto:info@bnoon.sa"
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium mt-1 inline-block"
+                >
+                  {t("registeredUserNotice.contactSupport")}
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-6">
           {/* Full Name */}
           <div>
@@ -316,9 +346,11 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
               value={formData.fullName}
               onChange={(e) => handleInputChange("fullName", e.target.value)}
               placeholder={t("placeholders.fullName")}
+              disabled={isRegisteredUser}
               className={cn(
                 "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent dark:bg-gray-700 dark:text-white",
-                errors.fullName ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
+                errors.fullName ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600",
+                isRegisteredUser && "bg-gray-100 dark:bg-gray-600 cursor-not-allowed opacity-75"
               )}
             />
             {errors.fullName && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.fullName}</p>}
@@ -358,9 +390,11 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
               id="nationality"
               value={formData.nationality}
               onChange={(e) => handleInputChange("nationality", e.target.value)}
+              disabled={isRegisteredUser}
               className={cn(
                 "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent dark:bg-gray-700 dark:text-white",
-                errors.nationality ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
+                errors.nationality ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600",
+                isRegisteredUser && "bg-gray-100 dark:bg-gray-600 cursor-not-allowed opacity-75"
               )}
             >
               <option value="">{t("labels.selectNationality")}</option>
@@ -385,16 +419,20 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
               {genders.map((gender) => (
                 <button
                   key={gender.id}
+                  disabled={isRegisteredUser}
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    handleInputChange("gender", gender.id);
+                    if (!isRegisteredUser) {
+                      handleInputChange("gender", gender.id);
+                    }
                   }}
                   className={cn(
                     "p-3 rounded-md border text-sm font-medium transition-all duration-200",
                     formData.gender === gender.id
                       ? "bg-primary text-white border-primary shadow-md"
-                      : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 dark:hover:bg-purple-900/20 hover:border-primary"
+                      : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 dark:hover:bg-purple-900/20 hover:border-primary",
+                    isRegisteredUser && "cursor-not-allowed opacity-75"
                   )}
                 >
                   {gender.label}
@@ -422,16 +460,20 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
               {idTypeData?.map((idType) => (
                 <button
                   key={idType.id}
+                  disabled={isRegisteredUser}
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    handleInputChange("idType", idType.id?.toString() ?? "");
+                    if (!isRegisteredUser) {
+                      handleInputChange("idType", idType.id?.toString() ?? "");
+                    }
                   }}
                   className={cn(
                     "p-3 rounded-md border text-sm font-medium transition-all duration-200",
                     formData.idType === idType.id?.toString()
                       ? "bg-primary text-white border-primary shadow-md"
-                      : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 dark:hover:bg-purple-900/20 hover:border-primary"
+                      : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 dark:hover:bg-purple-900/20 hover:border-primary",
+                    isRegisteredUser && "cursor-not-allowed opacity-75"
                   )}
                 >
                   {tIdTypes(idType.name ?? "") || idType.name}
@@ -455,6 +497,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
               maxLength={didSelectIqamaNo || isSaudiNational ? 10 : undefined}
               value={formData.idNumber}
               onChange={(e) => handleInputChange("idNumber", e.target.value)}
+              disabled={isRegisteredUser}
               placeholder={
                 selectedIdType?.name?.toLocaleLowerCase().includes("passport")
                   ? t("placeholders.passportNumber")
@@ -464,7 +507,8 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
               }
               className={cn(
                 "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent dark:bg-gray-700 dark:text-white",
-                errors.idNumber ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
+                errors.idNumber ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600",
+                isRegisteredUser && "bg-gray-100 dark:bg-gray-600 cursor-not-allowed opacity-75"
               )}
             />
             {errors.idNumber && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.idNumber}</p>}

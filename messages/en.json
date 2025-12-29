@@ -49,7 +49,8 @@
     "title": "What Are You Interested In?",
     "description": "Select the reason for your appointment — the service that best fits your needs. From assessment to treatment, our team of consultants will guide you every step of the way with expert care and a personalized plan.",
     "buttons": {
-      "backToClinicSelection": "Back to clinic selection"
+      "backToClinicSelection": "Back to clinic selection",
+      "selectService": "Select"
     },
     "services": {
       "having-child": {
@@ -272,6 +273,10 @@
       "back": "Back",
       "confirm": "Confirm",
       "loading": "Loading"
+    },
+    "registeredUserNotice": {
+      "message": "Your personal information is locked because you already have a profile on file. Only your email can be updated for this appointment.",
+      "contactSupport": "Need to update your info? Contact support"
     }
   },
   "AppointmentConfirmationPage": {
@@ -404,6 +409,10 @@
       "back": "Back",
       "confirm": "Confirm",
       "loading": "Loading"
+    },
+    "registeredUserNotice": {
+      "message": "Your name is locked because you already have a profile on file.",
+      "contactSupport": "Need to update your info? Contact support"
     }
   },
   "NavHeader": {

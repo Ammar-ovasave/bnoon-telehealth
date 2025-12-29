@@ -20,6 +20,7 @@ export async function getConfirmAppointmentEmail(params: {
   patientEmail: string;
   patientGender: string;
   appointmentLink: string;
+  manageAppointmentsLink: string;
   clinicName: string;
   isVirtual?: boolean;
   locationLink?: string;
@@ -31,6 +32,7 @@ export async function getConfirmAppointmentEmail(params: {
     const file = await fs.readFile(path.resolve("src", "templates", templateFileName), { encoding: "utf-8" });
     let html = file
       .replace(/{{appointmentLink}}/g, params.appointmentLink)
+      .replace(/{{manageAppointmentsLink}}/g, params.manageAppointmentsLink)
       .replace(/{{appointmentDate}}/g, params.appointmentDate)
       .replace(/{{appointmentTime}}/g, params.appointmentTime)
       .replace(/{{location}}/g, params.location)

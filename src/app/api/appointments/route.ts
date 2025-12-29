@@ -70,6 +70,7 @@ export async function POST(request: Request) {
     const appointmentLink = isVirtualAppointment
       ? `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`
       : `${url.origin}/manage-appointments`;
+    const manageAppointmentsLink = `${url.origin}/manage-appointments`;
     const appointmentDate = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy");
     const appointmentTime = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a");
     // Parse the startTime - payload.startTime is always in UTC format (ends with Z)
@@ -96,6 +97,7 @@ export async function POST(request: Request) {
         ? sendConfirmAppointmentEmail({
             appointmentDate,
             appointmentLink,
+            manageAppointmentsLink,
             appointmentTime,
             startDateObj: startDateForCalendar,
             doctorName: doctorResource?.linkedUserFullName ?? "",
@@ -147,6 +149,7 @@ export async function POST(request: Request) {
 async function sendConfirmAppointmentEmail(params: {
   appointmentDate: string;
   appointmentLink: string;
+  manageAppointmentsLink: string;
   appointmentTime: string;
   startDateObj: Date;
   doctorName: string;
@@ -167,6 +170,7 @@ async function sendConfirmAppointmentEmail(params: {
   const emailTemplate = await getConfirmAppointmentEmail({
     appointmentDate: params.appointmentDate,
     appointmentLink: params.appointmentLink,
+    manageAppointmentsLink: params.manageAppointmentsLink,
     appointmentTime: params.appointmentTime,
     doctorName: params.doctorName,
     location: params.location,

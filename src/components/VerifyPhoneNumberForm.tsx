@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { ArrowLeft, ArrowRight, Phone, Shield, ChevronDown } from "lucide-react";
+import { ArrowLeft, ArrowRight, Phone, Shield, ChevronDown, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { countryCodes } from "@/constants";
 import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
@@ -12,7 +12,7 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import { Spinner } from "./ui/spinner";
 import useTimer from "@/hooks/useTimer";
 import { differenceInSeconds } from "date-fns";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 const OTP_LENGTH = 4;
 
@@ -27,6 +27,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const t = useTranslations("VerifyPhonePage");
+  const locale = useLocale();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -94,8 +95,6 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
       setIsLoading(false);
       return toast.error(t("errors.failedToSendOTP"));
     }
-    // console.log("sendOTPResponse", sendOTPResponse);
-    // sessionStorage.setItem("otp", sendOTPResponse.code);
     localStorage.setItem("otpSentAt", new Date().toISOString());
     sessionStorage.setItem("mrn", mrnToUse);
     sessionStorage.setItem("purpose", purpose);
@@ -118,18 +117,11 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
       setIsLoading(false);
       return toast.error(t("errors.invalidOTP"));
     }
-    // const urlSearchParams = new URLSearchParams(window.location.search);
-    // const selectedVisitType = urlSearchParams.get("selectedVisitType");
     mutateCurrentUser(undefined);
     setTimeout(() => {
       setIsLoading(false);
       onVerifyPhoneSuccess();
     }, 200);
-    // if (selectedVisitType === "clinic") {
-    //   router.push(`/in-person-appointment-info${window.location.search}`);
-    // } else {
-    //   router.push(`/virtual-visit-info${window.location.search}`);
-    // }
   };
 
   const handleCountryCodeSelect = (code: string) => {
@@ -177,56 +169,71 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
   const isTimerActive = remainingTime > 0 && lastSentOTPAt !== null;
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
+      {/* Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 rounded-full blur-3xl" />
+      </div>
+
       {loadingCurrentUser || loadingBranches ? (
-        <div className="flex justify-center items-center h-screen">
-          <Spinner className="size-10" />
+        <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
+          <div className="w-16 h-16 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
+            <Spinner className="w-8 h-8 text-bnoon-teal" />
+          </div>
+          <p className="text-gray-500 text-sm">
+            {locale === "ar" ? "جاري التحميل..." : "Loading..."}
+          </p>
         </div>
       ) : (
-        <div className="px-4 mx-auto py-8 max-w-2xl pb-30">
+        <div className="relative px-4 sm:px-6 lg:px-8 mx-auto py-8 md:py-12 max-w-xl pb-24">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <div className="bg-primary/10 p-3 rounded-full">
-                <Phone className="h-8 w-8 text-primary" />
+          <div className="text-center mb-8 animate-fade-in-up">
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-bnoon-teal to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg shadow-bnoon-teal/20">
+                {showOtpInput ? (
+                  <Shield className="h-10 w-10 text-white" />
+                ) : (
+                  <Smartphone className="h-10 w-10 text-white" />
+                )}
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-bnoon-navy mb-3">
               {showOtpInput ? t("title.verifyPhone") : t("title.enterPhone")}
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-base text-gray-600 max-w-md mx-auto leading-relaxed">
               {showOtpInput ? t("description.verifyPhone", { otpLength: OTP_LENGTH }) : t("description.enterPhone")}
             </p>
           </div>
+
           {/* Phone Number Input */}
           {!showOtpInput && (
-            <div className="mb-8">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <div className="animate-fade-in-up animation-delay-200">
+              <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100">
+                <label htmlFor="phone" className="block text-sm font-semibold text-bnoon-navy mb-3">
                   {t("labels.phoneNumber")}
                 </label>
                 <div className="flex gap-2">
                   <div className="relative" ref={dropdownRef}>
                     <button
                       type="button"
-                      // disabled={true}
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors min-w-[100px]"
+                      className="flex items-center gap-2 bg-bnoon-light border-2 border-gray-200 rounded-xl px-3 py-3 hover:border-bnoon-teal/50 transition-colors min-w-[110px] focus:outline-none focus:border-bnoon-teal"
                     >
                       <span className="text-lg">{getSelectedCountry().flag}</span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{selectedCountryCode}</span>
-                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm text-gray-700 font-medium">{selectedCountryCode}</span>
+                      <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {isDropdownOpen && (
-                      <div className="absolute top-full left-0 mt-1 w-80 max-h-64 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg z-10">
-                        <div className="p-2">
+                      <div className="absolute top-full ltr:left-0 rtl:right-0 mt-2 w-72 max-h-64 overflow-hidden bg-white border border-gray-200 rounded-xl shadow-xl z-50">
+                        <div className="p-3 border-b border-gray-100">
                           <input
                             type="text"
                             placeholder={t("placeholders.searchCountries")}
                             value={searchTerm}
                             onChange={handleSearchChange}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                            className="w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg focus:outline-none focus:border-bnoon-teal transition-colors"
                           />
                         </div>
                         <div className="max-h-48 overflow-y-auto">
@@ -236,17 +243,17 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                                 key={country.code}
                                 type="button"
                                 onClick={() => handleCountryCodeSelect(country.code)}
-                                className={`w-full flex items-center gap-3 px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-                                  selectedCountryCode === country.code ? "bg-blue-50 dark:bg-blue-900" : ""
+                                className={`w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-bnoon-teal/5 transition-colors ${
+                                  selectedCountryCode === country.code ? "bg-bnoon-teal/10 text-bnoon-teal" : ""
                                 }`}
                               >
                                 <span className="text-lg">{country.flag}</span>
-                                <span className="text-gray-600 dark:text-gray-400">{country.code}</span>
-                                <span className="text-gray-800 dark:text-gray-200">{country.country}</span>
+                                <span className="text-gray-600 font-medium">{country.code}</span>
+                                <span className="text-gray-800">{country.country}</span>
                               </button>
                             ))
                           ) : (
-                            <div className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+                            <div className="px-4 py-6 text-sm text-gray-500 text-center">
                               {t("messages.noCountriesFound", { searchTerm })}
                             </div>
                           )}
@@ -262,65 +269,85 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                     placeholder={
                       selectedCountryCode === "+966" ? t("placeholders.phoneNumberKSA") : t("placeholders.phoneNumber")
                     }
-                    className="flex-1 px-3 ltr:text-left rtl:text-right py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="flex-1 px-4 ltr:text-left rtl:text-right py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-bnoon-teal transition-colors text-lg"
                     maxLength={15}
                   />
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t("labels.enterPhoneWithoutCode")}</p>
+                <p className="text-xs text-gray-500 mt-3">{t("labels.enterPhoneWithoutCode")}</p>
+                
                 {isTimerActive && (
-                  <div className="mt-4 p-3 bg-primary/10 border border-primary rounded-md">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
+                  <div className="mt-6 p-4 bg-bnoon-teal/10 border border-bnoon-teal/20 rounded-xl">
+                    <p className="text-sm text-bnoon-navy text-center font-medium">
                       {t("messages.waitBeforeRequest", { time: formatTime(remainingTime) })}
                     </p>
                   </div>
                 )}
-                <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
-                  <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
+                
+                <div className="flex flex-col-reverse sm:flex-row gap-4 justify-between mt-8">
+                  <Button onClick={handleBack} variant="outline" size="lg" className="w-full sm:w-auto">
                     <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
                   </Button>
                   <Button
                     onClick={handleSendOtp}
                     disabled={!phoneNumber || phoneNumber.length < 7 || isLoading || isTimerActive}
                     size="lg"
-                    className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
+                    className="w-full sm:w-auto"
                   >
-                    {isLoading ? t("buttons.sending") : t("buttons.sendVerificationCode")}{" "}
-                    <ArrowRight className="rtl:scale-x-[-1]" />
+                    {isLoading ? (
+                      <>
+                        <Spinner className="w-4 h-4" />
+                        {t("buttons.sending")}
+                      </>
+                    ) : (
+                      <>
+                        {t("buttons.sendVerificationCode")}
+                        <ArrowRight className="rtl:scale-x-[-1]" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>
             </div>
           )}
+
+          {/* OTP Input */}
           {showOtpInput && (
-            <div className="mb-8">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-center mb-4">
-                  <div className="bg-primary/10 p-2 rounded-full">
-                    <Shield className="h-6 w-6 text-primary" />
+            <div className="animate-fade-in-up animation-delay-200">
+              <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100">
+                <div className="flex items-center justify-center mb-6">
+                  <div className="w-14 h-14 bg-bnoon-teal/10 rounded-xl flex items-center justify-center">
+                    <Shield className="h-7 w-7 text-bnoon-teal" />
                   </div>
                 </div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4 text-center">
+                <label className="block text-sm font-semibold text-bnoon-navy mb-6 text-center">
                   {t("labels.enterVerificationCode")}
                 </label>
-                <div className="flex justify-center">
-                  <InputOTP maxLength={6} value={otp} onChange={setOtp} className="gap-2">
-                    <InputOTPGroup>
+                <div className="flex justify-center" dir="ltr">
+                  <InputOTP maxLength={6} value={otp} onChange={setOtp} className="gap-3">
+                    <InputOTPGroup className="gap-3">
                       {Array(OTP_LENGTH)
                         .fill(0)
                         .map((_, i) => {
-                          return <InputOTPSlot key={i} index={i} />;
+                          return (
+                            <InputOTPSlot
+                              key={i}
+                              index={i}
+                              className="w-14 h-14 text-xl font-bold border-2 border-gray-200 rounded-xl focus:border-bnoon-teal transition-colors"
+                            />
+                          );
                         })}
                     </InputOTPGroup>
                   </InputOTP>
                 </div>
-                <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
+                <div className="flex flex-col-reverse sm:flex-row gap-4 justify-between mt-8">
                   <Button
                     onClick={() => {
                       setShowOtpInput(false);
+                      setOtp("");
                     }}
                     variant="outline"
                     size="lg"
-                    className="px-6 py-3 w-full md:w-auto"
+                    className="w-full sm:w-auto"
                   >
                     <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
                   </Button>
@@ -328,10 +355,19 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                     onClick={handleVerifyOtp}
                     disabled={!otp || otp.length !== OTP_LENGTH || isLoading}
                     size="lg"
-                    className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
+                    className="w-full sm:w-auto"
                   >
-                    {isLoading ? t("buttons.verifying") : t("buttons.verifyPhoneNumber")}{" "}
-                    <ArrowRight className="rtl:scale-x-[-1]" />
+                    {isLoading ? (
+                      <>
+                        <Spinner className="w-4 h-4" />
+                        {t("buttons.verifying")}
+                      </>
+                    ) : (
+                      <>
+                        {t("buttons.verifyPhoneNumber")}
+                        <ArrowRight className="rtl:scale-x-[-1]" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>

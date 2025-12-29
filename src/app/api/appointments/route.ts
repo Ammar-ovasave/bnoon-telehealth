@@ -91,27 +91,30 @@ export async function POST(request: Request) {
         appointmentId: createAppointmentResponse.data.id,
         description: isVirtualAppointment ? `${payload.description} - ${appointmentLink}` : payload.description,
       }),
-      sendConfirmAppointmentEmail({
-        appointmentDate,
-        appointmentLink,
-        appointmentTime,
-        startDateObj: startDateForCalendar,
-        doctorName: doctorResource?.linkedUserFullName ?? "",
-        location: payload.description.toLocaleLowerCase().includes("virtual") ? "Virtual Visit" : "In Clinic",
-        patientEmail: payload.email ?? patientToUse.emailAddress ?? "",
-        patientGender: patientToUse.sex === 0 ? "female" : "male",
-        patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${
-          payload.middleName ?? patientToUse.middleName ?? ""
-        } ${payload.lastName ?? patientToUse.lastName ?? ""}`.trim(),
-        serviceName: service?.name ?? "",
-        clinicName: clinicBranch?.name ?? "",
-        isVirtual: isVirtualAppointment,
-        locationLink: clinicBranch?.locationLink,
-        baseAPIURL: baseAPIURL ?? null,
-        mrn: payload.patientMrn,
-        appointmentId: createAppointmentResponse.data.id ?? 0,
-        locale: locale,
-      }),
+      // Only send confirmation email for virtual appointments
+      isVirtualAppointment
+        ? sendConfirmAppointmentEmail({
+            appointmentDate,
+            appointmentLink,
+            appointmentTime,
+            startDateObj: startDateForCalendar,
+            doctorName: doctorResource?.linkedUserFullName ?? "",
+            location: "Virtual Visit",
+            patientEmail: payload.email ?? patientToUse.emailAddress ?? "",
+            patientGender: patientToUse.sex === 0 ? "female" : "male",
+            patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${
+              payload.middleName ?? patientToUse.middleName ?? ""
+            } ${payload.lastName ?? patientToUse.lastName ?? ""}`.trim(),
+            serviceName: service?.name ?? "",
+            clinicName: clinicBranch?.name ?? "",
+            isVirtual: true,
+            locationLink: clinicBranch?.locationLink,
+            baseAPIURL: baseAPIURL ?? null,
+            mrn: payload.patientMrn,
+            appointmentId: createAppointmentResponse.data.id ?? 0,
+            locale: locale,
+          })
+        : Promise.resolve(null),
       sendNewAppointmentSMS({
         fullName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${payload.middleName ?? patientToUse.middleName ?? ""} ${
           payload.lastName ?? patientToUse.lastName ?? ""

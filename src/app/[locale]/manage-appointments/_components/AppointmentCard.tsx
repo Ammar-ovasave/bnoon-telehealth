@@ -122,6 +122,11 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 
   const isVirtuaAppointment = appointment.description?.toLocaleLowerCase().includes("virtual");
 
+  // Check if appointment is completed or cancelled - hide action buttons for these
+  const isAppointmentCompleted = appointment.status?.name?.toLocaleLowerCase().includes("completed");
+  const isAppointmentCancelled = appointment.status?.name?.toLocaleLowerCase() === "cancelled";
+  const canModifyAppointment = !isAppointmentCompleted && !isAppointmentCancelled;
+
   const { data: patientData, fullName } = useFertiSmartPatient();
 
   const { data: countriesData } = useFertiSmartCountries();
@@ -218,16 +223,18 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
           )}
         </div>
         <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
-          {appointment.status?.name !== "Cancelled" && (
+          {/* Join button - show for virtual appointments that are not cancelled/completed */}
+          {canModifyAppointment && isVirtuaAppointment && (
+            <Link href={`/video-call/${appointment.id}/prepare`}>
+              <Button variant="default" size="sm" className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                {t("buttons.join")}
+              </Button>
+            </Link>
+          )}
+          {/* Reschedule and Cancel buttons - only for appointments that can be modified */}
+          {canModifyAppointment && (
             <>
-              {isVirtuaAppointment && (
-                <Link href={`/video-call/${appointment.id}/prepare`}>
-                  <Button variant="default" size="sm" className="flex items-center gap-2">
-                    <Phone className="h-4 w-4" />
-                    {t("buttons.join")}
-                  </Button>
-                </Link>
-              )}
               <Button onClick={() => handleReschedule()} variant="outline" size="sm" className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" />
                 {t("buttons.reschedule")}

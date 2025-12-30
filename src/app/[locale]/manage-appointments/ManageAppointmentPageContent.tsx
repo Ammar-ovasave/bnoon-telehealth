@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Calendar, CalendarDays, Plus } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslations, useLocale } from "next-intl";
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
+import useUserPreferences from "@/hooks/useUserPreferences";
+import useCurrentBranch from "@/hooks/useCurrentBranch";
+import useSwitchBranch from "@/hooks/useSwitchBranch";
 import AppointmentCard from "./_components/AppointmentCard";
 import ClinicBranchSelect from "@/components/ClinicBranchSelect";
 import Image from "next/image";
@@ -14,6 +17,24 @@ export default function ManageAppointmentPageContent() {
   const t = useTranslations("ManageAppointmentsPage");
   const locale = useLocale();
   const { data, isLoading } = useCurrentUserAppointments();
+  const { defaultBranchId, isLoading: isLoadingPreferences } = useUserPreferences();
+  const { data: currentBranchData, isLoading: isLoadingBranch } = useCurrentBranch();
+  const { handleSwitchBranch } = useSwitchBranch();
+  const hasAutoSwitched = useRef(false);
+
+  // Auto-switch to default branch on first load if no branch is currently selected
+  useEffect(() => {
+    if (
+      !hasAutoSwitched.current &&
+      !isLoadingPreferences &&
+      !isLoadingBranch &&
+      defaultBranchId &&
+      !currentBranchData?.branch?.id
+    ) {
+      hasAutoSwitched.current = true;
+      handleSwitchBranch({ payload: { branchId: defaultBranchId } });
+    }
+  }, [defaultBranchId, currentBranchData?.branch?.id, isLoadingPreferences, isLoadingBranch, handleSwitchBranch]);
 
   const currentUserAppointmentsData = useMemo(
     () =>

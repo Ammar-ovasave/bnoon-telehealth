@@ -112,7 +112,7 @@ describe("Default Branch Feature", () => {
     });
   });
 
-  describe("Auto-Switch Logic", () => {
+  describe("Auto-Switch Logic (Legacy - No Branch Selected)", () => {
     interface AutoSwitchParams {
       hasAutoSwitched: boolean;
       isLoadingPreferences: boolean;
@@ -121,7 +121,8 @@ describe("Default Branch Feature", () => {
       currentBranchId: string | null;
     }
 
-    const shouldAutoSwitch = (params: AutoSwitchParams): boolean => {
+    // Legacy logic: only switch when no branch is currently selected
+    const shouldAutoSwitchLegacy = (params: AutoSwitchParams): boolean => {
       return (
         !params.hasAutoSwitched &&
         !params.isLoadingPreferences &&
@@ -131,8 +132,8 @@ describe("Default Branch Feature", () => {
       );
     };
 
-    it("should auto-switch when all conditions are met", () => {
-      const result = shouldAutoSwitch({
+    it("should auto-switch when no branch selected", () => {
+      const result = shouldAutoSwitchLegacy({
         hasAutoSwitched: false,
         isLoadingPreferences: false,
         isLoadingBranch: false,
@@ -143,7 +144,7 @@ describe("Default Branch Feature", () => {
     });
 
     it("should NOT auto-switch if already switched", () => {
-      const result = shouldAutoSwitch({
+      const result = shouldAutoSwitchLegacy({
         hasAutoSwitched: true,
         isLoadingPreferences: false,
         isLoadingBranch: false,
@@ -154,7 +155,7 @@ describe("Default Branch Feature", () => {
     });
 
     it("should NOT auto-switch while loading preferences", () => {
-      const result = shouldAutoSwitch({
+      const result = shouldAutoSwitchLegacy({
         hasAutoSwitched: false,
         isLoadingPreferences: true,
         isLoadingBranch: false,
@@ -165,7 +166,7 @@ describe("Default Branch Feature", () => {
     });
 
     it("should NOT auto-switch while loading branch", () => {
-      const result = shouldAutoSwitch({
+      const result = shouldAutoSwitchLegacy({
         hasAutoSwitched: false,
         isLoadingPreferences: false,
         isLoadingBranch: true,
@@ -176,7 +177,7 @@ describe("Default Branch Feature", () => {
     });
 
     it("should NOT auto-switch when no default branch", () => {
-      const result = shouldAutoSwitch({
+      const result = shouldAutoSwitchLegacy({
         hasAutoSwitched: false,
         isLoadingPreferences: false,
         isLoadingBranch: false,
@@ -186,8 +187,8 @@ describe("Default Branch Feature", () => {
       expect(result).toBe(false);
     });
 
-    it("should NOT auto-switch when branch already selected", () => {
-      const result = shouldAutoSwitch({
+    it("should NOT auto-switch when branch already selected (legacy limitation)", () => {
+      const result = shouldAutoSwitchLegacy({
         hasAutoSwitched: false,
         isLoadingPreferences: false,
         isLoadingBranch: false,
@@ -195,6 +196,375 @@ describe("Default Branch Feature", () => {
         currentBranchId: "jeddah",
       });
       expect(result).toBe(false);
+    });
+  });
+
+  describe("Auto-Switch Logic (Updated - Switch to Default)", () => {
+    interface AutoSwitchParams {
+      hasAutoSwitched: boolean;
+      isLoadingPreferences: boolean;
+      isLoadingBranch: boolean;
+      defaultBranchId: ClinicBranchID | null;
+      currentBranchId: string | null;
+    }
+
+    // Updated logic: switch when current branch differs from default
+    const shouldAutoSwitch = (params: AutoSwitchParams): boolean => {
+      return (
+        !params.hasAutoSwitched &&
+        !params.isLoadingPreferences &&
+        !params.isLoadingBranch &&
+        params.defaultBranchId !== null &&
+        params.currentBranchId !== params.defaultBranchId
+      );
+    };
+
+    it("should auto-switch when current branch differs from default", () => {
+      const result = shouldAutoSwitch({
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "jeddah",
+      });
+      expect(result).toBe(true);
+    });
+
+    it("should auto-switch when no branch is currently selected", () => {
+      const result = shouldAutoSwitch({
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: null,
+      });
+      expect(result).toBe(true);
+    });
+
+    it("should NOT auto-switch when current branch IS the default", () => {
+      const result = shouldAutoSwitch({
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "riyadh-granada",
+      });
+      expect(result).toBe(false);
+    });
+
+    it("should NOT auto-switch if already switched this session", () => {
+      const result = shouldAutoSwitch({
+        hasAutoSwitched: true,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "jeddah",
+      });
+      expect(result).toBe(false);
+    });
+
+    it("should NOT auto-switch while loading preferences", () => {
+      const result = shouldAutoSwitch({
+        hasAutoSwitched: false,
+        isLoadingPreferences: true,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "jeddah",
+      });
+      expect(result).toBe(false);
+    });
+
+    it("should NOT auto-switch while loading branch data", () => {
+      const result = shouldAutoSwitch({
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: true,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "jeddah",
+      });
+      expect(result).toBe(false);
+    });
+
+    it("should NOT auto-switch when no default branch is set", () => {
+      const result = shouldAutoSwitch({
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: null,
+        currentBranchId: "jeddah",
+      });
+      expect(result).toBe(false);
+    });
+
+    it("should handle all branch combinations correctly", () => {
+      const branches: (ClinicBranchID | null)[] = ["riyadh-granada", "jeddah", "al-ahsa", null];
+
+      branches.forEach((defaultBranch) => {
+        branches.forEach((currentBranch) => {
+          const result = shouldAutoSwitch({
+            hasAutoSwitched: false,
+            isLoadingPreferences: false,
+            isLoadingBranch: false,
+            defaultBranchId: defaultBranch,
+            currentBranchId: currentBranch,
+          });
+
+          if (defaultBranch === null) {
+            // No default set, should never auto-switch
+            expect(result).toBe(false);
+          } else if (currentBranch === defaultBranch) {
+            // Already on default branch, no switch needed
+            expect(result).toBe(false);
+          } else {
+            // Different branch or no branch, should switch
+            expect(result).toBe(true);
+          }
+        });
+      });
+    });
+  });
+
+  describe("Manage Appointments Page Auto-Switch Scenarios", () => {
+    interface PageState {
+      hasAutoSwitched: boolean;
+      isLoadingPreferences: boolean;
+      isLoadingBranch: boolean;
+      defaultBranchId: ClinicBranchID | null;
+      currentBranchId: string | null;
+    }
+
+    // Updated logic matching ManageAppointmentPageContent
+    const needsAutoSwitch = (state: PageState): boolean => {
+      // Still loading initial data
+      if (state.isLoadingPreferences || state.isLoadingBranch) return false;
+      // No default branch configured
+      if (!state.defaultBranchId) return false;
+      // Already on the default branch
+      if (state.currentBranchId === state.defaultBranchId) return false;
+      // Haven't switched yet this session
+      return !state.hasAutoSwitched;
+    };
+
+    it("Scenario: User lands on page with different branch cookie", () => {
+      // User has Jeddah in cookie but Riyadh as default
+      const state: PageState = {
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "jeddah",
+      };
+
+      expect(needsAutoSwitch(state)).toBe(true);
+    });
+
+    it("Scenario: User lands on page with matching branch cookie", () => {
+      // User has Riyadh in cookie and Riyadh as default
+      const state: PageState = {
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "riyadh-granada",
+      };
+
+      expect(needsAutoSwitch(state)).toBe(false);
+    });
+
+    it("Scenario: First-time user with no branch cookie", () => {
+      const state: PageState = {
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: null,
+      };
+
+      expect(needsAutoSwitch(state)).toBe(true);
+    });
+
+    it("Scenario: User with no default branch set", () => {
+      const state: PageState = {
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: null,
+        currentBranchId: "jeddah",
+      };
+
+      expect(needsAutoSwitch(state)).toBe(false);
+    });
+
+    it("Scenario: User manually switches branch after auto-switch", () => {
+      // After auto-switch, hasAutoSwitched is true
+      // User then manually switches to another branch
+      // Should NOT trigger another auto-switch
+      const stateAfterManualSwitch: PageState = {
+        hasAutoSwitched: true,
+        isLoadingPreferences: false,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "al-ahsa", // User manually switched here
+      };
+
+      expect(needsAutoSwitch(stateAfterManualSwitch)).toBe(false);
+    });
+
+    it("Scenario: Page still loading preferences", () => {
+      const state: PageState = {
+        hasAutoSwitched: false,
+        isLoadingPreferences: true,
+        isLoadingBranch: false,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "jeddah",
+      };
+
+      expect(needsAutoSwitch(state)).toBe(false);
+    });
+
+    it("Scenario: Page still loading branch data", () => {
+      const state: PageState = {
+        hasAutoSwitched: false,
+        isLoadingPreferences: false,
+        isLoadingBranch: true,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "jeddah",
+      };
+
+      expect(needsAutoSwitch(state)).toBe(false);
+    });
+
+    it("Scenario: Both loading states active", () => {
+      const state: PageState = {
+        hasAutoSwitched: false,
+        isLoadingPreferences: true,
+        isLoadingBranch: true,
+        defaultBranchId: "riyadh-granada",
+        currentBranchId: "jeddah",
+      };
+
+      expect(needsAutoSwitch(state)).toBe(false);
+    });
+  });
+
+  describe("Manage Appointments Page Loading States", () => {
+    interface LoadingState {
+      isLoadingPreferences: boolean;
+      isLoadingBranch: boolean;
+      needsAutoSwitch: boolean;
+      isSwitchingBranch: boolean;
+    }
+
+    const isInitializing = (state: LoadingState): boolean => {
+      return (
+        state.isLoadingPreferences ||
+        state.isLoadingBranch ||
+        state.needsAutoSwitch ||
+        state.isSwitchingBranch
+      );
+    };
+
+    it("should show loading during preferences fetch", () => {
+      expect(
+        isInitializing({
+          isLoadingPreferences: true,
+          isLoadingBranch: false,
+          needsAutoSwitch: false,
+          isSwitchingBranch: false,
+        })
+      ).toBe(true);
+    });
+
+    it("should show loading during branch fetch", () => {
+      expect(
+        isInitializing({
+          isLoadingPreferences: false,
+          isLoadingBranch: true,
+          needsAutoSwitch: false,
+          isSwitchingBranch: false,
+        })
+      ).toBe(true);
+    });
+
+    it("should show loading when auto-switch is needed", () => {
+      expect(
+        isInitializing({
+          isLoadingPreferences: false,
+          isLoadingBranch: false,
+          needsAutoSwitch: true,
+          isSwitchingBranch: false,
+        })
+      ).toBe(true);
+    });
+
+    it("should show loading while branch is switching", () => {
+      expect(
+        isInitializing({
+          isLoadingPreferences: false,
+          isLoadingBranch: false,
+          needsAutoSwitch: false,
+          isSwitchingBranch: true,
+        })
+      ).toBe(true);
+    });
+
+    it("should NOT show loading when all ready", () => {
+      expect(
+        isInitializing({
+          isLoadingPreferences: false,
+          isLoadingBranch: false,
+          needsAutoSwitch: false,
+          isSwitchingBranch: false,
+        })
+      ).toBe(false);
+    });
+
+    it("should show loading during complete initialization flow", () => {
+      // Simulate the full flow
+      const states: LoadingState[] = [
+        // Step 1: Initial mount - everything loading
+        {
+          isLoadingPreferences: true,
+          isLoadingBranch: true,
+          needsAutoSwitch: false,
+          isSwitchingBranch: false,
+        },
+        // Step 2: Preferences loaded, branch still loading
+        {
+          isLoadingPreferences: false,
+          isLoadingBranch: true,
+          needsAutoSwitch: false,
+          isSwitchingBranch: false,
+        },
+        // Step 3: Both loaded, needs auto-switch
+        {
+          isLoadingPreferences: false,
+          isLoadingBranch: false,
+          needsAutoSwitch: true,
+          isSwitchingBranch: false,
+        },
+        // Step 4: Auto-switch in progress
+        {
+          isLoadingPreferences: false,
+          isLoadingBranch: false,
+          needsAutoSwitch: false,
+          isSwitchingBranch: true,
+        },
+        // Step 5: Complete - ready to show content
+        {
+          isLoadingPreferences: false,
+          isLoadingBranch: false,
+          needsAutoSwitch: false,
+          isSwitchingBranch: false,
+        },
+      ];
+
+      // All states except the last should show loading
+      expect(isInitializing(states[0])).toBe(true);
+      expect(isInitializing(states[1])).toBe(true);
+      expect(isInitializing(states[2])).toBe(true);
+      expect(isInitializing(states[3])).toBe(true);
+      expect(isInitializing(states[4])).toBe(false);
     });
   });
 

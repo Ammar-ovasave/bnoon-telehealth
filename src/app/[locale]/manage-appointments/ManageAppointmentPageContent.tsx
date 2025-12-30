@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, CalendarDays, Plus } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslations, useLocale } from "next-intl";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
 import useUserPreferences from "@/hooks/useUserPreferences";
@@ -19,22 +19,43 @@ export default function ManageAppointmentPageContent() {
   const { data, isLoading } = useCurrentUserAppointments();
   const { defaultBranchId, isLoading: isLoadingPreferences } = useUserPreferences();
   const { data: currentBranchData, isLoading: isLoadingBranch } = useCurrentBranch();
-  const { handleSwitchBranch } = useSwitchBranch();
+  const { handleSwitchBranch, loading: isSwitchingBranch } = useSwitchBranch();
   const hasAutoSwitched = useRef(false);
+  const isAutoSwitching = useRef(false);
 
-  // Auto-switch to default branch on first load if no branch is currently selected
+  // Determine if we need to auto-switch to default branch
+  const needsAutoSwitch = useMemo(() => {
+    // Still loading initial data
+    if (isLoadingPreferences || isLoadingBranch) return false;
+    // No default branch configured
+    if (!defaultBranchId) return false;
+    // Already on the default branch
+    if (currentBranchData?.branch?.id === defaultBranchId) return false;
+    // Haven't switched yet this session
+    return !hasAutoSwitched.current;
+  }, [isLoadingPreferences, isLoadingBranch, defaultBranchId, currentBranchData?.branch?.id]);
+
+  // Perform auto-switch to default branch
+  const performAutoSwitch = useCallback(async () => {
+    if (!defaultBranchId || hasAutoSwitched.current || isAutoSwitching.current) return;
+
+    hasAutoSwitched.current = true;
+    isAutoSwitching.current = true;
+
+    await handleSwitchBranch({ payload: { branchId: defaultBranchId } });
+
+    isAutoSwitching.current = false;
+  }, [defaultBranchId, handleSwitchBranch]);
+
+  // Auto-switch to default branch on first load
   useEffect(() => {
-    if (
-      !hasAutoSwitched.current &&
-      !isLoadingPreferences &&
-      !isLoadingBranch &&
-      defaultBranchId &&
-      !currentBranchData?.branch?.id
-    ) {
-      hasAutoSwitched.current = true;
-      handleSwitchBranch({ payload: { branchId: defaultBranchId } });
+    if (needsAutoSwitch) {
+      performAutoSwitch();
     }
-  }, [defaultBranchId, currentBranchData?.branch?.id, isLoadingPreferences, isLoadingBranch, handleSwitchBranch]);
+  }, [needsAutoSwitch, performAutoSwitch]);
+
+  // Show loading while auto-switching or switching branches
+  const isInitializing = isLoadingPreferences || isLoadingBranch || needsAutoSwitch || isSwitchingBranch;
 
   const currentUserAppointmentsData = useMemo(
     () =>
@@ -45,11 +66,11 @@ export default function ManageAppointmentPageContent() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 dark:bg-bnoon-teal/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -66,12 +87,12 @@ export default function ManageAppointmentPageContent() {
               />
             </div>
           </div>
-          <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-4">
             <CalendarDays className="w-4 h-4" />
             <span>{locale === "ar" ? "مواعيدي" : "My Appointments"}</span>
           </div>
-          <h1 className="mb-4 text-3xl sm:text-4xl font-bold text-bnoon-navy">{t("title")}</h1>
-          <p className="mx-auto max-w-2xl text-gray-600 text-base leading-relaxed">{t("description")}</p>
+          <h1 className="mb-4 text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
+          <p className="mx-auto max-w-2xl text-gray-600 dark:text-gray-300 text-base leading-relaxed">{t("description")}</p>
         </div>
 
         {/* Branch Selector */}
@@ -81,23 +102,29 @@ export default function ManageAppointmentPageContent() {
 
         {/* Appointments List */}
         <div className="space-y-4 animate-fade-in-up animation-delay-200">
-          {isLoading ? (
+          {isInitializing || isLoading ? (
             <div className="flex flex-col justify-center items-center py-16">
-              <div className="w-16 h-16 bg-bnoon-teal/10 rounded-full flex items-center justify-center mb-4">
+              <div className="w-16 h-16 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center mb-4">
                 <Spinner className="w-8 h-8 text-bnoon-teal" />
               </div>
-              <p className="text-gray-500 text-sm">
-                {locale === "ar" ? "جاري تحميل المواعيد..." : "Loading appointments..."}
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                {isInitializing
+                  ? locale === "ar"
+                    ? "جاري التحميل..."
+                    : "Loading..."
+                  : locale === "ar"
+                    ? "جاري تحميل المواعيد..."
+                    : "Loading appointments..."}
               </p>
             </div>
           ) : (currentUserAppointmentsData?.length ?? 0) === 0 ? (
             <div className="py-16 text-center">
-              <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg border border-gray-100 max-w-md mx-auto">
-                <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-lg border border-gray-100 dark:border-gray-700 max-w-md mx-auto">
+                <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Calendar className="h-10 w-10 text-gray-400" />
                 </div>
-                <h3 className="mb-3 text-xl font-bold text-bnoon-navy">{t("noAppointmentsFound.title")}</h3>
-                <p className="mb-8 text-gray-600 text-sm leading-relaxed">{t("noAppointmentsFound.description")}</p>
+                <h3 className="mb-3 text-xl font-bold text-bnoon-navy dark:text-white">{t("noAppointmentsFound.title")}</h3>
+                <p className="mb-8 text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noAppointmentsFound.description")}</p>
                 <Link href="/">
                   <Button size="lg" className="w-full">
                     <Plus className="w-4 h-4" />

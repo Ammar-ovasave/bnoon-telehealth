@@ -7,7 +7,7 @@ import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel"
 import { format, add } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
-import { CheckCircle, Clock, Phone, RefreshCw, X } from "lucide-react";
+import { CheckCircle, Clock, Mail, Phone, RefreshCw, X } from "lucide-react";
 import { FC, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -37,7 +37,7 @@ import { doctors } from "@/models/DoctorModel";
 import { useLocale } from "next-intl";
 import { getDoctorName } from "@/lib/getDoctorName";
 
-const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
+const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted = false }) => {
   const t = useTranslations("ManageAppointmentsPage.appointmentCard");
   const tServices = useTranslations("ServicesPage");
   const tVisitStatus = useTranslations("visitStatus");
@@ -202,8 +202,23 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   return (
     <div
       key={appointment.id}
-      className="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+      className={cn(
+        "bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 shadow-sm border transition-all duration-300",
+        isHighlighted
+          ? "border-bnoon-teal ring-2 ring-bnoon-teal/30 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 animate-highlight-pulse"
+          : "border-gray-200 dark:border-gray-700"
+      )}
     >
+      {/* Highlighted Badge */}
+      {isHighlighted && (
+        <div className="flex items-center gap-2 mb-4 pb-3 border-b border-bnoon-teal/20">
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal rounded-full text-xs font-medium">
+            <Mail className="w-3 h-3" />
+            {t("fromNotification")}
+          </div>
+        </div>
+      )}
+
       {/* Appointment Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
         <div className="flex flex-col md:flex-row items-center gap-3 mb-2 md:mb-0">
@@ -570,6 +585,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 
 interface AppointmentCardProps {
   appointment: FertiSmartAppointmentModel;
+  isHighlighted?: boolean;
 }
 
 const getAppointmentStatusColor = (status: string) => {

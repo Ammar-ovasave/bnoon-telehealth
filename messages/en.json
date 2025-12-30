@@ -325,12 +325,17 @@
       "title": "No Appointments Found",
       "description": "You don't have any appointments scheduled."
     },
+    "appointmentNotFound": {
+      "title": "Appointment Not Found",
+      "description": "The requested appointment was not found or has been cancelled"
+    },
     "buttons": {
       "bookNewAppointment": "Book New Appointment",
       "bookAnotherAppointment": "Book Another Appointment"
     },
     "appointmentCard": {
       "confirmation": "Confirmation",
+      "fromNotification": "From notification",
       "buttons": {
         "join": "Join",
         "reschedule": "Reschedule",

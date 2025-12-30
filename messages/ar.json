@@ -325,12 +325,17 @@
       "title": "لم يتم العثور على مواعيد",
       "description": "ليس لديك أي مواعيد مجدولة."
     },
+    "appointmentNotFound": {
+      "title": "الموعد غير موجود",
+      "description": "الموعد المطلوب غير موجود أو تم إلغاؤه"
+    },
     "buttons": {
       "bookNewAppointment": "حجز موعد جديد",
       "bookAnotherAppointment": "حجز موعد آخر"
     },
     "appointmentCard": {
       "confirmation": "رقم التأكيد",
+      "fromNotification": "من الإشعار",
       "buttons": {
         "join": "انضم",
         "reschedule": "إعادة الجدولة",

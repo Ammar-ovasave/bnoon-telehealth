@@ -1,10 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Calendar, CalendarDays, Plus } from "lucide-react";
+import { AlertCircle, Calendar, CalendarDays, Plus } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslations, useLocale } from "next-intl";
-import { useMemo, useEffect, useRef, useCallback } from "react";
+import { useMemo, useEffect, useRef, useCallback, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
 import useUserPreferences from "@/hooks/useUserPreferences";
 import useCurrentBranch from "@/hooks/useCurrentBranch";
@@ -12,42 +13,68 @@ import useSwitchBranch from "@/hooks/useSwitchBranch";
 import AppointmentCard from "./_components/AppointmentCard";
 import ClinicBranchSelect from "@/components/ClinicBranchSelect";
 import Image from "next/image";
+import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
 
 export default function ManageAppointmentPageContent() {
   const t = useTranslations("ManageAppointmentsPage");
   const locale = useLocale();
+  const searchParams = useSearchParams();
   const { data, isLoading } = useCurrentUserAppointments();
   const { defaultBranchId, isLoading: isLoadingPreferences } = useUserPreferences();
   const { data: currentBranchData, isLoading: isLoadingBranch } = useCurrentBranch();
   const { handleSwitchBranch, loading: isSwitchingBranch } = useSwitchBranch();
   const hasAutoSwitched = useRef(false);
   const isAutoSwitching = useRef(false);
+  const highlightedAppointmentRef = useRef<HTMLDivElement>(null);
+  const [appointmentNotFound, setAppointmentNotFound] = useState(false);
 
-  // Determine if we need to auto-switch to default branch
+  // Get URL parameters
+  const branchFromUrl = searchParams.get("branch");
+  const appointmentIdFromUrl = searchParams.get("appointmentId");
+
+  // Validate branch from URL - must exist and not be "coming soon"
+  const validBranchFromUrl = useMemo((): ClinicBranchID | null => {
+    if (!branchFromUrl) return null;
+    const clinic = clinicLocations.find((c) => c.id === branchFromUrl);
+    if (!clinic || clinic.isCommingSoon) return null;
+    return clinic.id as ClinicBranchID;
+  }, [branchFromUrl]);
+
+  // Determine target branch: URL param takes priority over default branch
+  const targetBranchId = useMemo((): ClinicBranchID | null => {
+    // Priority 1: Valid branch from URL
+    if (validBranchFromUrl) return validBranchFromUrl;
+    // Priority 2: Default branch from user preferences
+    if (defaultBranchId) return defaultBranchId;
+    // No target branch
+    return null;
+  }, [validBranchFromUrl, defaultBranchId]);
+
+  // Determine if we need to auto-switch to target branch
   const needsAutoSwitch = useMemo(() => {
     // Still loading initial data
     if (isLoadingPreferences || isLoadingBranch) return false;
-    // No default branch configured
-    if (!defaultBranchId) return false;
-    // Already on the default branch
-    if (currentBranchData?.branch?.id === defaultBranchId) return false;
+    // No target branch configured
+    if (!targetBranchId) return false;
+    // Already on the target branch
+    if (currentBranchData?.branch?.id === targetBranchId) return false;
     // Haven't switched yet this session
     return !hasAutoSwitched.current;
-  }, [isLoadingPreferences, isLoadingBranch, defaultBranchId, currentBranchData?.branch?.id]);
+  }, [isLoadingPreferences, isLoadingBranch, targetBranchId, currentBranchData?.branch?.id]);
 
-  // Perform auto-switch to default branch
+  // Perform auto-switch to target branch
   const performAutoSwitch = useCallback(async () => {
-    if (!defaultBranchId || hasAutoSwitched.current || isAutoSwitching.current) return;
+    if (!targetBranchId || hasAutoSwitched.current || isAutoSwitching.current) return;
 
     hasAutoSwitched.current = true;
     isAutoSwitching.current = true;
 
-    await handleSwitchBranch({ payload: { branchId: defaultBranchId } });
+    await handleSwitchBranch({ payload: { branchId: targetBranchId } });
 
     isAutoSwitching.current = false;
-  }, [defaultBranchId, handleSwitchBranch]);
+  }, [targetBranchId, handleSwitchBranch]);
 
-  // Auto-switch to default branch on first load
+  // Auto-switch to target branch on first load
   useEffect(() => {
     if (needsAutoSwitch) {
       performAutoSwitch();
@@ -56,6 +83,24 @@ export default function ManageAppointmentPageContent() {
 
   // Show loading while auto-switching or switching branches
   const isInitializing = isLoadingPreferences || isLoadingBranch || needsAutoSwitch || isSwitchingBranch;
+
+  // Check if highlighted appointment exists and scroll to it
+  useEffect(() => {
+    if (!isLoading && !isInitializing && appointmentIdFromUrl && data) {
+      const found = data.some((apt) => String(apt.id) === appointmentIdFromUrl);
+      setAppointmentNotFound(!found);
+
+      // Scroll to highlighted appointment after a short delay
+      if (found && highlightedAppointmentRef.current) {
+        setTimeout(() => {
+          highlightedAppointmentRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }, 300);
+      }
+    }
+  }, [isLoading, isInitializing, appointmentIdFromUrl, data]);
 
   const currentUserAppointmentsData = useMemo(
     () =>
@@ -100,6 +145,25 @@ export default function ManageAppointmentPageContent() {
           <ClinicBranchSelect className="mb-8" />
         </div>
 
+        {/* Appointment Not Found Message */}
+        {appointmentNotFound && appointmentIdFromUrl && !isInitializing && !isLoading && (
+          <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl animate-fade-in-up">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center">
+                <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <p className="font-medium text-amber-800 dark:text-amber-200">
+                  {t("appointmentNotFound.title")}
+                </p>
+                <p className="text-sm text-amber-700 dark:text-amber-300">
+                  {t("appointmentNotFound.description")}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Appointments List */}
         <div className="space-y-4 animate-fade-in-up animation-delay-200">
           {isInitializing || isLoading ? (
@@ -135,12 +199,14 @@ export default function ManageAppointmentPageContent() {
             </div>
           ) : (
             currentUserAppointmentsData?.map((appointment, index) => {
+              const isHighlighted = appointmentIdFromUrl === String(appointment.id);
               return (
                 <div
                   key={appointment.id}
+                  ref={isHighlighted ? highlightedAppointmentRef : undefined}
                   className={`animate-fade-in-up animation-delay-${(index % 5) * 100}`}
                 >
-                  <AppointmentCard appointment={appointment} />
+                  <AppointmentCard appointment={appointment} isHighlighted={isHighlighted} />
                 </div>
               );
             })

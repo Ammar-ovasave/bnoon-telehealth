@@ -50,7 +50,11 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
                     height={service.imageHeight ?? 50}
                     src={service.imageSrc}
                     alt={service.title}
-                    className={cn("h-12 w-12 object-contain", service.imageClassName)}
+                    className={cn(
+                      "h-12 w-12 object-contain transition-all duration-300",
+                      "dark:invert dark:brightness-200 dark:hue-rotate-180 dark:saturate-150",
+                      service.imageClassName
+                    )}
                   />
                 ) : (
                   <span className="text-3xl">{service.icon}</span>

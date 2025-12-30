@@ -44,6 +44,7 @@ const KSA_TIMEZONE = "Asia/Riyadh";
 export function PageContent() {
   const t = useTranslations("ReviewAppointmentPage");
   const tGenders = useTranslations("VirtualVisitInfoPage.genders");
+  const tDoctors = useTranslations("DoctorsPage");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const router = useRouter();
@@ -265,7 +266,9 @@ export function PageContent() {
               <div className="flex-1">
                 <h3 className="font-semibold text-bnoon-navy dark:text-white text-lg">{doctorDisplayName}</h3>
                 {selectedDoctor.specialty && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{selectedDoctor.specialty}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                    {tDoctors(`doctors.${selectedDoctor.id}.specialty`) || selectedDoctor.specialty}
+                  </p>
                 )}
               </div>
             </div>

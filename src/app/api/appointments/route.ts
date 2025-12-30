@@ -20,7 +20,6 @@ import { signJwt } from "@/services/signJwt";
 import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
 import { createNewAppointmentDB } from "@/firestore/appointments";
-import { hasDefaultBranch, setDefaultBranch } from "@/firestore/userPreferences";
 import axios, { branchURLs } from "@/services/axios";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
@@ -129,18 +128,6 @@ export async function POST(request: Request) {
         mobileNumber: patientToUse.contactNumber ?? "",
       }),
     ]);
-
-    // Set default branch if this is user's first appointment booking
-    // This runs in background and doesn't block the response
-    if (clinicBranch?.id && patientToUse.mrn) {
-      hasDefaultBranch(patientToUse.mrn).then((hasDefault) => {
-        if (!hasDefault) {
-          setDefaultBranch(patientToUse.mrn!, clinicBranch.id).catch((err) => {
-            console.error("Failed to set default branch:", err);
-          });
-        }
-      });
-    }
 
     const authToken = signJwt({
       mrn: patientToUse.mrn ?? "",

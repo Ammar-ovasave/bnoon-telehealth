@@ -7,7 +7,6 @@ import { useMemo, useEffect, useRef, useCallback, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
-import useUserPreferences from "@/hooks/useUserPreferences";
 import useCurrentBranch from "@/hooks/useCurrentBranch";
 import useSwitchBranch from "@/hooks/useSwitchBranch";
 import AppointmentCard from "./_components/AppointmentCard";
@@ -20,7 +19,6 @@ export default function ManageAppointmentPageContent() {
   const locale = useLocale();
   const searchParams = useSearchParams();
   const { data, isLoading } = useCurrentUserAppointments();
-  const { defaultBranchId, isLoading: isLoadingPreferences } = useUserPreferences();
   const { data: currentBranchData, isLoading: isLoadingBranch } = useCurrentBranch();
   const { handleSwitchBranch, loading: isSwitchingBranch } = useSwitchBranch();
   const [hasAutoSwitched, setHasAutoSwitched] = useState(false);
@@ -28,7 +26,7 @@ export default function ManageAppointmentPageContent() {
   const highlightedAppointmentRef = useRef<HTMLDivElement>(null);
   const [appointmentNotFound, setAppointmentNotFound] = useState(false);
 
-  // Get URL parameters
+  // Get URL parameters (for deep linking from notifications)
   const branchFromUrl = searchParams.get("branch");
   const appointmentIdFromUrl = searchParams.get("appointmentId");
 
@@ -40,41 +38,31 @@ export default function ManageAppointmentPageContent() {
     return clinic.id as ClinicBranchID;
   }, [branchFromUrl]);
 
-  // Determine target branch: URL param takes priority over default branch
-  const targetBranchId = useMemo((): ClinicBranchID | null => {
-    // Priority 1: Valid branch from URL
-    if (validBranchFromUrl) return validBranchFromUrl;
-    // Priority 2: Default branch from user preferences
-    if (defaultBranchId) return defaultBranchId;
-    // No target branch
-    return null;
-  }, [validBranchFromUrl, defaultBranchId]);
-
-  // Determine if we need to auto-switch to target branch
+  // Determine if we need to auto-switch to branch from URL
   const needsAutoSwitch = useMemo(() => {
     // Still loading initial data
-    if (isLoadingPreferences || isLoadingBranch) return false;
-    // No target branch configured
-    if (!targetBranchId) return false;
+    if (isLoadingBranch) return false;
+    // No branch specified in URL
+    if (!validBranchFromUrl) return false;
     // Already on the target branch
-    if (currentBranchData?.branch?.id === targetBranchId) return false;
+    if (currentBranchData?.branch?.id === validBranchFromUrl) return false;
     // Haven't switched yet this session
     return !hasAutoSwitched;
-  }, [isLoadingPreferences, isLoadingBranch, targetBranchId, currentBranchData?.branch?.id, hasAutoSwitched]);
+  }, [isLoadingBranch, validBranchFromUrl, currentBranchData?.branch?.id, hasAutoSwitched]);
 
-  // Perform auto-switch to target branch
+  // Perform auto-switch to branch from URL
   const performAutoSwitch = useCallback(async () => {
-    if (!targetBranchId || hasAutoSwitched || isAutoSwitching.current) return;
+    if (!validBranchFromUrl || hasAutoSwitched || isAutoSwitching.current) return;
 
     setHasAutoSwitched(true);
     isAutoSwitching.current = true;
 
-    await handleSwitchBranch({ payload: { branchId: targetBranchId } });
+    await handleSwitchBranch({ payload: { branchId: validBranchFromUrl } });
 
     isAutoSwitching.current = false;
-  }, [targetBranchId, handleSwitchBranch, hasAutoSwitched]);
+  }, [validBranchFromUrl, handleSwitchBranch, hasAutoSwitched]);
 
-  // Auto-switch to target branch on first load
+  // Auto-switch to branch from URL on first load
   useEffect(() => {
     if (needsAutoSwitch) {
       performAutoSwitch();
@@ -82,7 +70,7 @@ export default function ManageAppointmentPageContent() {
   }, [needsAutoSwitch, performAutoSwitch]);
 
   // Show loading while auto-switching or switching branches
-  const isInitializing = isLoadingPreferences || isLoadingBranch || needsAutoSwitch || isSwitchingBranch;
+  const isInitializing = isLoadingBranch || needsAutoSwitch || isSwitchingBranch;
 
   // Check if highlighted appointment exists and scroll to it
   useEffect(() => {
@@ -116,7 +104,7 @@ export default function ManageAppointmentPageContent() {
     if (currentBranchId) {
       return `/interest?selectedClinicLocation=${currentBranchId}`;
     }
-    return "/interest";
+    return "/";
   }, [currentBranchData?.branch?.id]);
 
   return (
@@ -181,13 +169,7 @@ export default function ManageAppointmentPageContent() {
                 <Spinner className="w-8 h-8 text-bnoon-teal" />
               </div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">
-                {isInitializing
-                  ? locale === "ar"
-                    ? "جاري التحميل..."
-                    : "Loading..."
-                  : locale === "ar"
-                    ? "جاري تحميل المواعيد..."
-                    : "Loading appointments..."}
+                {locale === "ar" ? "جاري تحميل المواعيد..." : "Loading appointments..."}
               </p>
             </div>
           ) : (currentUserAppointmentsData?.length ?? 0) === 0 ? (

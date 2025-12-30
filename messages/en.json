@@ -392,7 +392,7 @@
     "description": "Please provide your name to complete your in-person appointment booking. We'll use this information to prepare for your visit.",
     "visitDetails": {
       "title": "In-Person Visit Details",
-      "description": "You'll receive a confirmation email. Please arrive 10 minutes before your scheduled appointment time."
+      "description": "Please arrive 10 minutes before your scheduled appointment. Bring your ID and any previous medical reports."
     },
     "labels": {
       "fullName": "Full Name"
@@ -421,5 +421,34 @@
     "login": "Login",
     "logout": "Logout",
     "guest": "Guest"
+  },
+  "ReviewAppointmentPage": {
+    "title": "Review Your Appointment",
+    "description": "Please review your appointment details before confirming.",
+    "appointmentDetails": "Appointment Details",
+    "service": "Service",
+    "date": "Date",
+    "time": "Time",
+    "ksaTime": "KSA",
+    "visitType": "Visit Type",
+    "virtualVisit": "Virtual Visit",
+    "clinicVisit": "In-Clinic Visit",
+    "location": "Location",
+    "patientInformation": "Patient Information",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "email": "Email",
+    "nationality": "Nationality",
+    "gender": "Gender",
+    "virtualNotice": "For virtual visits, you will receive a confirmation email with a meeting link to join your appointment.",
+    "clinicNotice": "Please arrive 10 minutes before your scheduled appointment. Bring your ID and any previous medical reports.",
+    "buttons": {
+      "edit": "Edit Information",
+      "confirm": "Confirm Appointment",
+      "confirming": "Confirming..."
+    },
+    "errors": {
+      "somethingWentWrong": "Something went wrong"
+    }
   }
 }

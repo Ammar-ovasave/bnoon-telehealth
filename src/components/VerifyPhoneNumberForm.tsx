@@ -169,19 +169,19 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
   const isTimerActive = remainingTime > 0 && lastSentOTPAt !== null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 dark:bg-bnoon-teal/5 rounded-full blur-3xl" />
       </div>
 
       {loadingCurrentUser || loadingBranches ? (
         <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
-          <div className="w-16 h-16 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center">
             <Spinner className="w-8 h-8 text-bnoon-teal" />
           </div>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             {locale === "ar" ? "جاري التحميل..." : "Loading..."}
           </p>
         </div>
@@ -198,10 +198,10 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                 )}
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-bnoon-navy mb-3">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-bnoon-navy dark:text-white mb-3">
               {showOtpInput ? t("title.verifyPhone") : t("title.enterPhone")}
             </h1>
-            <p className="text-base text-gray-600 max-w-md mx-auto leading-relaxed">
+            <p className="text-base text-gray-600 dark:text-gray-300 max-w-md mx-auto leading-relaxed">
               {showOtpInput ? t("description.verifyPhone", { otpLength: OTP_LENGTH }) : t("description.enterPhone")}
             </p>
           </div>
@@ -209,8 +209,8 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
           {/* Phone Number Input */}
           {!showOtpInput && (
             <div className="animate-fade-in-up animation-delay-200">
-              <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100">
-                <label htmlFor="phone" className="block text-sm font-semibold text-bnoon-navy mb-3">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 dark:border-gray-700">
+                <label htmlFor="phone" className="block text-sm font-semibold text-bnoon-navy dark:text-white mb-3">
                   {t("labels.phoneNumber")}
                 </label>
                 <div className="flex gap-2">
@@ -218,22 +218,22 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                     <button
                       type="button"
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="flex items-center gap-2 bg-bnoon-light border-2 border-gray-200 rounded-xl px-3 py-3 hover:border-bnoon-teal/50 transition-colors min-w-[110px] focus:outline-none focus:border-bnoon-teal"
+                      className="flex items-center gap-2 bg-bnoon-light dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl px-3 py-3 hover:border-bnoon-teal/50 transition-colors min-w-[110px] focus:outline-none focus:border-bnoon-teal"
                     >
                       <span className="text-lg">{getSelectedCountry().flag}</span>
-                      <span className="text-sm text-gray-700 font-medium">{selectedCountryCode}</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-200 font-medium">{selectedCountryCode}</span>
                       <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {isDropdownOpen && (
-                      <div className="absolute top-full ltr:left-0 rtl:right-0 mt-2 w-72 max-h-64 overflow-hidden bg-white border border-gray-200 rounded-xl shadow-xl z-50">
-                        <div className="p-3 border-b border-gray-100">
+                      <div className="absolute top-full ltr:left-0 rtl:right-0 mt-2 w-72 max-h-64 overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50">
+                        <div className="p-3 border-b border-gray-100 dark:border-gray-700">
                           <input
                             type="text"
                             placeholder={t("placeholders.searchCountries")}
                             value={searchTerm}
                             onChange={handleSearchChange}
-                            className="w-full px-3 py-2 text-sm border-2 border-gray-200 rounded-lg focus:outline-none focus:border-bnoon-teal transition-colors"
+                            className="w-full px-3 py-2 text-sm border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:border-bnoon-teal transition-colors"
                           />
                         </div>
                         <div className="max-h-48 overflow-y-auto">
@@ -243,17 +243,17 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                                 key={country.code}
                                 type="button"
                                 onClick={() => handleCountryCodeSelect(country.code)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-bnoon-teal/5 transition-colors ${
+                                className={`w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10 transition-colors ${
                                   selectedCountryCode === country.code ? "bg-bnoon-teal/10 text-bnoon-teal" : ""
                                 }`}
                               >
                                 <span className="text-lg">{country.flag}</span>
-                                <span className="text-gray-600 font-medium">{country.code}</span>
-                                <span className="text-gray-800">{country.country}</span>
+                                <span className="text-gray-600 dark:text-gray-400 font-medium">{country.code}</span>
+                                <span className="text-gray-800 dark:text-gray-200">{country.country}</span>
                               </button>
                             ))
                           ) : (
-                            <div className="px-4 py-6 text-sm text-gray-500 text-center">
+                            <div className="px-4 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">
                               {t("messages.noCountriesFound", { searchTerm })}
                             </div>
                           )}
@@ -269,22 +269,22 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                     placeholder={
                       selectedCountryCode === "+966" ? t("placeholders.phoneNumberKSA") : t("placeholders.phoneNumber")
                     }
-                    className="flex-1 px-4 ltr:text-left rtl:text-right py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-bnoon-teal transition-colors text-lg"
+                    className="flex-1 px-4 ltr:text-left rtl:text-right py-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:outline-none focus:border-bnoon-teal transition-colors text-lg"
                     maxLength={15}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-3">{t("labels.enterPhoneWithoutCode")}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">{t("labels.enterPhoneWithoutCode")}</p>
                 
                 {isTimerActive && (
-                  <div className="mt-6 p-4 bg-bnoon-teal/10 border border-bnoon-teal/20 rounded-xl">
-                    <p className="text-sm text-bnoon-navy text-center font-medium">
+                  <div className="mt-6 p-4 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 border border-bnoon-teal/20 dark:border-bnoon-teal/30 rounded-xl">
+                    <p className="text-sm text-bnoon-navy dark:text-white text-center font-medium">
                       {t("messages.waitBeforeRequest", { time: formatTime(remainingTime) })}
                     </p>
                   </div>
                 )}
                 
                 <div className="flex flex-col-reverse sm:flex-row gap-4 justify-between mt-8">
-                  <Button onClick={handleBack} variant="outline" size="lg" className="w-full sm:w-auto">
+                  <Button onClick={handleBack} variant="outline" size="lg" className="w-full sm:w-auto dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
                     <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
                   </Button>
                   <Button
@@ -313,13 +313,13 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
           {/* OTP Input */}
           {showOtpInput && (
             <div className="animate-fade-in-up animation-delay-200">
-              <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 dark:border-gray-700">
                 <div className="flex items-center justify-center mb-6">
-                  <div className="w-14 h-14 bg-bnoon-teal/10 rounded-xl flex items-center justify-center">
+                  <div className="w-14 h-14 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
                     <Shield className="h-7 w-7 text-bnoon-teal" />
                   </div>
                 </div>
-                <label className="block text-sm font-semibold text-bnoon-navy mb-6 text-center">
+                <label className="block text-sm font-semibold text-bnoon-navy dark:text-white mb-6 text-center">
                   {t("labels.enterVerificationCode")}
                 </label>
                 <div className="flex justify-center" dir="ltr">
@@ -332,7 +332,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                             <InputOTPSlot
                               key={i}
                               index={i}
-                              className="w-14 h-14 text-xl font-bold border-2 border-gray-200 rounded-xl focus:border-bnoon-teal transition-colors"
+                              className="w-14 h-14 text-xl font-bold border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-xl focus:border-bnoon-teal transition-colors"
                             />
                           );
                         })}
@@ -347,7 +347,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                     }}
                     variant="outline"
                     size="lg"
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
                   >
                     <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
                   </Button>

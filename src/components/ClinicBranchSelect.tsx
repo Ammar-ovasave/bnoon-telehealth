@@ -48,26 +48,26 @@ export default function ClinicBranchSelect({ className }: ClinicBranchSelectProp
     <LoadingOverlay visible={switchingBranch}>
       <div
         className={cn(
-          "relative overflow-hidden rounded-xl border border-bnoon-teal/20 bg-white p-6 shadow-sm transition hover:border-bnoon-teal/40",
+          "relative overflow-hidden rounded-xl border border-bnoon-teal/20 dark:border-bnoon-teal/30 bg-white dark:bg-gray-800 p-6 shadow-sm transition hover:border-bnoon-teal/40",
           className
         )}
       >
-        <div className="absolute -top-16 -right-16 size-40 rounded-full bg-bnoon-teal/10 blur-3xl" />
+        <div className="absolute -top-16 -right-16 size-40 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20 blur-3xl" />
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex size-14 items-center justify-center rounded-full bg-bnoon-teal/10 text-bnoon-teal">
+            <div className="flex size-14 items-center justify-center rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal">
               <Image src={`/icons/ClinicBuilding.png`} alt={t("label")} width={100} height={100} />
             </div>
             <div>
               <p className="text-sm font-semibold uppercase tracking-wide text-bnoon-teal">{t("label")}</p>
-              <h2 className="text-xl font-bold text-bnoon-navy">{t("heading")}</h2>
+              <h2 className="text-xl font-bold text-bnoon-navy dark:text-white">{t("heading")}</h2>
             </div>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             {/* Branch Selector */}
             <div className="flex min-w-[240px] flex-col gap-2">
-              <label htmlFor="clinic-branch-select" className="text-sm font-medium text-gray-700">
+              <label htmlFor="clinic-branch-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t("selectBranch")}
               </label>
               <div className="relative w-fit">
@@ -76,7 +76,7 @@ export default function ClinicBranchSelect({ className }: ClinicBranchSelectProp
                   value={selectedBranchId}
                   onChange={handleChange}
                   disabled={isLoading || switchingBranch}
-                  className="border-bnoon-teal/30 bg-bnoon-teal/5 font-semibold text-bnoon-navy focus-visible:border-bnoon-teal focus-visible:ring-bnoon-teal/30"
+                  className="border-bnoon-teal/30 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 dark:border-bnoon-teal/40 font-semibold text-bnoon-navy dark:text-white focus-visible:border-bnoon-teal focus-visible:ring-bnoon-teal/30"
                 >
                   {clinicLocations
                     .filter((item) => !item.isCommingSoon)
@@ -109,8 +109,8 @@ export default function ClinicBranchSelect({ className }: ClinicBranchSelectProp
                 className={cn(
                   "gap-1.5 text-xs transition-all",
                   isCurrentBranchDefault
-                    ? "border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-50 cursor-default"
-                    : "text-gray-500 hover:text-bnoon-teal hover:bg-bnoon-teal/5"
+                    ? "border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 cursor-default"
+                    : "text-gray-500 dark:text-gray-400 hover:text-bnoon-teal hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10"
                 )}
               >
                 {isSettingDefault ? (
@@ -134,11 +134,11 @@ export default function ClinicBranchSelect({ className }: ClinicBranchSelectProp
 
         {/* Default Branch Info */}
         {defaultBranchId && !isCurrentBranchDefault && !isLoadingPreferences && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <p className="text-xs text-gray-500 flex items-center gap-1.5">
+          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
               <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
               {locale === "ar" ? "فرعك الافتراضي:" : "Your default branch:"}{" "}
-              <span className="font-medium text-bnoon-navy">
+              <span className="font-medium text-bnoon-navy dark:text-white">
                 {tHomePage(`clinics.${defaultBranchId}.name`)}
               </span>
             </p>

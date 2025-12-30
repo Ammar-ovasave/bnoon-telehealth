@@ -19,24 +19,24 @@ export const PageContent: FC = () => {
   const locale = useLocale();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-bnoon-teal/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 -right-40 w-60 h-60 bg-cyan-500/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -right-40 w-60 h-60 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-3xl" />
       </div>
 
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-5xl pb-24">
         {/* Header */}
         <div className="text-center mb-10 md:mb-12 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" />
             <span>{locale === "ar" ? "خدماتنا" : "Our Services"}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bnoon-navy mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bnoon-navy dark:text-white mb-4 leading-tight">
             {t("title")}
           </h1>
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
             {t("description")}
           </p>
         </div>
@@ -44,10 +44,10 @@ export const PageContent: FC = () => {
         {/* Services Grid */}
         {isLoading ? (
           <div className="flex flex-col justify-center items-center min-h-[40vh] gap-4">
-            <div className="w-16 h-16 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center">
               <Spinner className="w-8 h-8 text-bnoon-teal" />
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
               {locale === "ar" ? "جاري تحميل الخدمات..." : "Loading services..."}
             </p>
           </div>
@@ -76,7 +76,7 @@ export const PageContent: FC = () => {
 
         {/* Back Button */}
         <div className="w-full flex justify-center mt-12 animate-fade-in-up animation-delay-300">
-          <Button variant="outline" className="max-w-md w-full" onClick={() => router.back()}>
+          <Button variant="outline" className="max-w-md w-full dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800" onClick={() => router.back()}>
             <ChevronLeft className="rtl:scale-x-[-1]" />
             {t("buttons.backToClinicSelection")}
           </Button>

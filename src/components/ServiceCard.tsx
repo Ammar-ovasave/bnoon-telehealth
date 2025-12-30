@@ -27,19 +27,20 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
     <Link href={`/doctors?${newUrlSearchParams.toString()}`}>
       <Card
         className={cn(
-          "cursor-pointer relative gap-0 justify-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden h-full border-0 shadow-md group"
+          "cursor-pointer relative gap-0 justify-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden h-full border-0 shadow-md group",
+          "dark:bg-gray-800 dark:shadow-lg dark:shadow-black/20"
         )}
       >
         {/* Hover Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-bnoon-teal/0 to-cyan-500/0 group-hover:from-bnoon-teal/5 group-hover:to-cyan-500/5 transition-all duration-300 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-bnoon-teal/0 to-cyan-500/0 group-hover:from-bnoon-teal/5 group-hover:to-cyan-500/5 dark:group-hover:from-bnoon-teal/10 dark:group-hover:to-cyan-500/10 transition-all duration-300 pointer-events-none" />
         
         <CardHeader className="text-center px-5 py-6 gap-0 relative">
           {/* Icon Container */}
           <div className="flex justify-center mb-4">
             <div className="relative w-20 h-20 flex items-center justify-center">
               {/* Background Circle */}
-              <div className="absolute inset-0 bg-bnoon-teal/10 rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300" />
-              <div className="absolute inset-0 bg-white rounded-2xl shadow-sm" />
+              <div className="absolute inset-0 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300" />
+              <div className="absolute inset-0 bg-white dark:bg-gray-700 rounded-2xl shadow-sm" />
               
               {/* Icon */}
               <div className="relative z-10">
@@ -59,12 +60,12 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
           </div>
 
           {/* Title */}
-          <CardTitle className="text-base font-bold text-bnoon-navy mb-2 group-hover:text-bnoon-teal transition-colors duration-300">
+          <CardTitle className="text-base font-bold text-bnoon-navy dark:text-white mb-2 group-hover:text-bnoon-teal transition-colors duration-300">
             {t(`services.${service.id}.title`)}
           </CardTitle>
 
           {/* Description */}
-          <CardDescription className="text-xs text-gray-500 leading-relaxed line-clamp-2">
+          <CardDescription className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2">
             {t(`services.${service.id}.description`)}
           </CardDescription>
 

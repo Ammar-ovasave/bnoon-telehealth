@@ -89,7 +89,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
         </div>
 
         {/* Content Section */}
-        <div className="p-5 flex flex-col flex-1 bg-white relative z-10">
+        <div className="p-5 flex flex-col flex-1 bg-white dark:bg-gray-800 relative z-10">
           {/* Decorative Line - Animates during loading */}
           <div 
             className={`
@@ -102,7 +102,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
           />
           
           {/* Description */}
-          <p className="text-gray-600 text-sm leading-relaxed flex-1 line-clamp-2">
+          <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed flex-1 line-clamp-2">
             {locale === "ar"
               ? "مركز متخصص في علاجات الخصوبة وصحة المرأة مع أحدث التقنيات الطبية"
               : "Specialized center for fertility treatments and women's health with latest medical technologies"}
@@ -116,7 +116,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
               className={`
                 w-full mt-4 group/btn transition-all duration-300
                 ${clinic.isCommingSoon
-                  ? "bg-gray-100 text-gray-500 hover:bg-gray-100 cursor-not-allowed"
+                  ? "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-not-allowed"
                   : "bg-bnoon-teal hover:bg-bnoon-teal/90 text-white"
                 }
               `}

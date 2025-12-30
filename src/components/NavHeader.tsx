@@ -13,6 +13,7 @@ import { useTranslations, useLocale } from "next-intl";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import { Calendar, LogOut, Menu, X, User } from "lucide-react";
 import Image from "next/image";
+import { ThemeToggle, ThemeToggleCompact } from "./ThemeToggle";
 
 function NavHeader() {
   const { data: currentUserData, isLoading } = useCurrentUser();
@@ -27,7 +28,7 @@ function NavHeader() {
     .trim();
 
   return (
-    <header className="bg-white sticky top-0 z-50 border-b border-gray-100 shadow-sm">
+    <header className="bg-white dark:bg-gray-900 sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo & Brand Descriptor */}
@@ -37,14 +38,14 @@ function NavHeader() {
               alt="Bnoon - بنون"
               width={140}
               height={58}
-              className="h-10 md:h-12 w-auto"
+              className="h-10 md:h-12 w-auto dark:brightness-110"
               priority
             />
-            <div className="hidden lg:block border-l border-gray-200 pl-3">
-              <p className="text-[10px] leading-tight text-bnoon-navy font-medium">
+            <div className="hidden lg:block border-l border-gray-200 dark:border-gray-700 pl-3">
+              <p className="text-[10px] leading-tight text-bnoon-navy dark:text-white font-medium">
                 {locale === "ar" ? "مركز الإخصاب وصحة المرأة" : "The Fertility & Women's Health Center"}
               </p>
-              <p className="text-[9px] leading-tight text-gray-500">
+              <p className="text-[9px] leading-tight text-gray-500 dark:text-gray-400">
                 {locale === "ar" ? "جزء من شبكة جلوبال فيرتيليتي" : "Part of Global Fertility Network"}
               </p>
             </div>
@@ -56,7 +57,7 @@ function NavHeader() {
             {!isLoading && currentUserData?.mrn && (
               <Link
                 href={"/manage-appointments"}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-bnoon-teal hover:bg-bnoon-teal/5 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-bnoon-teal hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10 rounded-lg transition-colors"
               >
                 <Calendar className="w-4 h-4" />
                 {t("myAppointments")}
@@ -65,19 +66,19 @@ function NavHeader() {
 
             {/* Separator */}
             {!isLoading && currentUserData?.mrn && (
-              <div className="h-6 w-px bg-gray-200" />
+              <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
             )}
 
             {/* User Area - grouped together */}
             {!isLoading && currentUserData?.mrn ? (
               <div className="flex items-center gap-3">
                 {/* User Info with Branch */}
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
                   <div className="w-7 h-7 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
                     <User className="w-4 h-4 text-bnoon-teal" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-bnoon-navy max-w-[120px] truncate leading-tight">
+                    <span className="text-sm font-medium text-bnoon-navy dark:text-white max-w-[120px] truncate leading-tight">
                       {displayName || currentUserData.mrn}
                     </span>
                     <BranchNameInline />
@@ -100,16 +101,20 @@ function NavHeader() {
               </>
             )}
 
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Language Switcher - always at the end */}
             <LanguageSwitcher />
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center gap-3">
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle />
             <LanguageSwitcher />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -118,20 +123,20 @@ function NavHeader() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100 animate-fade-in">
+          <div className="md:hidden py-4 border-t border-gray-100 dark:border-gray-800 animate-fade-in">
             <div className="flex flex-col gap-3">
               {/* User Info Card - Mobile */}
               {!isLoading && currentUserData?.mrn && (
-                <div className="flex items-center gap-3 px-3 py-3 bg-gradient-to-r from-gray-50 to-bnoon-teal/5 rounded-xl border border-gray-100">
+                <div className="flex items-center gap-3 px-3 py-3 bg-gradient-to-r from-gray-50 to-bnoon-teal/5 dark:from-gray-800 dark:to-bnoon-teal/10 rounded-xl border border-gray-100 dark:border-gray-700">
                   <div className="w-12 h-12 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
                     <User className="w-6 h-6 text-bnoon-teal" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-bnoon-navy truncate">
+                    <p className="text-sm font-semibold text-bnoon-navy dark:text-white truncate">
                       {displayName || t("guest")}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         MRN: {currentUserData.mrn}
                       </span>
                       <BranchNameMobile />
@@ -147,7 +152,7 @@ function NavHeader() {
               {!isLoading && currentUserData?.mrn && (
                 <Link
                   href={"/manage-appointments"}
-                  className="flex items-center gap-3 py-3 px-4 text-sm font-medium text-gray-700 hover:text-bnoon-teal bg-white hover:bg-bnoon-teal/5 rounded-xl border border-gray-100 transition-colors"
+                  className="flex items-center gap-3 py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-bnoon-teal bg-white dark:bg-gray-800 hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10 rounded-xl border border-gray-100 dark:border-gray-700 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Calendar className="w-5 h-5" />
@@ -184,7 +189,7 @@ const LanguageSwitcher: FC = () => {
   return (
     <Link
       href={`/${otherLocale}`}
-      className="px-3 py-1.5 text-sm font-medium text-bnoon-navy border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
+      className="px-3 py-1.5 text-sm font-medium text-bnoon-navy dark:text-white border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
     >
       {label}
     </Link>
@@ -198,7 +203,7 @@ const BranchName: FC = () => {
   // Show skeleton while loading
   if (isLoading) {
     return (
-      <div className="h-6 w-24 bg-gray-200 rounded-full animate-pulse" />
+      <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
     );
   }
 
@@ -207,7 +212,7 @@ const BranchName: FC = () => {
   const branchName = t(`clinics.${data.branch.id}.name`);
 
   return (
-    <Badge className="bg-bnoon-teal/10 text-bnoon-teal border-bnoon-teal/20 hover:bg-bnoon-teal/20 px-3 py-1">
+    <Badge className="bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal border-bnoon-teal/20 dark:border-bnoon-teal/30 hover:bg-bnoon-teal/20 dark:hover:bg-bnoon-teal/30 px-3 py-1">
       {branchName}
     </Badge>
   );
@@ -287,7 +292,7 @@ const LogoutButton: FC<{ isMobile?: boolean }> = ({ isMobile }) => {
         onClick={handleClick}
         variant="outline"
         disabled={loading}
-        className="w-full justify-center gap-2 rounded-full text-red-600 border-red-200 hover:bg-red-50"
+        className="w-full justify-center gap-2 rounded-full text-red-600 dark:text-red-400 border-red-200 dark:border-red-900 hover:bg-red-50 dark:hover:bg-red-900/30"
       >
         {loading ? <Spinner className="w-4 h-4" /> : <LogOut className="w-4 h-4" />}
         {t("logout")}
@@ -300,7 +305,7 @@ const LogoutButton: FC<{ isMobile?: boolean }> = ({ isMobile }) => {
       onClick={handleClick}
       variant="ghost"
       disabled={loading}
-      className="text-gray-600 hover:text-red-600 hover:bg-red-50 gap-2 rounded-full"
+      className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 gap-2 rounded-full"
     >
       {loading ? <Spinner className="w-4 h-4" /> : <LogOut className="w-4 h-4" />}
       {t("logout")}

@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import localFont from "next/font/local";
 import SWRProvider from "@/providers/SWRProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 import NavHeader from "@/components/NavHeader";
 import Footer from "@/components/Footer";
 import { setRequestLocale } from "next-intl/server";
@@ -90,12 +91,14 @@ export default async function RootLayout({
   return (
     <SWRProvider fallback={{ "/api/current-user": currentUser }}>
       <NextIntlClientProvider>
-        <html lang={paramsResult.locale} dir={isAr ? "rtl" : "ltr"}>
-          <body className={`antialiased ${isAr ? alexandria.className : helvetica.className}`}>
-            <NavHeader />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
-            <Toaster />
+        <html lang={paramsResult.locale} dir={isAr ? "rtl" : "ltr"} suppressHydrationWarning>
+          <body className={`antialiased bg-white dark:bg-gray-900 transition-colors duration-300 ${isAr ? alexandria.className : helvetica.className}`}>
+            <ThemeProvider>
+              <NavHeader />
+              <main className="min-h-screen bg-white dark:bg-gray-900">{children}</main>
+              <Footer />
+              <Toaster />
+            </ThemeProvider>
           </body>
         </html>
       </NextIntlClientProvider>

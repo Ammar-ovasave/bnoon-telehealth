@@ -74,19 +74,19 @@ export default function DoctorsListPage() {
   const virtualDoctorsCount = doctors.filter((d) => d.availability.virtual).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-40 w-60 h-60 bg-bnoon-navy/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 -left-40 w-60 h-60 bg-bnoon-navy/5 dark:bg-bnoon-teal/5 rounded-full blur-3xl" />
       </div>
 
       {isLoadingResources ? (
         <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
-          <div className="w-16 h-16 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center">
             <Spinner className="w-8 h-8 text-bnoon-teal" />
           </div>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             {locale === "ar" ? "جاري تحميل الأطباء..." : "Loading doctors..."}
           </p>
         </div>
@@ -94,25 +94,25 @@ export default function DoctorsListPage() {
         <div className="relative mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-24">
           {/* Header */}
           <div className="text-center mb-10 md:mb-12 animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Stethoscope className="w-4 h-4" />
               <span>{locale === "ar" ? "اختر طبيبك" : "Choose Your Doctor"}</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bnoon-navy mb-4 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bnoon-navy dark:text-white mb-4 leading-tight">
               {t("title")}
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
               {t("description")}
             </p>
           </div>
 
           {/* Visit Type Selector - Compact Pills */}
           <div className="animate-fade-in-up animation-delay-200 mb-8">
-            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 dark:border-gray-700">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h2 className="text-lg font-bold text-bnoon-navy mb-1">{t("visitType.title")}</h2>
-                  <p className="text-sm text-gray-500">{t("visitType.description")}</p>
+                  <h2 className="text-lg font-bold text-bnoon-navy dark:text-white mb-1">{t("visitType.title")}</h2>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t("visitType.description")}</p>
                 </div>
 
                 {/* Visit Type Pills */}
@@ -127,7 +127,7 @@ export default function DoctorsListPage() {
                       "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bnoon-teal/50",
                       availabilityFilter === "clinic"
                         ? "bg-bnoon-teal text-white border-bnoon-teal shadow-lg shadow-bnoon-teal/30"
-                        : "bg-white text-gray-700 border-gray-200 shadow-sm hover:border-bnoon-teal hover:bg-bnoon-teal/5 hover:shadow-md",
+                        : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 shadow-sm hover:border-bnoon-teal hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10 hover:shadow-md",
                       clinicDoctorsCount === 0 && "opacity-50 cursor-not-allowed hover:scale-100 active:scale-100"
                     )}
                   >
@@ -155,7 +155,7 @@ export default function DoctorsListPage() {
                       "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bnoon-navy/50",
                       availabilityFilter === "virtual"
                         ? "bg-bnoon-navy text-white border-bnoon-navy shadow-lg shadow-bnoon-navy/30"
-                        : "bg-white text-gray-700 border-gray-200 shadow-sm hover:border-bnoon-navy hover:bg-bnoon-navy/5 hover:shadow-md",
+                        : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 shadow-sm hover:border-bnoon-navy hover:bg-bnoon-navy/5 dark:hover:bg-bnoon-navy/10 hover:shadow-md",
                       virtualDoctorsCount === 0 && "opacity-50 cursor-not-allowed hover:scale-100 active:scale-100"
                     )}
                   >
@@ -167,7 +167,7 @@ export default function DoctorsListPage() {
                     <span>{t("visitType.virtual.title")}</span>
                     <span className={cn(
                       "text-xs px-2 py-0.5 rounded-full font-bold",
-                      availabilityFilter === "virtual" ? "bg-white/20" : "bg-bnoon-navy/10 text-bnoon-navy"
+                      availabilityFilter === "virtual" ? "bg-white/20" : "bg-bnoon-navy/10 dark:bg-bnoon-navy/20 text-bnoon-navy dark:text-bnoon-teal"
                     )}>
                       {virtualDoctorsCount}
                     </span>
@@ -177,8 +177,8 @@ export default function DoctorsListPage() {
 
               {/* Hint message when no type selected */}
               {!availabilityFilter && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-sm text-amber-600 flex items-center gap-2">
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-2">
                     <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
                     {locale === "ar"
                       ? "يرجى اختيار نوع الزيارة لتتمكن من حجز موعد مع الطبيب"
@@ -209,12 +209,12 @@ export default function DoctorsListPage() {
               </div>
             ) : (
               <div className="text-center py-16">
-                <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm border border-gray-100 max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 max-w-md mx-auto">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Filter className="h-8 w-8 text-gray-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-bnoon-navy mb-3">{t("noDoctorsFound.title")}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{t("noDoctorsFound.description")}</p>
+                  <h3 className="text-xl font-bold text-bnoon-navy dark:text-white mb-3">{t("noDoctorsFound.title")}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noDoctorsFound.description")}</p>
                 </div>
               </div>
             )}
@@ -222,7 +222,7 @@ export default function DoctorsListPage() {
 
           {/* Back Button */}
           <div className="mt-12 text-center animate-fade-in-up animation-delay-300">
-            <Button onClick={handleBack} variant="outline" size="lg" className="px-8">
+            <Button onClick={handleBack} variant="outline" size="lg" className="px-8 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
               <ArrowLeft className="rtl:scale-x-[-1]" />
               {t("buttons.backToServiceSelection")}
             </Button>

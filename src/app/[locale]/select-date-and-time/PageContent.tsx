@@ -120,21 +120,21 @@ export default function SelectDateAndTimePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 dark:bg-bnoon-teal/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-32">
         {/* Header */}
         <div className="text-center mb-10 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
             <CalendarDays className="w-4 h-4" />
             <span>{locale === "ar" ? "حدد موعدك" : "Schedule Your Visit"}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy mb-4">{t("title")}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
           
           {selectedVisitType && (
             <div className="flex justify-center mb-4">
@@ -164,7 +164,7 @@ export default function SelectDateAndTimePage() {
           {/* Doctor Info Card */}
           {selectedDoctor && (
             <div className="flex justify-center mb-6">
-              <div className="inline-flex items-center gap-4 bg-white px-5 py-3 rounded-2xl shadow-md border border-gray-100">
+              <div className="inline-flex items-center gap-4 bg-white dark:bg-gray-800 px-5 py-3 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
                 {/* Doctor Photo */}
                 <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-bnoon-teal to-bnoon-navy p-[2px]">
@@ -181,10 +181,10 @@ export default function SelectDateAndTimePage() {
 
                 {/* Doctor Info */}
                 <div className="text-start rtl:text-right">
-                  <h3 className="font-bold text-bnoon-navy text-base sm:text-lg">
+                  <h3 className="font-bold text-bnoon-navy dark:text-white text-base sm:text-lg">
                     {getDoctorName(selectedDoctor, locale)}
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-500 mt-0.5 max-w-[200px] sm:max-w-[280px] line-clamp-2">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 max-w-[200px] sm:max-w-[280px] line-clamp-2">
                     {tDoctors(`doctors.${selectedDoctor.id}.specialty`) || selectedDoctor.specialty}
                   </p>
                 </div>
@@ -192,17 +192,17 @@ export default function SelectDateAndTimePage() {
             </div>
           )}
 
-          <p className="text-base text-gray-600 max-w-2xl mx-auto leading-relaxed">{t("description")}</p>
+          <p className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">{t("description")}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up animation-delay-200">
           {/* Date Selection */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-bnoon-teal/10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
                 <Image src={`/icons/Calender.png`} alt="Select Date" width={20} height={20} />
               </div>
-              <h2 className="text-lg font-bold text-bnoon-navy">{t("selectDate")}</h2>
+              <h2 className="text-lg font-bold text-bnoon-navy dark:text-white">{t("selectDate")}</h2>
             </div>
             <div className="flex justify-center">
               <Calendar
@@ -214,7 +214,7 @@ export default function SelectDateAndTimePage() {
                 }}
                 disabled={isDateDisabled}
                 locale={dateFnsLocale}
-                className="rounded-xl border border-gray-100"
+                className="rounded-xl border border-gray-100 dark:border-gray-700"
                 formatters={{
                   formatWeekdayName: weekdayFormatter,
                 }}
@@ -233,27 +233,27 @@ export default function SelectDateAndTimePage() {
           </div>
 
           {/* Time Selection */}
-          <div className="bg-white flex flex-col rounded-2xl p-6 shadow-lg border border-gray-100">
+          <div className="bg-white dark:bg-gray-800 flex flex-col rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-bnoon-teal/10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
                 <Clock className="w-5 h-5 text-bnoon-teal" />
               </div>
-              <h2 className="text-lg font-bold text-bnoon-navy">{t("selectTime")}</h2>
+              <h2 className="text-lg font-bold text-bnoon-navy dark:text-white">{t("selectTime")}</h2>
             </div>
 
             {!selectedDate ? (
               <div className="text-center py-12 flex-1 flex flex-col items-center justify-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mb-4">
                   <Clock className="w-8 h-8 text-gray-400" />
                 </div>
-                <p className="text-gray-500">{t("messages.selectDateFirst")}</p>
+                <p className="text-gray-500 dark:text-gray-400">{t("messages.selectDateFirst")}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-80 flex-1 overflow-y-auto p-1">
                 {loadingTimeslots || loadingResources || loadingCurrentUser ? (
                   <div className="col-span-full flex flex-col justify-center items-center py-12">
                     <Spinner className="w-8 h-8 text-bnoon-teal" />
-                    <p className="text-gray-500 text-sm mt-3">
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-3">
                       {locale === "ar" ? "جاري تحميل المواعيد..." : "Loading available times..."}
                     </p>
                   </div>
@@ -266,7 +266,7 @@ export default function SelectDateAndTimePage() {
                         "p-3 rounded-xl relative border-2 text-sm font-semibold transition-all duration-200 cursor-pointer",
                         selectedTimeSlot === slot.start
                           ? "bg-bnoon-teal text-white border-bnoon-teal shadow-lg shadow-bnoon-teal/20"
-                          : "bg-white border-gray-200 text-bnoon-navy hover:border-bnoon-teal/50 hover:bg-bnoon-teal/5"
+                          : "bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-bnoon-navy dark:text-white hover:border-bnoon-teal/50 hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10"
                       )}
                     >
                       {format(slot.start ?? new Date().toISOString(), "hh:mm aa", { locale: dateFnsLocale })}
@@ -282,10 +282,10 @@ export default function SelectDateAndTimePage() {
                   ))
                 ) : (
                   <div className="col-span-full text-center py-12">
-                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
                       <CalendarDays className="w-8 h-8 text-gray-400" />
                     </div>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                       {t("messages.noAvailability", {
                         date: selectedDate ? format(selectedDate, "dd-MM-yyyy") : t("messages.notSelected"),
                       })}
@@ -296,8 +296,8 @@ export default function SelectDateAndTimePage() {
             )}
 
             {selectedTimeSlot && (availabilityData?.length ?? 0) > 0 && (
-              <div className="mt-4 p-4 bg-bnoon-teal/10 rounded-xl border border-bnoon-teal/20">
-                <p className="text-sm text-bnoon-navy font-medium">
+              <div className="mt-4 p-4 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl border border-bnoon-teal/20 dark:border-bnoon-teal/30">
+                <p className="text-sm text-bnoon-navy dark:text-white font-medium">
                   {t("messages.selected")}{" "}
                   <span className="font-bold">
                     {format(
@@ -324,38 +324,38 @@ export default function SelectDateAndTimePage() {
 
         {/* Summary */}
         {(selectedDate || selectedTimeSlot) && (
-          <div className="mt-6 bg-white rounded-2xl p-6 shadow-lg border border-gray-100 animate-fade-in-up animation-delay-300">
-            <h3 className="text-lg font-bold text-bnoon-navy mb-4">{t("summary.title")}</h3>
+          <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 animate-fade-in-up animation-delay-300">
+            <h3 className="text-lg font-bold text-bnoon-navy dark:text-white mb-4">{t("summary.title")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {selectedVisitType && (
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">{t("summary.visitType")}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t("summary.visitType")}</p>
                   <div className="flex items-center gap-2">
                     {selectedVisitType === "clinic" ? (
                       <>
                         <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={20} height={20} />
-                        <p className="font-semibold text-bnoon-navy">{t("visitTypes.clinic")}</p>
+                        <p className="font-semibold text-bnoon-navy dark:text-white">{t("visitTypes.clinic")}</p>
                       </>
                     ) : (
                       <>
                         <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={20} height={20} />
-                        <p className="font-semibold text-bnoon-navy">{t("visitTypes.virtual")}</p>
+                        <p className="font-semibold text-bnoon-navy dark:text-white">{t("visitTypes.virtual")}</p>
                       </>
                     )}
                   </div>
                 </div>
               )}
               <div>
-                <p className="text-sm text-gray-500 mb-1">{t("summary.date")}</p>
-                <p className="font-semibold text-bnoon-navy">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t("summary.date")}</p>
+                <p className="font-semibold text-bnoon-navy dark:text-white">
                   {selectedDate
                     ? format(selectedDate, locale === "ar" ? "dd MMMM yyyy" : "EEEE, MMMM do, yyyy", { locale: dateFnsLocale })
                     : t("messages.notSelected")}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">{t("summary.time")}</p>
-                <p className="font-semibold text-bnoon-navy">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t("summary.time")}</p>
+                <p className="font-semibold text-bnoon-navy dark:text-white">
                   {selectedTimeSlot && (availabilityData?.length ?? 0) > 0
                     ? format(
                         availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
@@ -381,9 +381,9 @@ export default function SelectDateAndTimePage() {
         )}
 
         {/* Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm p-4 border-t border-gray-100 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm p-4 border-t border-gray-100 dark:border-gray-800 shadow-lg">
           <div className="flex flex-col-reverse md:flex-row gap-4 justify-between max-w-6xl mx-auto">
-            <Button onClick={handleBack} variant="outline" size="lg" className="w-full md:w-auto">
+            <Button onClick={handleBack} variant="outline" size="lg" className="w-full md:w-auto dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
               <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
             </Button>
             <Link href={getNextPageUrl()} className="w-full md:w-auto">

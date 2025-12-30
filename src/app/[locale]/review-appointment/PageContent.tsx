@@ -229,11 +229,11 @@ export function PageContent() {
   ]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 dark:bg-bnoon-teal/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -244,78 +244,78 @@ export function PageContent() {
               <CheckCircle2 className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="mb-3 text-2xl sm:text-3xl font-bold text-bnoon-navy">{t("title")}</h1>
-          <p className="text-gray-600 text-sm leading-relaxed max-w-md mx-auto">{t("description")}</p>
+          <h1 className="mb-3 text-2xl sm:text-3xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed max-w-md mx-auto">{t("description")}</p>
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden animate-fade-in-up animation-delay-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden animate-fade-in-up animation-delay-100">
           {/* Doctor Section */}
           {selectedDoctor && (
-            <div className="flex items-center gap-4 p-6 bg-bnoon-teal/5 border-b border-bnoon-teal/10">
+            <div className="flex items-center gap-4 p-6 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 border-b border-bnoon-teal/10 dark:border-bnoon-teal/20">
               {selectedDoctor.photo && (
                 <Image
                   src={selectedDoctor.photo}
                   alt={doctorDisplayName}
                   width={72}
                   height={72}
-                  className="rounded-full object-cover border-2 border-white shadow-md"
+                  className="rounded-full object-cover border-2 border-white dark:border-gray-700 shadow-md"
                 />
               )}
               <div className="flex-1">
-                <h3 className="font-semibold text-bnoon-navy text-lg">{doctorDisplayName}</h3>
+                <h3 className="font-semibold text-bnoon-navy dark:text-white text-lg">{doctorDisplayName}</h3>
                 {selectedDoctor.specialty && (
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{selectedDoctor.specialty}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{selectedDoctor.specialty}</p>
                 )}
               </div>
             </div>
           )}
 
           {/* Appointment Details */}
-          <div className="p-6 border-b border-gray-100">
-            <h4 className="text-sm font-semibold text-bnoon-navy uppercase tracking-wide mb-4">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+            <h4 className="text-sm font-semibold text-bnoon-navy dark:text-white uppercase tracking-wide mb-4">
               {t("appointmentDetails")}
             </h4>
 
             <div className="space-y-4">
               {/* Service */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                   <Stethoscope className="h-5 w-5 text-bnoon-teal" />
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">{t("service")}</span>
-                  <p className="font-medium text-gray-900">{selectedService?.title}</p>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("service")}</span>
+                  <p className="font-medium text-gray-900 dark:text-white">{selectedService?.title}</p>
                 </div>
               </div>
 
               {/* Date */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                   <Calendar className="h-5 w-5 text-bnoon-teal" />
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">{t("date")}</span>
-                  <p className="font-medium text-gray-900">{formattedDate}</p>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("date")}</span>
+                  <p className="font-medium text-gray-900 dark:text-white">{formattedDate}</p>
                 </div>
               </div>
 
               {/* Time */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                   <Clock className="h-5 w-5 text-bnoon-teal" />
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">{t("time")}</span>
-                  <p className="font-medium text-gray-900">
-                    {formattedTime} <span className="text-xs text-gray-500">({t("ksaTime")})</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("time")}</span>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {formattedTime} <span className="text-xs text-gray-500 dark:text-gray-400">({t("ksaTime")})</span>
                   </p>
                 </div>
               </div>
 
               {/* Visit Type */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                   {visitType === "virtual" ? (
                     <Video className="h-5 w-5 text-bnoon-teal" />
                   ) : (
@@ -323,8 +323,8 @@ export function PageContent() {
                   )}
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">{t("visitType")}</span>
-                  <p className="font-medium text-gray-900">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("visitType")}</span>
+                  <p className="font-medium text-gray-900 dark:text-white">
                     {visitType === "virtual" ? t("virtualVisit") : t("clinicVisit")}
                   </p>
                 </div>
@@ -333,14 +333,14 @@ export function PageContent() {
               {/* Location (for clinic visits) */}
               {visitType === "clinic" && branchData?.branch && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                     <MapPin className="h-5 w-5 text-bnoon-teal" />
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">{t("location")}</span>
-                    <p className="font-medium text-gray-900">{branchData.branch.name}</p>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("location")}</span>
+                    <p className="font-medium text-gray-900 dark:text-white">{branchData.branch.name}</p>
                     {branchData.branch.address && (
-                      <p className="text-xs text-gray-500">{branchData.branch.address}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{branchData.branch.address}</p>
                     )}
                   </div>
                 </div>
@@ -349,43 +349,43 @@ export function PageContent() {
           </div>
 
           {/* Patient Information */}
-          <div className="p-6 border-b border-gray-100">
-            <h4 className="text-sm font-semibold text-bnoon-navy uppercase tracking-wide mb-4">
+          <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+            <h4 className="text-sm font-semibold text-bnoon-navy dark:text-white uppercase tracking-wide mb-4">
               {t("patientInformation")}
             </h4>
 
             <div className="space-y-4">
               {/* Full Name */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
-                  <User className="h-5 w-5 text-gray-600" />
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                  <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">{t("fullName")}</span>
-                  <p className="font-medium text-gray-900">{fullName}</p>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("fullName")}</span>
+                  <p className="font-medium text-gray-900 dark:text-white">{fullName}</p>
                 </div>
               </div>
 
               {/* Phone */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
-                  <Phone className="h-5 w-5 text-gray-600" />
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                  <Phone className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">{t("phone")}</span>
-                  <p className="font-medium text-gray-900 ltr">{currentUserData?.contactNumber}</p>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("phone")}</span>
+                  <p className="font-medium text-gray-900 dark:text-white ltr">{currentUserData?.contactNumber}</p>
                 </div>
               </div>
 
               {/* Email (for virtual visits) */}
               {visitType === "virtual" && email && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
-                    <Mail className="h-5 w-5 text-gray-600" />
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                    <Mail className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">{t("email")}</span>
-                    <p className="font-medium text-gray-900">{email}</p>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("email")}</span>
+                    <p className="font-medium text-gray-900 dark:text-white">{email}</p>
                   </div>
                 </div>
               )}
@@ -393,12 +393,12 @@ export function PageContent() {
               {/* Nationality (for virtual visits) */}
               {visitType === "virtual" && nationality && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
-                    <Globe className="h-5 w-5 text-gray-600" />
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                    <Globe className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">{t("nationality")}</span>
-                    <p className="font-medium text-gray-900">{nationality}</p>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("nationality")}</span>
+                    <p className="font-medium text-gray-900 dark:text-white">{nationality}</p>
                   </div>
                 </div>
               )}
@@ -406,12 +406,12 @@ export function PageContent() {
               {/* Gender (for virtual visits) */}
               {visitType === "virtual" && gender && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
-                    <User className="h-5 w-5 text-gray-600" />
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                    <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">{t("gender")}</span>
-                    <p className="font-medium text-gray-900">{tGenders(gender)}</p>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("gender")}</span>
+                    <p className="font-medium text-gray-900 dark:text-white">{tGenders(gender)}</p>
                   </div>
                 </div>
               )}
@@ -419,12 +419,12 @@ export function PageContent() {
               {/* ID Type & Number (for virtual visits) */}
               {visitType === "virtual" && idTypeName && idNumber && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
-                    <CreditCard className="h-5 w-5 text-gray-600" />
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                    <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500">{idTypeName}</span>
-                    <p className="font-medium text-gray-900">{idNumber}</p>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{idTypeName}</span>
+                    <p className="font-medium text-gray-900 dark:text-white">{idNumber}</p>
                   </div>
                 </div>
               )}
@@ -433,8 +433,8 @@ export function PageContent() {
 
           {/* Notice */}
           <div className="p-6">
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800">
+            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
                 {visitType === "virtual" ? t("virtualNotice") : t("clinicNotice")}
               </p>
             </div>
@@ -447,7 +447,7 @@ export function PageContent() {
             variant="outline"
             size="lg"
             onClick={handleBack}
-            className="flex-1"
+            className="flex-1 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
             disabled={loading}
           >
             <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />

@@ -10,7 +10,7 @@ const Footer: FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-bnoon-navy text-white">
+    <footer className="bg-bnoon-navy dark:bg-gray-950 text-white border-t border-bnoon-navy dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand Section */}
@@ -20,9 +20,9 @@ const Footer: FC = () => {
               alt="Bnoon - بنون"
               width={120}
               height={50}
-              className="h-10 w-auto brightness-0 invert"
+              className="h-10 w-auto brightness-0 invert dark:brightness-100 dark:invert-0"
             />
-            <p className="text-sm text-white/80 leading-relaxed">
+            <p className="text-sm text-white/80 dark:text-gray-400 leading-relaxed">
               {locale === "ar"
                 ? "مركز الإخصاب وصحة المرأة. جزء من شبكة جلوبال فيرتيليتي."
                 : "The Fertility & Women's Health Center. Part of Global Fertility Network."}
@@ -36,10 +36,10 @@ const Footer: FC = () => {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-white">
+            <h3 className="font-semibold text-white dark:text-gray-100">
               {locale === "ar" ? "روابط سريعة" : "Quick Links"}
             </h3>
-            <ul className="space-y-2 text-sm text-white/70">
+            <ul className="space-y-2 text-sm text-white/70 dark:text-gray-400">
               <li>
                 <Link href="/" className="hover:text-bnoon-teal transition-colors">
                   {locale === "ar" ? "الرئيسية" : "Home"}
@@ -60,10 +60,10 @@ const Footer: FC = () => {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-white">
+            <h3 className="font-semibold text-white dark:text-gray-100">
               {locale === "ar" ? "تواصل معنا" : "Contact Us"}
             </h3>
-            <ul className="space-y-2 text-sm text-white/70">
+            <ul className="space-y-2 text-sm text-white/70 dark:text-gray-400">
               <li>
                 <a href="tel:+966114448080" className="hover:text-bnoon-teal transition-colors" dir="ltr">
                   +966 11 444 8080
@@ -74,7 +74,7 @@ const Footer: FC = () => {
                   info@bnoon.sa
                 </a>
               </li>
-              <li className="text-white/50">
+              <li className="text-white/50 dark:text-gray-500">
                 {locale === "ar" ? "الرياض - جدة - المملكة العربية السعودية" : "Riyadh - Jeddah - Saudi Arabia"}
               </li>
             </ul>
@@ -84,7 +84,7 @@ const Footer: FC = () => {
                 href="https://www.instagram.com/bnoon.sa"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-bnoon-teal transition-colors"
+                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-full flex items-center justify-center hover:bg-bnoon-teal dark:hover:bg-bnoon-teal transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -95,7 +95,7 @@ const Footer: FC = () => {
                 href="https://www.linkedin.com/company/bnoon"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-bnoon-teal transition-colors"
+                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-full flex items-center justify-center hover:bg-bnoon-teal dark:hover:bg-bnoon-teal transition-colors"
                 aria-label="LinkedIn"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -107,11 +107,11 @@ const Footer: FC = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/50">
+        <div className="mt-12 pt-8 border-t border-white/10 dark:border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-white/50 dark:text-gray-500">
             © {currentYear} Bnoon. {locale === "ar" ? "جميع الحقوق محفوظة." : "All rights reserved."}
           </p>
-          <p className="text-xs text-white/50">
+          <p className="text-xs text-white/50 dark:text-gray-500">
             {locale === "ar"
               ? "جزء من شبكة جلوبال فيرتيليتي (GFN)"
               : "Part of Global Fertility Network (GFN)"}

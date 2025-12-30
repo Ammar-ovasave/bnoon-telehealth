@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import useSWR from "swr";
 
 export interface UserPreferencesData {
-  mrn: string;
+  phoneNumber: string;
   defaultBranchId: ClinicBranchID | null;
   createdAt: string | null;
   updatedAt: string | null;

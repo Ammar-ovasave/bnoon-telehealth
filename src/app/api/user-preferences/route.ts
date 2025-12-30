@@ -10,24 +10,25 @@ import { ClinicBranchID, clinicLocations } from "@/models/ClinicModel";
 /**
  * GET /api/user-preferences
  * Fetch the current user's preferences (including default branch)
+ * Uses phone number as the unique identifier across all branches
  */
 export async function GET() {
   try {
     const currentUser = await getCurrentUser();
 
-    if (!currentUser?.mrn) {
+    if (!currentUser?.contactNumber) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const preferences = await getUserPreferences(currentUser.mrn);
+    const preferences = await getUserPreferences(currentUser.contactNumber);
 
     if (!preferences) {
       // Return empty preferences if none exist
       return NextResponse.json({
-        mrn: currentUser.mrn,
+        phoneNumber: currentUser.contactNumber,
         defaultBranchId: null,
         createdAt: null,
         updatedAt: null,
@@ -47,12 +48,13 @@ export async function GET() {
 /**
  * PATCH /api/user-preferences
  * Update user preferences (set/clear default branch)
+ * Uses phone number as the unique identifier across all branches
  */
 export async function PATCH(request: NextRequest) {
   try {
     const currentUser = await getCurrentUser();
 
-    if (!currentUser?.mrn) {
+    if (!currentUser?.contactNumber) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -75,16 +77,16 @@ export async function PATCH(request: NextRequest) {
 
     // Update or clear the default branch
     if (defaultBranchId === null) {
-      await clearDefaultBranch(currentUser.mrn);
+      await clearDefaultBranch(currentUser.contactNumber);
       return NextResponse.json({
-        mrn: currentUser.mrn,
+        phoneNumber: currentUser.contactNumber,
         defaultBranchId: null,
         message: "Default branch cleared",
       });
     }
 
     const updatedPreferences = await setDefaultBranch(
-      currentUser.mrn,
+      currentUser.contactNumber,
       defaultBranchId
     );
 

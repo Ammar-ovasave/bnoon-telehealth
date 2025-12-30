@@ -381,7 +381,7 @@ export default function SelectDateAndTimePage() {
         )}
 
         {/* Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm p-4 border-t border-gray-100 dark:border-gray-800 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm p-4 border-t border-gray-100 dark:border-gray-800 shadow-lg">
           <div className="flex flex-col-reverse md:flex-row gap-4 justify-between max-w-6xl mx-auto">
             <Button onClick={handleBack} variant="outline" size="lg" className="w-full md:w-auto dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
               <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}

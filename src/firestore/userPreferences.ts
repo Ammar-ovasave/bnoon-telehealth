@@ -5,25 +5,34 @@ import { Timestamp } from "firebase-admin/firestore";
 const COLLECTION_NAME = "userPreferences";
 
 export interface UserPreferences {
-  mrn: string;
+  phoneNumber: string;
   defaultBranchId: ClinicBranchID | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
 
 export interface UserPreferencesResponse {
-  mrn: string;
+  phoneNumber: string;
   defaultBranchId: ClinicBranchID | null;
   createdAt: string;
   updatedAt: string;
 }
 
 /**
- * Get user preferences by MRN
+ * Normalize phone number for consistent storage
+ * Removes spaces, dashes, and ensures consistent format
  */
-export async function getUserPreferences(mrn: string): Promise<UserPreferencesResponse | null> {
+function normalizePhoneNumber(phone: string): string {
+  return phone.replace(/[\s\-()]/g, "");
+}
+
+/**
+ * Get user preferences by phone number
+ */
+export async function getUserPreferences(phoneNumber: string): Promise<UserPreferencesResponse | null> {
   try {
-    const docRef = db.collection(COLLECTION_NAME).doc(mrn);
+    const normalizedPhone = normalizePhoneNumber(phoneNumber);
+    const docRef = db.collection(COLLECTION_NAME).doc(normalizedPhone);
     const doc = await docRef.get();
 
     if (!doc.exists) {
@@ -32,7 +41,7 @@ export async function getUserPreferences(mrn: string): Promise<UserPreferencesRe
 
     const data = doc.data() as UserPreferences;
     return {
-      mrn: data.mrn,
+      phoneNumber: data.phoneNumber,
       defaultBranchId: data.defaultBranchId,
       createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
       updatedAt: data.updatedAt?.toDate().toISOString() || new Date().toISOString(),
@@ -47,10 +56,11 @@ export async function getUserPreferences(mrn: string): Promise<UserPreferencesRe
  * Set or update the user's default branch
  */
 export async function setDefaultBranch(
-  mrn: string,
+  phoneNumber: string,
   branchId: ClinicBranchID
 ): Promise<UserPreferencesResponse> {
-  const docRef = db.collection(COLLECTION_NAME).doc(mrn);
+  const normalizedPhone = normalizePhoneNumber(phoneNumber);
+  const docRef = db.collection(COLLECTION_NAME).doc(normalizedPhone);
   const now = Timestamp.now();
 
   const existingDoc = await docRef.get();
@@ -64,7 +74,7 @@ export async function setDefaultBranch(
   } else {
     // Create new preferences document
     const newPreferences: UserPreferences = {
-      mrn,
+      phoneNumber: normalizedPhone,
       defaultBranchId: branchId,
       createdAt: now,
       updatedAt: now,
@@ -73,7 +83,7 @@ export async function setDefaultBranch(
   }
 
   return {
-    mrn,
+    phoneNumber: normalizedPhone,
     defaultBranchId: branchId,
     createdAt: existingDoc.exists
       ? (existingDoc.data() as UserPreferences).createdAt?.toDate().toISOString()
@@ -85,8 +95,9 @@ export async function setDefaultBranch(
 /**
  * Clear the user's default branch
  */
-export async function clearDefaultBranch(mrn: string): Promise<void> {
-  const docRef = db.collection(COLLECTION_NAME).doc(mrn);
+export async function clearDefaultBranch(phoneNumber: string): Promise<void> {
+  const normalizedPhone = normalizePhoneNumber(phoneNumber);
+  const docRef = db.collection(COLLECTION_NAME).doc(normalizedPhone);
   const doc = await docRef.get();
 
   if (doc.exists) {
@@ -100,7 +111,7 @@ export async function clearDefaultBranch(mrn: string): Promise<void> {
 /**
  * Check if user has a default branch set
  */
-export async function hasDefaultBranch(mrn: string): Promise<boolean> {
-  const prefs = await getUserPreferences(mrn);
+export async function hasDefaultBranch(phoneNumber: string): Promise<boolean> {
+  const prefs = await getUserPreferences(phoneNumber);
   return prefs?.defaultBranchId != null;
 }

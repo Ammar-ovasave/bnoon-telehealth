@@ -189,7 +189,7 @@ export default function ManageAppointmentPageContent() {
                 </div>
                 <h3 className="mb-3 text-xl font-bold text-bnoon-navy dark:text-white">{t("noAppointmentsFound.title")}</h3>
                 <p className="mb-8 text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noAppointmentsFound.description")}</p>
-                <Link href="/">
+                <Link href="/interest">
                   <Button size="lg" className="w-full">
                     <Plus className="w-4 h-4" />
                     {t("buttons.bookNewAppointment")}
@@ -216,7 +216,7 @@ export default function ManageAppointmentPageContent() {
         {/* Book New Appointment */}
         {(currentUserAppointmentsData?.length ?? 0) > 0 && (
           <div className="mt-10 text-center animate-fade-in-up animation-delay-300">
-            <Link href="/">
+            <Link href="/interest">
               <Button size="lg" className="px-8">
                 <Plus className="w-4 h-4" />
                 {t("buttons.bookAnotherAppointment")}

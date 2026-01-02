@@ -1,3 +1,9 @@
+## [1.0.0-staging.4](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/compare/v1.0.0-staging.3...v1.0.0-staging.4) (2026-01-02)
+
+### 🐛 Bug Fixes
+
+* allow .next directory in Docker build context ([b1c56cb](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/b1c56cb0de42f9dfa089e9391273fa482f8459ff))
+
 ## [1.0.0-staging.3](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/compare/v1.0.0-staging.2...v1.0.0-staging.3) (2026-01-02)
 
 ### ✨ Features

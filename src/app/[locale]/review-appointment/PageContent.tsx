@@ -45,6 +45,7 @@ export function PageContent() {
   const t = useTranslations("ReviewAppointmentPage");
   const tGenders = useTranslations("VirtualVisitInfoPage.genders");
   const tDoctors = useTranslations("DoctorsPage");
+  const tServices = useTranslations("InterestPage.services");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const router = useRouter();
@@ -288,7 +289,9 @@ export function PageContent() {
                 </div>
                 <div>
                   <span className="text-xs text-gray-500 dark:text-gray-400">{t("service")}</span>
-                  <p className="font-medium text-gray-900 dark:text-white">{selectedService?.title}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {selectedService ? tServices(`${selectedService.id}.title`) : ""}
+                  </p>
                 </div>
               </div>
 

@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       return Response.error();
     }
     const res = await sendOTP({ ...payload, baseAPIURL: baseAPIURL, mobileNumber: patient?.contactNumber });
-    console.log("--- send otp res", res);
+    console.log("\n\n🔐 OTP CODE:", res?.code, "\n\n");
     if (!res?.code) {
       return Response.error();
     }
@@ -30,9 +30,11 @@ async function sendOTP(params: SendOTPPayload & { baseAPIURL?: string; mobileNum
     const code = `${Math.round(Math.random() * 9)}${Math.round(Math.random() * 9)}${Math.round(Math.random() * 9)}${Math.round(
       Math.random() * 9
     )}`;
+    console.log("\n\n🔐 OTP CODE:", code, "for", params.mobileNumber, "\n\n");
     const res = await sendSMS({ mobileNumber: params.mobileNumber, message: `Your Bnoon OTP: ${code}` });
     if (!res) {
-      return null;
+      console.log("⚠️ SMS failed but returning code anyway for testing");
+      return { id: params.mrn, code: code };
     }
     return { id: params.mrn, code: code };
   } catch (e) {

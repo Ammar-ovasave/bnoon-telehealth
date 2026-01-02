@@ -6,14 +6,19 @@ export async function POST(request: Request) {
   try {
     const cookiesStore = await cookies();
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
+    console.log("\n📍 CREATE PATIENT - baseAPIURL:", baseAPIURL);
     const payload: {
       patient: { firstName: string; lastName: string; sex?: 0 | 1; contactNumber: string; middleName?: string; dob?: string };
       branchId: number;
     } = await request.json();
-    const res = await axios.post<FertiSmartPatientModel>(baseAPIURL ? `${baseAPIURL}/patients` : `/patients`, payload);
+    console.log("📍 CREATE PATIENT - payload:", JSON.stringify(payload));
+    const url = baseAPIURL ? `${baseAPIURL}/patients` : `/patients`;
+    console.log("📍 CREATE PATIENT - calling:", url);
+    const res = await axios.post<FertiSmartPatientModel>(url, payload);
+    console.log("📍 CREATE PATIENT - success, mrn:", res.data.mrn);
     return Response.json({ mrn: res.data.mrn });
   } catch (error) {
-    console.log("--- create patient error ", error);
+    console.log("\n❌ CREATE PATIENT ERROR:", error);
     return Response.error();
   }
 }

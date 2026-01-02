@@ -16,11 +16,11 @@ const Footer: FC = () => {
           {/* Brand Section */}
           <div className="space-y-4">
             <Image
-              src="/images/bnoon-logo.svg"
+              src="/images/bnoon-logo-white.svg"
               alt="Bnoon - بنون"
               width={120}
               height={50}
-              className="h-10 w-auto brightness-0 invert dark:brightness-100 dark:invert-0"
+              className="h-10 w-auto"
             />
             <p className="text-sm text-white/80 dark:text-gray-400 leading-relaxed">
               {locale === "ar"

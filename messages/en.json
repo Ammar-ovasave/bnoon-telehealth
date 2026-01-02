@@ -283,6 +283,9 @@
     "title": "Your Appointment is Confirmed!",
     "description": "Your appointment has been successfully booked and confirmed. You will receive a confirmation email or SMS shortly with all the details.",
     "confirmationNumber": "Confirmation Number",
+    "copyConfirmation": "Copy confirmation number",
+    "confirmationCopied": "Confirmation number copied!",
+    "copyFailed": "Failed to copy",
     "appointmentDetails": {
       "title": "Appointment Details",
       "dateTime": "Date & Time",
@@ -306,6 +309,8 @@
     "nextSteps": {
       "title": "What's Next?",
       "confirmationMessage": "You will receive a confirmation email or SMS with your appointment details.",
+      "confirmationMessageVirtual": "You will receive a confirmation email and SMS with your appointment details and meeting link.",
+      "confirmationMessageClinic": "You will receive a confirmation SMS with your appointment details.",
       "virtualTitle": "For Virtual Visits",
       "virtualTip1": "You'll receive a meeting link with your confirmation email.",
       "virtualTip2": "Ensure stable internet and test your camera/microphone.",

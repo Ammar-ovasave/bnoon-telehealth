@@ -1,11 +1,11 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, User, Mail, Globe, Users, CreditCard, CalendarDays, Sparkles, Video, Building } from "lucide-react";
+import { CheckCircle, User, Mail, Globe, Users, CreditCard, CalendarDays, Sparkles, Video, Building, Copy, Check } from "lucide-react";
 import Link from "next/link";
 import { clinicLocations } from "@/models/ClinicModel";
 import { services } from "@/models/ServiceModel";
-import { FC, useMemo } from "react";
+import { FC, useMemo, useState, useCallback } from "react";
 import { doctors } from "@/models/DoctorModel";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { format } from "date-fns";
@@ -18,6 +18,7 @@ import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { getDoctorName } from "@/lib/getDoctorName";
+import { toast } from "sonner";
 
 export const PageContent: FC = () => {
   const t = useTranslations("AppointmentConfirmationPage");
@@ -28,10 +29,24 @@ export const PageContent: FC = () => {
   const searchParams = useSearchParams();
 
   const appointmentId = searchParams.get("appointmentId");
-  const selectedVisitType = searchParams.get("selectedVisitType") || "-";
+  const selectedVisitType = searchParams.get("visitType") || searchParams.get("selectedVisitType") || "-";
   const selectedDoctor = searchParams.get("selectedDoctor") || "-";
   const selectedService = searchParams.get("selectedService") || "-";
   const selectedClinicLocation = searchParams.get("selectedClinicLocation") || "-";
+
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyConfirmation = useCallback(async () => {
+    if (!appointmentId) return;
+    try {
+      await navigator.clipboard.writeText(appointmentId);
+      setCopied(true);
+      toast.success(t("confirmationCopied"));
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error(t("copyFailed"));
+    }
+  }, [appointmentId, t]);
 
   const { data: countriesData, isLoading: loadingCountries } = useFertiSmartCountries();
 
@@ -143,6 +158,17 @@ export const PageContent: FC = () => {
                 <p className="text-xs text-bnoon-teal font-medium">{t("confirmationNumber")}</p>
                 <p className="text-lg font-bold text-bnoon-navy dark:text-white">{confirmationNumber}</p>
               </div>
+              <button
+                onClick={handleCopyConfirmation}
+                className="p-2 rounded-lg hover:bg-bnoon-teal/20 active:scale-95 transition-all cursor-pointer"
+                title={t("copyConfirmation")}
+              >
+                {copied ? (
+                  <Check className="w-5 h-5 text-green-600" />
+                ) : (
+                  <Copy className="w-5 h-5 text-bnoon-teal" />
+                )}
+              </button>
             </div>
           </div>
 
@@ -250,16 +276,18 @@ export const PageContent: FC = () => {
           <div className="mt-8 animate-fade-in-up animation-delay-300">
             <h3 className="text-lg font-bold text-bnoon-navy dark:text-white mb-4">{t("nextSteps.title")}</h3>
 
-            {/* General confirmation message */}
+            {/* General confirmation message - varies by visit type */}
             <div className="p-4 bg-gradient-to-r from-bnoon-teal/10 to-cyan-500/10 dark:from-bnoon-teal/20 dark:to-cyan-500/20 rounded-xl border border-bnoon-teal/20 dark:border-bnoon-teal/30 mb-4">
               <p className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
                 <span className="w-2 h-2 bg-bnoon-teal rounded-full mt-1.5 flex-shrink-0" />
-                {t("nextSteps.confirmationMessage")}
+                {selectedVisitType === "virtual"
+                  ? t("nextSteps.confirmationMessageVirtual")
+                  : t("nextSteps.confirmationMessageClinic")}
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Virtual Visit Tips */}
+            {/* Show tips based on visit type */}
+            {selectedVisitType === "virtual" ? (
               <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
@@ -278,8 +306,7 @@ export const PageContent: FC = () => {
                   </li>
                 </ul>
               </div>
-
-              {/* In-Person Visit Tips */}
+            ) : (
               <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center">
@@ -298,7 +325,7 @@ export const PageContent: FC = () => {
                   </li>
                 </ul>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Action Buttons */}

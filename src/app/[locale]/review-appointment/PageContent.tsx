@@ -45,7 +45,7 @@ export function PageContent() {
   const t = useTranslations("ReviewAppointmentPage");
   const tGenders = useTranslations("VirtualVisitInfoPage.genders");
   const tDoctors = useTranslations("DoctorsPage");
-  const tServices = useTranslations("InterestPage.services");
+  const tServices = useTranslations("ServicesPage.services");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const router = useRouter();

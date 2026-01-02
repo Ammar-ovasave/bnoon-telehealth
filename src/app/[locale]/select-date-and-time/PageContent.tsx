@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { ArrowLeft, ArrowRight, MapPin, Video, CalendarDays, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, Clock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { add, addMonths, format } from "date-fns";
@@ -263,21 +263,13 @@ export default function SelectDateAndTimePage() {
                       key={slot.start}
                       onClick={() => handleTimeSlotSelect(slot.start ?? "")}
                       className={cn(
-                        "p-3 rounded-xl relative border-2 text-sm font-semibold transition-all duration-200 cursor-pointer",
+                        "p-3 rounded-xl border-2 text-sm font-semibold transition-all duration-200 cursor-pointer",
                         selectedTimeSlot === slot.start
                           ? "bg-bnoon-teal text-white border-bnoon-teal shadow-lg shadow-bnoon-teal/20"
                           : "bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-bnoon-navy dark:text-white hover:border-bnoon-teal/50 hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10"
                       )}
                     >
                       {format(slot.start ?? new Date().toISOString(), "hh:mm aa", { locale: dateFnsLocale })}
-                      <div
-                        className={cn(
-                          "absolute top-[-8px] right-[-8px] p-1.5 rounded-full",
-                          selectedTimeSlot === slot.start ? "bg-white text-bnoon-teal" : "bg-bnoon-teal text-white"
-                        )}
-                      >
-                        {selectedVisitType === "clinic" ? <MapPin className="h-3 w-3" /> : <Video className="h-3 w-3" />}
-                      </div>
                     </button>
                   ))
                 ) : (

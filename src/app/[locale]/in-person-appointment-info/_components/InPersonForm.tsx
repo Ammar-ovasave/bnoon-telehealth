@@ -24,15 +24,12 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
   const t = useTranslations("InPersonAppointmentInfoPage");
   const { data: patientData } = useFertiSmartPatient();
 
-  // Check if user is registered (has existing profile with identity data)
-  // Registered users should not be able to edit their identity fields
+  // Check if user is registered (has existing profile with name)
+  // Registered users should not be able to edit their name
   const isRegisteredUser = useMemo(() => {
-    return !!(
-      patientData?.identityId &&
-      patientData?.nationality?.name &&
-      patientData?.sex !== undefined
-    );
-  }, [patientData?.identityId, patientData?.nationality?.name, patientData?.sex]);
+    const hasName = !!(patientData?.firstName && patientData.firstName !== "-");
+    return hasName;
+  }, [patientData?.firstName]);
 
   const [formData, setFormData] = useState<FormData>(defaultValus);
   const [errors, setErrors] = useState<FormErrors>({});

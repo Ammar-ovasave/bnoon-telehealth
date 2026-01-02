@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FC, useCallback, useState } from "react";
 import { logout } from "@/services/client";
 import { Spinner } from "./ui/spinner";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import useCurrentBranch from "@/hooks/useCurrentBranch";
 import { Badge } from "./ui/badge";
 import { useTranslations, useLocale } from "next-intl";
@@ -38,7 +38,15 @@ function NavHeader() {
               alt="Bnoon - بنون"
               width={120}
               height={50}
-              className="h-9 md:h-10 w-auto dark:brightness-110"
+              className="h-9 md:h-10 w-auto dark:hidden"
+              priority
+            />
+            <Image
+              src="/images/bnoon-logo-white.svg"
+              alt="Bnoon - بنون"
+              width={120}
+              height={50}
+              className="h-9 md:h-10 w-auto hidden dark:block"
               priority
             />
           </Link>
@@ -175,12 +183,20 @@ function NavHeader() {
 
 const LanguageSwitcher: FC = () => {
   const locale = useLocale();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const otherLocale = locale === "ar" ? "en" : "ar";
   const label = locale === "ar" ? "EN" : "عربي";
 
+  // Build the URL with the other locale
+  // Remove the current locale prefix and add the new one
+  const pathWithoutLocale = pathname.replace(/^\/(en|ar)/, "");
+  const queryString = searchParams.toString();
+  const newUrl = `/${otherLocale}${pathWithoutLocale}${queryString ? `?${queryString}` : ""}`;
+
   return (
     <Link
-      href={`/${otherLocale}`}
+      href={newUrl}
       className="px-3 py-1.5 text-sm font-medium text-bnoon-navy dark:text-white border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
     >
       {label}

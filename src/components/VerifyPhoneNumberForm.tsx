@@ -65,19 +65,21 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
       return;
     }
     setIsLoading(true);
-    const existingPatients = await getPatientsByPhoneNumber({ phoneNumber: fullPhoneNumber });
+    const allPatients = await getPatientsByPhoneNumber({ phoneNumber: fullPhoneNumber });
+    // Filter out patients with empty mrn
+    const existingPatients = allPatients?.filter((p) => p.mrn && p.mrn.trim() !== "") ?? [];
     const createPatientResponse = currentUserData?.mrn
       ? { mrn: currentUserData.mrn }
-      : (existingPatients?.length ?? 0) > 0
-      ? existingPatients?.[0]
+      : existingPatients.length > 0
+      ? existingPatients[0]
       : await createPatient({
           branchId: selectedBranch.id ?? 0,
           patient: { contactNumber: fullPhoneNumber, firstName: "-", lastName: "-", middleName: "-" },
         });
     const mrnToUse = currentUserData?.mrn
       ? currentUserData.mrn
-      : (existingPatients?.length ?? 0) > 0
-      ? existingPatients?.[0].mrn
+      : existingPatients.length > 0
+      ? existingPatients[0].mrn
       : createPatientResponse?.mrn;
     if (!mrnToUse) {
       setIsLoading(false);

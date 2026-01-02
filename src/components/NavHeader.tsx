@@ -31,24 +31,16 @@ function NavHeader() {
     <header className="bg-white dark:bg-gray-900 sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo & Brand Descriptor */}
-          <Link href={"/"} className="flex items-center gap-3">
+          {/* Logo */}
+          <Link href={"/"} className="flex items-center">
             <Image
               src="/images/bnoon-logo.svg"
               alt="Bnoon - بنون"
-              width={140}
-              height={58}
-              className="h-10 md:h-12 w-auto dark:brightness-110"
+              width={120}
+              height={50}
+              className="h-9 md:h-10 w-auto dark:brightness-110"
               priority
             />
-            <div className="hidden lg:block border-l border-gray-200 dark:border-gray-700 pl-3">
-              <p className="text-[10px] leading-tight text-bnoon-navy dark:text-white font-medium">
-                {locale === "ar" ? "مركز الإخصاب وصحة المرأة" : "The Fertility & Women's Health Center"}
-              </p>
-              <p className="text-[9px] leading-tight text-gray-500 dark:text-gray-400">
-                {locale === "ar" ? "جزء من شبكة جلوبال فيرتيليتي" : "Part of Global Fertility Network"}
-              </p>
-            </div>
           </Link>
 
           {/* Desktop Navigation */}

@@ -45,9 +45,9 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
         key={clinic.id}
         onClick={handleSelectClinic}
         className={`
-          gap-0 cursor-pointer relative h-[420px] w-full 
+          gap-0 cursor-pointer relative h-[480px] w-full
           transition-all duration-500 ease-out
-          hover:shadow-2xl hover:-translate-y-2 
+          hover:shadow-2xl hover:-translate-y-2
           overflow-hidden p-0 border-0 group
           ${clinic.isCommingSoon ? "opacity-80" : ""}
           ${loadingSwitchBranch ? "pointer-events-none" : ""}
@@ -55,7 +55,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
         style={{ zIndex: 1 }}
       >
         {/* Image Container */}
-        <div className="relative h-56 overflow-hidden">
+        <div className="relative h-72 overflow-hidden">
           <Image
             src={clinic.imageSrc}
             alt={`${clinic.name} clinic`}

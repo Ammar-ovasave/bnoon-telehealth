@@ -27,7 +27,7 @@ const Footer: FC = () => {
                 ? "مركز الإخصاب وصحة المرأة. جزء من شبكة جلوبال فيرتيليتي."
                 : "The Fertility & Women's Health Center. Part of Global Fertility Network."}
             </p>
-            <p className="text-xs text-bnoon-teal font-medium">
+            <p className="text-xs text-white/60 font-medium">
               {locale === "ar"
                 ? "أكبر شبكة مستقلة لخدمات الإخصاب في المملكة العربية السعودية"
                 : "The largest stand-alone fertility services network in KSA"}
@@ -41,17 +41,17 @@ const Footer: FC = () => {
             </h3>
             <ul className="space-y-2 text-sm text-white/70 dark:text-gray-400">
               <li>
-                <Link href="/" className="hover:text-bnoon-teal transition-colors">
+                <Link href="/" className="hover:text-white transition-colors">
                   {locale === "ar" ? "الرئيسية" : "Home"}
                 </Link>
               </li>
               <li>
-                <Link href="/manage-appointments" className="hover:text-bnoon-teal transition-colors">
+                <Link href="/manage-appointments" className="hover:text-white transition-colors">
                   {locale === "ar" ? "مواعيدي" : "My Appointments"}
                 </Link>
               </li>
               <li>
-                <a href="https://bnoon.sa" target="_blank" rel="noopener noreferrer" className="hover:text-bnoon-teal transition-colors">
+                <a href="https://bnoon.sa" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                   {locale === "ar" ? "زيارة الموقع الرئيسي" : "Visit Main Website"}
                 </a>
               </li>
@@ -65,12 +65,12 @@ const Footer: FC = () => {
             </h3>
             <ul className="space-y-2 text-sm text-white/70 dark:text-gray-400">
               <li>
-                <a href="tel:+966114448080" className="hover:text-bnoon-teal transition-colors" dir="ltr">
+                <a href="tel:+966114448080" className="hover:text-white transition-colors" dir="ltr">
                   +966 11 444 8080
                 </a>
               </li>
               <li>
-                <a href="mailto:info@bnoon.sa" className="hover:text-bnoon-teal transition-colors">
+                <a href="mailto:info@bnoon.sa" className="hover:text-white transition-colors">
                   info@bnoon.sa
                 </a>
               </li>
@@ -84,7 +84,7 @@ const Footer: FC = () => {
                 href="https://www.instagram.com/bnoon.sa"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-full flex items-center justify-center hover:bg-bnoon-teal dark:hover:bg-bnoon-teal transition-colors"
+                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-full flex items-center justify-center hover:bg-white/25 transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -95,7 +95,7 @@ const Footer: FC = () => {
                 href="https://www.linkedin.com/company/bnoon"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-full flex items-center justify-center hover:bg-bnoon-teal dark:hover:bg-bnoon-teal transition-colors"
+                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-full flex items-center justify-center hover:bg-white/25 transition-colors"
                 aria-label="LinkedIn"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

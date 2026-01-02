@@ -4,7 +4,7 @@ import { groupClinicsByCity } from "@/models/ClinicModel";
 import ClinicCard from "@/components/ClinicCard";
 import LoadingPage from "./loading";
 import { useTranslations, useLocale } from "next-intl";
-import { Heart, Users, Shield, Sparkles } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 export default function Home() {
   const t = useTranslations("HomePage");
@@ -20,93 +20,22 @@ export default function Home() {
     return Object.values(clinicsByCity).flat();
   }, [clinicsByCity]);
 
-  const features = [
-    {
-      icon: Heart,
-      title: locale === "ar" ? "رعاية متخصصة" : "Expert Care",
-      description: locale === "ar" ? "فريق من أفضل الأطباء المتخصصين" : "Team of top specialized doctors",
-    },
-    {
-      icon: Users,
-      title: locale === "ar" ? "دعم متكامل" : "Complete Support",
-      description: locale === "ar" ? "نرافقكم في كل خطوة" : "We accompany you every step",
-    },
-    {
-      icon: Shield,
-      title: locale === "ar" ? "خصوصية تامة" : "Complete Privacy",
-      description: locale === "ar" ? "سرية وأمان معلوماتكم" : "Your information is secure",
-    },
-  ];
-
   return (
-    <div className="bg-gradient-to-b from-white via-bnoon-light to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Decorative Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-bnoon-navy/5 dark:bg-bnoon-teal/5 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
-          {/* Header Content */}
-          <div className="text-center mb-12 md:mb-16 animate-fade-in-up">
-            {/* Brand Tagline Badge */}
-            <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <span>{locale === "ar" ? "مستقبل الخصوبة هنا" : "The Future of Fertility is Here"}</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-bnoon-navy dark:text-white mb-6 leading-tight">
-              {locale === "ar" ? "نساعدك في بناء المستقبل الذي تستحقه" : "Helping You Build the Future You Deserve"}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      {/* Booking Interface - Clinic Selection */}
+      <section className="relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+          {/* Action Header */}
+          <div className="flex items-center justify-center gap-2 mb-6 md:mb-8">
+            <MapPin className="w-5 h-5 text-bnoon-navy dark:text-white" />
+            <h1 className="text-lg md:text-xl font-semibold text-bnoon-navy dark:text-white">
+              {locale === "ar" ? "اختر المركز" : "Select a Center"}
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-4">
-              {locale === "ar" 
-                ? "الجيل القادم من رعاية الخصوبة—حيث يجتمع العلم المتقدم والتكنولوجيا الذكية والتعاطف والخبرة لمنح كل عائلة أفضل بداية ممكنة."
-                : "The next generation of fertility care—where advanced science, smart technology, compassion and expertise come together to give every family the best possible start."}
-            </p>
-            {/* Secondary Tagline */}
-            <p className="text-sm text-bnoon-teal font-semibold">
-              {locale === "ar" ? "أكثر من ٢٠ عامًا من الرعاية الموثوقة • أكثر من ٥٠٠٠ عائلة سعيدة سنويًا" : "20+ Years of Trusted Care • 5,000+ Happy Families Annually"}
-            </p>
           </div>
 
-          {/* Features Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-12 md:mb-16">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className={`flex items-center gap-4 bg-white dark:bg-gray-800 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 animate-fade-in-up animation-delay-${(index + 1) * 100}`}
-              >
-                <div className="flex-shrink-0 w-12 h-12 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
-                  <feature.icon className="w-6 h-6 text-bnoon-teal" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-bnoon-navy dark:text-white text-sm md:text-base">{feature.title}</h3>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm">{feature.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Clinics Section - Fixed Grid Layout */}
-      <section className="relative pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold text-bnoon-navy dark:text-white mb-3">
-              {locale === "ar" ? "مراكزنا" : "Our Centers"}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              {locale === "ar" 
-                ? "اختر المركز الأقرب إليك لبدء رحلتك نحو تحقيق حلم الأبوة والأمومة"
-                : "Choose the center closest to you to start your journey towards parenthood"}
-            </p>
-          </div>
-
-          {/* Fixed Grid - All Clinics */}
+          {/* Clinics Grid - Primary Content */}
           <Suspense fallback={<LoadingPage />}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
               {allClinics.map((clinic, index) => (
                 <div
                   key={clinic.id}
@@ -119,51 +48,19 @@ export default function Home() {
           </Suspense>
 
           {/* City Labels */}
-          <div className="mt-12 flex flex-wrap justify-center gap-4">
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
             {Object.entries(clinicsByCity).map(([city, clinics]) => (
               <div
                 key={city}
-                className="flex items-center gap-2 bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm border border-gray-100 dark:border-gray-700"
+                className="flex items-center gap-1.5 bg-white dark:bg-gray-800 px-2.5 py-1 rounded-full shadow-sm border border-gray-200 dark:border-gray-700"
               >
-                <div className="w-2 h-2 bg-bnoon-teal rounded-full" />
-                <span className="text-sm font-medium text-bnoon-navy dark:text-white">{getTranslatedCity(city)}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
-                  {clinics.length}
+                <div className="w-1.5 h-1.5 bg-bnoon-navy rounded-full" />
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{getTranslatedCity(city)}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  ({clinics.length})
                 </span>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom CTA Section */}
-      <section className="bg-gradient-to-r from-bnoon-teal to-bnoon-navy py-12 md:py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <Sparkles className="w-4 h-4" />
-            <span>{locale === "ar" ? "رعاية خصوبة عالمية المستوى، متاحة الآن محليًا" : "World-Class Fertility Care, Available Now Locally"}</span>
-          </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            {locale === "ar" ? "كبّر عائلتك مع بنون" : "Grow Your Family with Bnoon"}
-          </h2>
-          <p className="text-white/90 text-base md:text-lg mb-8">
-            {locale === "ar"
-              ? "نحول الأمل إلى بدايات جديدة. فريقنا المتخصص جاهز لمرافقتك في كل خطوة."
-              : "Turning hope into new beginnings. Our specialized team is ready to accompany you every step of the way."}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a
-              href="tel:+966114448080"
-              className="inline-flex items-center gap-2 bg-white text-bnoon-teal px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-            >
-              <span dir="ltr">+966 11 444 8080</span>
-            </a>
-            <a
-              href="mailto:info@bnoon.sa"
-              className="inline-flex items-center gap-2 bg-white/20 text-white px-8 py-3 rounded-full font-semibold hover:bg-white/30 transition-all duration-300"
-            >
-              info@bnoon.sa
-            </a>
           </div>
         </div>
       </section>

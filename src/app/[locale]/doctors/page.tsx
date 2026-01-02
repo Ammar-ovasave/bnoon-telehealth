@@ -10,6 +10,7 @@ import DoctorCard from "@/components/DoctorCard";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
@@ -202,32 +203,60 @@ export default function DoctorsListPage() {
 
           {/* Doctors Grid - Always Visible */}
           <div className="animate-fade-in-up animation-delay-300">
-            {doctors.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {doctors.map((doctor, index) => (
-                  <div
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              layout
+            >
+              <AnimatePresence mode="popLayout">
+                {doctors.map((doctor) => (
+                  <motion.div
                     key={doctor.id}
-                    className={`animate-fade-in-up animation-delay-${(index % 6) * 100}`}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{
+                      opacity: 0,
+                      scale: 0.8,
+                      y: -20,
+                      transition: { duration: 0.2, ease: "easeOut" }
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30,
+                      opacity: { duration: 0.2 }
+                    }}
                   >
                     <DoctorCard
                       doctor={doctor}
                       selectedDoctor={selectedDoctor}
                       setSelectedDoctor={handleDoctorChange}
                     />
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 max-w-md mx-auto">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Filter className="h-8 w-8 text-gray-400" />
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Empty State */}
+            <AnimatePresence>
+              {doctors.length === 0 && (
+                <motion.div
+                  className="text-center py-16"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 max-w-md mx-auto">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <Filter className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-bnoon-navy dark:text-white mb-3">{t("noDoctorsFound.title")}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noDoctorsFound.description")}</p>
                   </div>
-                  <h3 className="text-xl font-bold text-bnoon-navy dark:text-white mb-3">{t("noDoctorsFound.title")}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noDoctorsFound.description")}</p>
-                </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Back Button */}

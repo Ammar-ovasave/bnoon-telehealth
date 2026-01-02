@@ -1,3 +1,13 @@
+## [1.0.0-staging.3](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/compare/v1.0.0-staging.2...v1.0.0-staging.3) (2026-01-02)
+
+### ✨ Features
+
+* update Dockerfile to match ovasave-portal pattern ([00fc3f8](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/00fc3f8fd227d9dc790eb206ab1090167ec3c0c0))
+
+### 🐛 Bug Fixes
+
+* rename Dockerfile stage to 'production' for pipeline compatibility ([7c777e5](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/7c777e5ae292d7631a2188b8f44c38396c929d93))
+
 ## [1.0.0-staging.2](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/compare/v1.0.0-staging.1...v1.0.0-staging.2) (2026-01-02)
 
 ### ✨ Features

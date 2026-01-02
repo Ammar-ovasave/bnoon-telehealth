@@ -34,7 +34,7 @@ export const clinicLocations: ClinicLocation[] = [
     city: "Riyadh",
     address: "King Salman Road",
     doctors: "18 specialists",
-    imageSrc: "/images/bnoon-north-riiyadh.jpg",
+    imageSrc: "/images/bnoon-north-riyadh.jpg",
     contactEmail: "info@bnoon.sa",
     contactNumber: "+966114448080",
     isCommingSoon: true,

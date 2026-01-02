@@ -3,7 +3,7 @@ node_modules
 npm-debug.log*
 
 # Next.js
-.next
+# NOTE: .next is NOT ignored - pipeline copies pre-built artifact here
 out
 
 # Testing

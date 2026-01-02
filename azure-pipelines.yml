@@ -1,0 +1,48 @@
+# ============================================
+# Bnoon Telehealth - Staging Pipeline
+# Deploys to staging slot on push to staging branch
+# ============================================
+
+trigger:
+  branches:
+    include:
+      - staging
+
+pr: none
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: ovasave/ci-cd-templates
+      ref: main
+
+extends:
+  template: pipelines/nextjs/trunk-staging.yml@templates
+  parameters:
+    # Docker Configuration
+    imageName: 'bnoon/telehealth/webapp'
+    registry: 'ovasavestage.azurecr.io'
+    dockerfile: 'Dockerfile'
+    dockerTarget: 'production'
+
+    # Deployment Configuration
+    webAppName: 'bnoon-telehealth'
+    resourceGroup: 'bnoon-telehealth-rg'
+    slotName: 'staging'
+    azureSubscription: 'ovasave-azure-arm'
+
+    # Build Configuration
+    # Firebase credentials needed at build time for Next.js
+    buildEnvVars:
+      FIREBASE_SERVICE_ACCOUNT: $(FIREBASE_SERVICE_ACCOUNT)
+
+    # Verification
+    enableVerification: true
+    serviceUrl: 'https://bnoon-telehealth-staging.azurewebsites.net/en'
+    verificationTimeout: 300
+
+    # Quality Gates (adjust as needed)
+    # Skip tests for now since no test files exist
+    testScript: 'echo "No tests configured"'
+    coverageThreshold: 0

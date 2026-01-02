@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, User, Mail, Globe, Users, CreditCard, CalendarDays, Sparkles } from "lucide-react";
+import { CheckCircle, User, Mail, Globe, Users, CreditCard, CalendarDays, Sparkles, Video, Building } from "lucide-react";
 import Link from "next/link";
 import { clinicLocations } from "@/models/ClinicModel";
 import { services } from "@/models/ServiceModel";
@@ -247,21 +247,57 @@ export const PageContent: FC = () => {
           </div>
 
           {/* Next Steps */}
-          <div className="mt-8 bg-gradient-to-r from-bnoon-teal/10 to-cyan-500/10 dark:from-bnoon-teal/20 dark:to-cyan-500/20 rounded-2xl p-6 border border-bnoon-teal/20 dark:border-bnoon-teal/30 animate-fade-in-up animation-delay-300">
+          <div className="mt-8 animate-fade-in-up animation-delay-300">
             <h3 className="text-lg font-bold text-bnoon-navy dark:text-white mb-4">{t("nextSteps.title")}</h3>
-            <div className="space-y-3 text-gray-700 dark:text-gray-300">
-              <p className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-bnoon-teal rounded-full mt-2 flex-shrink-0" />
+
+            {/* General confirmation message */}
+            <div className="p-4 bg-gradient-to-r from-bnoon-teal/10 to-cyan-500/10 dark:from-bnoon-teal/20 dark:to-cyan-500/20 rounded-xl border border-bnoon-teal/20 dark:border-bnoon-teal/30 mb-4">
+              <p className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                <span className="w-2 h-2 bg-bnoon-teal rounded-full mt-1.5 flex-shrink-0" />
                 {t("nextSteps.confirmationMessage")}
               </p>
-              <p className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-bnoon-teal rounded-full mt-2 flex-shrink-0" />
-                {t("nextSteps.virtualVisitMessage")}
-              </p>
-              <p className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-bnoon-teal rounded-full mt-2 flex-shrink-0" />
-                {t("nextSteps.inPersonVisitMessage")}
-              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Virtual Visit Tips */}
+              <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
+                    <Video className="h-4 w-4 text-blue-600 dark:text-blue-300" />
+                  </div>
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 text-sm">{t("nextSteps.virtualTitle")}</h4>
+                </div>
+                <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                    {t("nextSteps.virtualTip1")}
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5 flex-shrink-0" />
+                    {t("nextSteps.virtualTip2")}
+                  </li>
+                </ul>
+              </div>
+
+              {/* In-Person Visit Tips */}
+              <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center">
+                    <Building className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
+                  </div>
+                  <h4 className="font-semibold text-emerald-900 dark:text-emerald-100 text-sm">{t("nextSteps.clinicTitle")}</h4>
+                </div>
+                <ul className="space-y-2 text-sm text-emerald-800 dark:text-emerald-200">
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0" />
+                    {t("nextSteps.clinicTip1")}
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0" />
+                    {t("nextSteps.clinicTip2")}
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 

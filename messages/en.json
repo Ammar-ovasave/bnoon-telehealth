@@ -306,8 +306,12 @@
     "nextSteps": {
       "title": "What's Next?",
       "confirmationMessage": "You will receive a confirmation email or SMS with your appointment details.",
-      "virtualVisitMessage": "For virtual visits, you'll receive a meeting link with the confirmation email.",
-      "inPersonVisitMessage": "For in-person visits, please arrive 10 minutes early at the clinic location. Please bring your ID, passport copy and previous medical reports, if any."
+      "virtualTitle": "For Virtual Visits",
+      "virtualTip1": "You'll receive a meeting link with your confirmation email.",
+      "virtualTip2": "Ensure stable internet and test your camera/microphone.",
+      "clinicTitle": "For In-Person Visits",
+      "clinicTip1": "Please arrive 10 minutes early at the clinic.",
+      "clinicTip2": "Bring your ID, passport copy and any medical reports."
     },
     "buttons": {
       "manageAppointments": "Manage Appointments"
@@ -445,8 +449,16 @@
     "email": "Email",
     "nationality": "Nationality",
     "gender": "Gender",
-    "virtualNotice": "For virtual visits, you will receive a confirmation email with a meeting link to join your appointment.",
-    "clinicNotice": "Please arrive 10 minutes before your scheduled appointment. Bring your ID and any previous medical reports.",
+    "nextSteps": {
+      "virtualTitle": "Virtual Visit Tips",
+      "virtualTip1": "You will receive a confirmation email with a meeting link to join your appointment.",
+      "virtualTip2": "Ensure you have a stable internet connection and a quiet environment.",
+      "virtualTip3": "Test your camera and microphone before the appointment.",
+      "clinicTitle": "In-Person Visit Tips",
+      "clinicTip1": "Please arrive 10 minutes before your scheduled appointment.",
+      "clinicTip2": "Bring your ID, passport copy and any previous medical reports.",
+      "clinicTip3": "Wear comfortable clothing for your examination."
+    },
     "buttons": {
       "edit": "Edit Information",
       "confirm": "Confirm Appointment",

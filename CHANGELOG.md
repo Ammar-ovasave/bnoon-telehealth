@@ -1,3 +1,9 @@
+## [1.0.0-staging.2](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/compare/v1.0.0-staging.1...v1.0.0-staging.2) (2026-01-02)
+
+### ✨ Features
+
+* add Dockerfile for Azure deployment ([021a1d5](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/021a1d523dccb76ca21a7152fb6782e15cea4deb))
+
 ## 1.0.0-staging.1 (2026-01-02)
 
 ### ✨ Features

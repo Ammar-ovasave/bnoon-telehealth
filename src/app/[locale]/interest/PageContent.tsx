@@ -6,7 +6,7 @@ import ServiceCard from "@/components/ServiceCard";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Sparkles } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { doctors } from "@/models/DoctorModel";
 
@@ -29,10 +29,6 @@ export const PageContent: FC = () => {
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-5xl pb-24">
         {/* Header */}
         <div className="text-center mb-10 md:mb-12 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Sparkles className="w-4 h-4" />
-            <span>{locale === "ar" ? "خدماتنا" : "Our Services"}</span>
-          </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bnoon-navy dark:text-white mb-4 leading-tight">
             {t("title")}
           </h1>
@@ -52,8 +48,8 @@ export const PageContent: FC = () => {
             </p>
           </div>
         ) : (
-          <div className="flex flex-wrap justify-center gap-5 md:gap-6 animate-fade-in-up animation-delay-200">
-            {services
+          (() => {
+            const filteredServices = services
               .filter((service) => {
                 return servicesData?.some((s) => s.name?.toLocaleLowerCase().includes(service.title.toLocaleLowerCase()));
               })
@@ -62,16 +58,41 @@ export const PageContent: FC = () => {
                   return doc.services.some((s) => s === service.id) && doc.branchId === selectedClinicLocationId;
                 });
                 return hasDoctors;
-              })
-              .map((service, index) => (
-                <div
-                  key={service.id}
-                  className={`w-full sm:w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-2.5rem)/3)] animate-fade-in-up animation-delay-${(index % 6) * 100}`}
-                >
-                  <ServiceCard service={service} />
+              });
+
+            const row1Services = filteredServices.slice(0, 3);
+            const row2Services = filteredServices.slice(3);
+
+            return (
+              <div className="flex flex-col gap-5 md:gap-6 animate-fade-in-up animation-delay-200">
+                {/* Row 1: First 3 services */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
+                  {row1Services.map((service, index) => (
+                    <div
+                      key={service.id}
+                      className={`animate-fade-in-up animation-delay-${index * 100}`}
+                    >
+                      <ServiceCard service={service} />
+                    </div>
+                  ))}
                 </div>
-              ))}
-          </div>
+
+                {/* Row 2: Remaining services centered */}
+                {row2Services.length > 0 && (
+                  <div className="flex flex-col sm:flex-row justify-center gap-5 md:gap-6">
+                    {row2Services.map((service, index) => (
+                      <div
+                        key={service.id}
+                        className={`w-full sm:w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-1.5rem)/3)] animate-fade-in-up animation-delay-${(index + 3) * 100}`}
+                      >
+                        <ServiceCard service={service} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()
         )}
 
         {/* Back Button */}

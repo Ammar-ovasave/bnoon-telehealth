@@ -22,7 +22,7 @@ export const clinicLocations: ClinicLocation[] = [
     city: "Riyadh",
     address: "Granada District",
     doctors: "15 specialists",
-    imageSrc: "/images/bnoon-riyadh.jpg",
+    imageSrc: "/images/bnoon-riyadh.png",
     contactEmail: "info@bnoon.sa",
     contactNumber: "+966114448080",
     apiUrl: `https://unvaunted-weedily-jannie.ngrok-free.dev`,

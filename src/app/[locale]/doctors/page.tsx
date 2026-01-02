@@ -8,7 +8,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { AvailabilityFilter } from "@/models/VisitTypeModel";
 import DoctorCard from "@/components/DoctorCard";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
-import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 
@@ -50,28 +49,40 @@ export default function DoctorsListPage() {
         return matchBranch;
       })
       .filter((item) => {
+        // Filter by FertiSmart resources - only show doctors that exist in the system
+        return resourcesData?.some((resource) =>
+          resource.linkedUserFullName?.toLocaleLowerCase().includes(item.name.toLocaleLowerCase())
+        );
+      })
+      .filter((item) => {
+        // Filter by visit type availability - only show doctors available for selected visit type
+        if (!availabilityFilter) return true; // Show all if no filter selected
+        if (availabilityFilter === "clinic") return item.availability.clinic;
+        if (availabilityFilter === "virtual") return item.availability.virtual;
+        return true;
+      });
+  }, [resourcesData, searchParams, availabilityFilter]);
+
+  // Base doctors list (without visit type filter) for counting
+  const baseDoctors = useMemo(() => {
+    return fullDoctorsList
+      .filter((item) => {
+        const matchBranch = item.branchId === searchParams.get("selectedClinicLocation");
+        if (searchParams.get("selectedService")) {
+          return matchBranch && item.services.some((service) => service === searchParams.get("selectedService"));
+        }
+        return matchBranch;
+      })
+      .filter((item) => {
         return resourcesData?.some((resource) =>
           resource.linkedUserFullName?.toLocaleLowerCase().includes(item.name.toLocaleLowerCase())
         );
       });
   }, [resourcesData, searchParams]);
 
-  // Check if doctor is available for selected visit type
-  const isDoctorAvailable = (doctor: typeof doctors[0]) => {
-    if (!availabilityFilter) return false;
-    switch (availabilityFilter) {
-      case "clinic":
-        return doctor.availability.clinic;
-      case "virtual":
-        return doctor.availability.virtual;
-      default:
-        return true;
-    }
-  };
-
-  // Count available doctors for each type
-  const clinicDoctorsCount = doctors.filter((d) => d.availability.clinic).length;
-  const virtualDoctorsCount = doctors.filter((d) => d.availability.virtual).length;
+  // Count available doctors for each type (from base list, not filtered list)
+  const clinicDoctorsCount = baseDoctors.filter((d) => d.availability.clinic).length;
+  const virtualDoctorsCount = baseDoctors.filter((d) => d.availability.virtual).length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
@@ -202,7 +213,6 @@ export default function DoctorsListPage() {
                       doctor={doctor}
                       selectedDoctor={selectedDoctor}
                       setSelectedDoctor={handleDoctorChange}
-                      disabled={!isDoctorAvailable(doctor)}
                     />
                   </div>
                 ))}

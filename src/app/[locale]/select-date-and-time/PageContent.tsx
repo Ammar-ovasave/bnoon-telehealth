@@ -130,69 +130,74 @@ export default function SelectDateAndTimePage() {
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-32">
         {/* Header */}
         <div className="text-center mb-10 animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <CalendarDays className="w-4 h-4" />
-            <span>{locale === "ar" ? "حدد موعدك" : "Schedule Your Visit"}</span>
-          </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
-          
-          {selectedVisitType && (
-            <div className="flex justify-center mb-4">
-              <div
-                className={cn(
-                  "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium",
-                  selectedVisitType === "clinic"
-                    ? "bg-bnoon-teal/10 text-bnoon-teal"
-                    : "bg-bnoon-navy/10 text-bnoon-navy"
-                )}
-              >
-                {selectedVisitType === "clinic" ? (
-                  <>
-                    <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={20} height={20} />
-                    <span>{t("visitTypes.clinic")}</span>
-                  </>
-                ) : (
-                  <>
-                    <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={20} height={20} />
-                    <span>{t("visitTypes.virtual")}</span>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
+          <p className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6">{t("description")}</p>
 
-          {/* Doctor Info Card */}
+          {/* Doctor Info Card with Visit Type */}
           {selectedDoctor && (
-            <div className="flex justify-center mb-6">
-              <div className="inline-flex items-center gap-4 bg-white dark:bg-gray-800 px-5 py-3 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
-                {/* Doctor Photo */}
-                <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-bnoon-teal to-bnoon-navy p-[2px]">
-                    <div className="w-full h-full rounded-full overflow-hidden bg-white">
-                      <Image
-                        src={selectedDoctor.photo}
-                        alt={getDoctorName(selectedDoctor, locale)}
-                        fill
-                        className={cn("object-cover", selectedDoctor.imageClassName)}
-                      />
+            <div className="flex justify-center">
+              <div className="inline-flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-gray-800 px-5 py-4 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700">
+                {/* Doctor Section */}
+                <div className="flex items-center gap-4">
+                  {/* Doctor Photo */}
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-bnoon-teal to-bnoon-navy p-[2px]">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-white">
+                        <Image
+                          src={selectedDoctor.photo}
+                          alt={getDoctorName(selectedDoctor, locale)}
+                          fill
+                          className={cn("object-cover", selectedDoctor.imageClassName)}
+                        />
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Doctor Info */}
+                  <div className="text-start rtl:text-right">
+                    <h3 className="font-bold text-bnoon-navy dark:text-white text-base sm:text-lg">
+                      {getDoctorName(selectedDoctor, locale)}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 max-w-[200px] sm:max-w-[280px] line-clamp-2">
+                      {tDoctors(`doctors.${selectedDoctor.id}.specialty`) || selectedDoctor.specialty}
+                    </p>
                   </div>
                 </div>
 
-                {/* Doctor Info */}
-                <div className="text-start rtl:text-right">
-                  <h3 className="font-bold text-bnoon-navy dark:text-white text-base sm:text-lg">
-                    {getDoctorName(selectedDoctor, locale)}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 max-w-[200px] sm:max-w-[280px] line-clamp-2">
-                    {tDoctors(`doctors.${selectedDoctor.id}.specialty`) || selectedDoctor.specialty}
-                  </p>
-                </div>
+                {/* Divider */}
+                {selectedVisitType && (
+                  <>
+                    <div className="hidden sm:block w-px h-12 bg-gray-200 dark:bg-gray-700" />
+                    <div className="sm:hidden w-full h-px bg-gray-200 dark:bg-gray-700" />
+                  </>
+                )}
+
+                {/* Visit Type Badge */}
+                {selectedVisitType && (
+                  <div
+                    className={cn(
+                      "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium",
+                      selectedVisitType === "clinic"
+                        ? "bg-bnoon-teal/10 text-bnoon-teal"
+                        : "bg-bnoon-navy/10 text-bnoon-navy dark:bg-bnoon-navy/20 dark:text-cyan-400"
+                    )}
+                  >
+                    {selectedVisitType === "clinic" ? (
+                      <>
+                        <Image src={`/icons/Location1.png`} alt="Clinic Visit" width={20} height={20} />
+                        <span>{t("visitTypes.clinic")}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Image src={`/icons/Virtualvisit.png`} alt="Virtual Visit" width={20} height={20} />
+                        <span>{t("visitTypes.virtual")}</span>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
-
-          <p className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">{t("description")}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up animation-delay-200">

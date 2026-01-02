@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
+  const [loadingDoctor, setLoadingDoctor] = useState<string | null>(null);
   const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>();
   const router = useRouter();
   const t = useTranslations("DoctorsPage");
@@ -32,6 +33,8 @@ export default function DoctorsListPage() {
   };
 
   const handleDoctorChange = (doctor: string) => {
+    if (loadingDoctor) return; // Prevent double clicks
+    setLoadingDoctor(doctor);
     setSelectedDoctor(doctor);
     const searchParams = new URLSearchParams(window.location.search);
     searchParams.set("selectedDoctor", doctor);
@@ -231,6 +234,7 @@ export default function DoctorsListPage() {
                       doctor={doctor}
                       selectedDoctor={selectedDoctor}
                       setSelectedDoctor={handleDoctorChange}
+                      isLoading={loadingDoctor === doctor.id}
                     />
                   </motion.div>
                 ))}

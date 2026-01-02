@@ -2,7 +2,7 @@ import { DoctorModel } from "@/models/DoctorModel";
 import { FC } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Video, Building2 } from "lucide-react";
+import { ChevronRight, Video, Building2, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { useTranslations, useLocale } from "next-intl";
@@ -14,9 +14,10 @@ interface DoctorCardProps {
   selectedDoctor: string;
   setSelectedDoctor: (doctor: string) => void;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
-const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDoctor, disabled = false }) => {
+const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDoctor, disabled = false, isLoading = false }) => {
   const t = useTranslations("DoctorsPage");
   const locale = useLocale();
   const doctorName = getDoctorName(doctor, locale);
@@ -141,11 +142,20 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
                 : "bg-bnoon-navy hover:bg-bnoon-navy/90"
             )}
             variant="default"
-            disabled={disabled}
-            onClick={() => !disabled && setSelectedDoctor(doctor.id)}
+            disabled={disabled || isLoading}
+            onClick={() => !disabled && !isLoading && setSelectedDoctor(doctor.id)}
           >
-            {t("buttons.bookAppointment")}
-            <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1 rtl:scale-x-[-1] rtl:group-hover/btn:-translate-x-1" />
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {locale === "ar" ? "جاري التحميل..." : "Loading..."}
+              </>
+            ) : (
+              <>
+                {t("buttons.bookAppointment")}
+                <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1 rtl:scale-x-[-1] rtl:group-hover/btn:-translate-x-1" />
+              </>
+            )}
           </Button>
         </div>
       </CardContent>

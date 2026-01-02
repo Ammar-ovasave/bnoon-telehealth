@@ -308,6 +308,87 @@ npm run lint         # Run ESLint
 # No test commands (tests not implemented)
 ```
 
+## Azure Deployment
+
+### Environments
+
+| Environment | URL | Branch | Slot |
+|:------------|:----|:-------|:-----|
+| **Production** | https://bnoon-telehealth.azurewebsites.net | main | (production) |
+| **Staging** | https://bnoon-telehealth-staging.azurewebsites.net | staging | staging |
+
+### Azure Resources
+
+| Resource | Name | Details |
+|:---------|:-----|:--------|
+| Resource Group | `bnoon-telehealth-rg` | UAE North |
+| App Service Plan | `bnoon-telehealth-plan` | S1 (Standard) |
+| Web App | `bnoon-telehealth` | Container-based |
+| Staging Slot | `bnoon-telehealth/staging` | Deployment slot |
+| Container Registry | `ovasavestage.azurecr.io` | Shared ACR |
+| Image | `bnoon/telehealth/webapp` | Docker image |
+
+### CI/CD Pipelines
+
+| Pipeline | Trigger | Deploys To |
+|:---------|:--------|:-----------|
+| `bnoon-telehealth-staging` | Push to `staging` branch | Staging slot |
+
+The staging pipeline uses semantic versioning (e.g., `1.0.0-rc.1`) for Docker image tags.
+
+### Deployment Scripts
+
+```bash
+# One-time infrastructure setup
+./scripts/setup-azure-infra.sh
+
+# Build and push Docker image manually
+./scripts/build-and-push.sh [tag]
+
+# Deploy (restart to pull latest)
+./scripts/deploy.sh
+
+# View logs
+./scripts/logs.sh           # Download and view
+./scripts/logs.sh --tail    # Stream live
+```
+
+### Manual Azure Commands
+
+```bash
+# ACR login
+az acr login --name ovasavestage
+
+# Build for Azure (linux/amd64)
+DOCKER_BUILDKIT=1 docker build \
+  --platform linux/amd64 \
+  --secret id=FIREBASE_SERVICE_ACCOUNT,src=/tmp/bnoon-secrets/FIREBASE_SERVICE_ACCOUNT \
+  --target production \
+  -t ovasavestage.azurecr.io/bnoon/telehealth/webapp:latest .
+
+# Push to ACR
+docker push ovasavestage.azurecr.io/bnoon/telehealth/webapp:latest
+
+# Restart production
+az webapp restart --name bnoon-telehealth --resource-group bnoon-telehealth-rg
+
+# Restart staging slot
+az webapp restart --name bnoon-telehealth --resource-group bnoon-telehealth-rg --slot staging
+
+# View logs (production)
+az webapp log tail --name bnoon-telehealth --resource-group bnoon-telehealth-rg
+
+# View logs (staging)
+az webapp log tail --name bnoon-telehealth --resource-group bnoon-telehealth-rg --slot staging
+
+# Swap staging to production
+az webapp deployment slot swap --name bnoon-telehealth --resource-group bnoon-telehealth-rg --slot staging --target-slot production
+```
+
+### Reminder: Staging Environment Variables
+
+> **TODO:** Update staging slot environment variables to use staging-specific values instead of production values. Currently staging uses the same Firebase, Agora, and JWT credentials as production.
+
 ## Environment Variables
 
 | Variable | Purpose | Required | Default |

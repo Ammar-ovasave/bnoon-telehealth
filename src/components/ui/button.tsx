@@ -10,19 +10,19 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-bnoon-teal text-white hover:bg-bnoon-teal/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0",
+          "bg-bnoon-navy text-white hover:bg-bnoon-navy/90 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 shadow-md focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
-          "border-2 border-bnoon-teal bg-transparent text-bnoon-teal hover:bg-bnoon-teal hover:text-white shadow-sm",
+          "border-2 border-bnoon-navy bg-transparent text-bnoon-navy hover:bg-bnoon-navy hover:text-white shadow-sm",
         secondary:
-          "bg-bnoon-navy text-white hover:bg-bnoon-navy/90 shadow-md hover:shadow-lg",
+          "bg-secondary text-white hover:bg-secondary/90 shadow-md hover:shadow-lg",
         ghost:
-          "text-bnoon-navy hover:bg-bnoon-teal/10 hover:text-bnoon-teal",
+          "text-bnoon-navy hover:bg-bnoon-navy/10 hover:text-bnoon-navy",
         link:
-          "text-bnoon-teal underline-offset-4 hover:underline",
+          "text-bnoon-navy underline-offset-4 hover:underline",
         bnoonPrimary:
-          "bg-gradient-to-r from-bnoon-teal to-cyan-500 text-white hover:shadow-xl hover:shadow-bnoon-teal/25 hover:-translate-y-0.5 active:translate-y-0",
+          "bg-gradient-to-r from-bnoon-navy to-[#006699] text-white hover:shadow-xl hover:shadow-bnoon-navy/25 hover:-translate-y-0.5 active:translate-y-0",
         bnoonOutline:
           "border-2 border-bnoon-navy bg-transparent text-bnoon-navy hover:bg-bnoon-navy hover:text-white",
       },

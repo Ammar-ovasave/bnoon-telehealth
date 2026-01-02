@@ -47,19 +47,23 @@
 }
 
 :root {
-  /* Official Bnoon Brand Colors from Brand Guidelines */
-  --bnoon-primary: #39bced;      /* Primary Cyan/Teal */
-  --bnoon-navy: #004e78;         /* Navy Blue */
-  --bnoon-light: #d7f2fb;        /* Light Background */
+  /* Official Bnoon Brand Colors - Navy as Primary */
+  --bnoon-primary: #004e78;      /* Primary Navy Blue */
+  --bnoon-navy: #004e78;         /* Navy Blue (same as primary) */
+  --bnoon-light: #e8f4f8;        /* Light Background (soft navy tint) */
   --bnoon-gray: #6b6d70;         /* Text Gray */
-  
-  /* Legacy aliases for compatibility */
-  --bnoon-teal: #39bced;
-  --bnoon-teal-dark: #2da8d9;
-  --bnoon-teal-light: #d7f2fb;
-  --bnoon-navy-light: #006699;
+
+  /* Navy shades for variety */
+  --bnoon-navy-light: #006699;   /* Lighter navy */
+  --bnoon-navy-dark: #003d5e;    /* Darker navy for hover states */
+  --bnoon-navy-soft: #e8f4f8;    /* Very soft navy background */
   --bnoon-cream: #f8fbfd;
-  
+
+  /* Legacy teal alias - maps to navy now for compatibility */
+  --bnoon-teal: #004e78;
+  --bnoon-teal-dark: #003d5e;
+  --bnoon-teal-light: #e8f4f8;
+
   --radius: 0.75rem;
   --background: #ffffff;
   --foreground: #004e78;
@@ -67,94 +71,99 @@
   --card-foreground: #004e78;
   --popover: #ffffff;
   --popover-foreground: #004e78;
-  
-  /* Primary is Bnoon Cyan */
-  --primary: #39bced;
+
+  /* Primary is Bnoon Navy */
+  --primary: #004e78;
   --primary-foreground: #ffffff;
-  
-  /* Secondary is Bnoon Navy */
-  --secondary: #004e78;
+
+  /* Secondary is lighter navy */
+  --secondary: #006699;
   --secondary-foreground: #ffffff;
-  
-  --muted: #d7f2fb;
+
+  --muted: #e8f4f8;
   --muted-foreground: #6b6d70;
-  --accent: #d7f2fb;
-  --accent-foreground: #39bced;
+  --accent: #e8f4f8;
+  --accent-foreground: #004e78;
   --destructive: #ef4444;
   --border: #e2e8f0;
   --input: #f1f5f9;
-  --ring: #39bced;
-  
-  /* Charts using Bnoon palette */
-  --chart-1: #39bced;
-  --chart-2: #004e78;
-  --chart-3: #5cc8f0;
-  --chart-4: #7ed4f3;
-  --chart-5: #d7f2fb;
-  
+  --ring: #004e78;
+
+  /* Charts using Navy palette */
+  --chart-1: #004e78;
+  --chart-2: #006699;
+  --chart-3: #3d7a9e;
+  --chart-4: #6b9bb8;
+  --chart-5: #e8f4f8;
+
   /* Sidebar */
   --sidebar: #ffffff;
   --sidebar-foreground: #004e78;
-  --sidebar-primary: #39bced;
+  --sidebar-primary: #004e78;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #d7f2fb;
-  --sidebar-accent-foreground: #39bced;
+  --sidebar-accent: #e8f4f8;
+  --sidebar-accent-foreground: #004e78;
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #39bced;
+  --sidebar-ring: #004e78;
 }
 
 .dark {
-  /* Bnoon Dark Mode - Based on official brand colors */
-  --bnoon-primary: #5cc8f0;      /* Lighter cyan for dark mode */
-  --bnoon-navy: #7ed4f3;         /* Lighter navy text for readability */
+  /* Bnoon Dark Mode - Navy primary with lighter variant for visibility */
+  --bnoon-primary: #5a9fc9;      /* Lighter navy for dark mode visibility */
+  --bnoon-navy: #5a9fc9;         /* Lighter navy for readability */
   --bnoon-light: #1a2d3d;        /* Dark background tint */
   --bnoon-gray: #94a3b8;         /* Lighter gray for dark mode */
-  
-  /* Legacy aliases */
-  --bnoon-teal: #5cc8f0;
-  --bnoon-teal-dark: #39bced;
+
+  /* Navy shades for dark mode */
+  --bnoon-navy-light: #6bb3d9;
+  --bnoon-navy-dark: #4a8fb8;
+  --bnoon-navy-soft: #1a3a4a;
+
+  /* Legacy teal alias - maps to lighter navy for dark mode */
+  --bnoon-teal: #5a9fc9;
+  --bnoon-teal-dark: #4a8fb8;
   --bnoon-teal-light: #1a3a4a;
-  
+
   --background: #0c1929;
   --foreground: #e8f4f8;
   --card: #132536;
   --card-foreground: #e8f4f8;
   --popover: #132536;
   --popover-foreground: #e8f4f8;
-  
-  /* Primary is Bnoon Cyan (lighter for dark mode) */
-  --primary: #5cc8f0;
+
+  /* Primary is lighter Navy for dark mode visibility */
+  --primary: #5a9fc9;
   --primary-foreground: #0c1929;
-  
-  /* Secondary */
-  --secondary: #1a3a4a;
-  --secondary-foreground: #e8f4f8;
-  
+
+  /* Secondary is slightly different navy shade */
+  --secondary: #6bb3d9;
+  --secondary-foreground: #0c1929;
+
   --muted: #1a3a4a;
   --muted-foreground: #94a3b8;
   --accent: #1a3a4a;
-  --accent-foreground: #5cc8f0;
+  --accent-foreground: #5a9fc9;
   --destructive: #f87171;
   --border: #1e4a5f;
   --input: #1a3a4a;
-  --ring: #5cc8f0;
-  
-  /* Charts using Bnoon dark palette */
-  --chart-1: #5cc8f0;
-  --chart-2: #7ed4f3;
-  --chart-3: #39bced;
-  --chart-4: #a8e4f9;
-  --chart-5: #d7f2fb;
-  
+  --ring: #5a9fc9;
+
+  /* Charts using Navy dark palette */
+  --chart-1: #5a9fc9;
+  --chart-2: #6bb3d9;
+  --chart-3: #7cc4e0;
+  --chart-4: #8dd5f0;
+  --chart-5: #a8e4f9;
+
   /* Sidebar */
   --sidebar: #132536;
   --sidebar-foreground: #e8f4f8;
-  --sidebar-primary: #5cc8f0;
+  --sidebar-primary: #5a9fc9;
   --sidebar-primary-foreground: #0c1929;
   --sidebar-accent: #1a3a4a;
-  --sidebar-accent-foreground: #5cc8f0;
+  --sidebar-accent-foreground: #5a9fc9;
   --sidebar-border: #1e4a5f;
-  --sidebar-ring: #5cc8f0;
+  --sidebar-ring: #5a9fc9;
 }
 
 @layer base {
@@ -180,22 +189,22 @@
   }
 }
 
-/* Bnoon-style gradient backgrounds - Official brand colors */
+/* Bnoon-style gradient backgrounds - Navy based */
 .bg-bnoon-gradient {
-  background: linear-gradient(135deg, #39bced 0%, #004e78 100%);
+  background: linear-gradient(135deg, #006699 0%, #004e78 100%);
 }
 
 .bg-bnoon-gradient-soft {
-  background: linear-gradient(180deg, #ffffff 0%, #d7f2fb 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #e8f4f8 100%);
 }
 
 .bg-bnoon-hero {
-  background: linear-gradient(to bottom, rgba(57, 188, 237, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+  background: linear-gradient(to bottom, rgba(0, 78, 120, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
 }
 
 /* Bnoon-style text gradients */
 .text-bnoon-gradient {
-  background: linear-gradient(135deg, #39bced 0%, #004e78 100%);
+  background: linear-gradient(135deg, #006699 0%, #004e78 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -208,7 +217,7 @@
 
 .btn-bnoon-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(57, 188, 237, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(0, 78, 120, 0.3);
 }
 
 /* Bnoon card styles */
@@ -280,7 +289,7 @@
 
 /* Bnoon decorative elements */
 .bnoon-dot-pattern {
-  background-image: radial-gradient(circle, #39bced 1px, transparent 1px);
+  background-image: radial-gradient(circle, #004e78 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
@@ -318,16 +327,16 @@
   inherits: false;
 }
 
-/* Bnoon Brand Glow Color Palette - Official brand colors */
+/* Bnoon Brand Glow Color Palette - Navy based */
 :root {
-  --bnoon-glow-1: #39bced;  /* Primary */
-  --bnoon-glow-2: #5cc8f0;
-  --bnoon-glow-3: #7ed4f3;
-  --bnoon-glow-4: #d7f2fb;  /* Light */
-  --bnoon-glow-5: #7ed4f3;
-  --bnoon-glow-6: #5cc8f0;
-  --bnoon-glow-7: #39bced;  /* Primary */
-  --bnoon-glow-8: #004e78;  /* Navy */
+  --bnoon-glow-1: #004e78;  /* Primary Navy */
+  --bnoon-glow-2: #006699;
+  --bnoon-glow-3: #3d7a9e;
+  --bnoon-glow-4: #6b9bb8;  /* Light Navy */
+  --bnoon-glow-5: #3d7a9e;
+  --bnoon-glow-6: #006699;
+  --bnoon-glow-7: #004e78;  /* Primary Navy */
+  --bnoon-glow-8: #003d5e;  /* Dark Navy */
 }
 
 /* Wrapper for the glow effect */
@@ -593,18 +602,18 @@
   animation: ai-glow 3s ease-in-out infinite;
 }
 
-/* Conic gradient for Bnoon brand effect - Official colors */
+/* Conic gradient for Bnoon brand effect - Navy based */
 .bg-gradient-conic {
   background: conic-gradient(
     from 0deg,
-    #39bced,
-    #5cc8f0,
-    #7ed4f3,
-    #d7f2fb,
-    #7ed4f3,
-    #5cc8f0,
-    #39bced,
-    #004e78
+    #004e78,
+    #006699,
+    #3d7a9e,
+    #6b9bb8,
+    #3d7a9e,
+    #006699,
+    #004e78,
+    #003d5e
   );
 }
 
@@ -616,10 +625,10 @@
 /* Highlighted appointment pulse animation */
 @keyframes highlightPulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(57, 188, 237, 0.4);
+    box-shadow: 0 0 0 0 rgba(0, 78, 120, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(57, 188, 237, 0);
+    box-shadow: 0 0 0 8px rgba(0, 78, 120, 0);
   }
 }
 

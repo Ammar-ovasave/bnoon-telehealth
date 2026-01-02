@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Next.js
+.next
+out
+
+# Testing
+coverage
+__tests__
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+jest.config.*
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# Docs
+README.md
+*.md
+
+# Environment (build-time vars should be passed as args)
+.env*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CI/CD
+.github
+.azure
+azure-pipelines*.yml
+scripts/

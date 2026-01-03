@@ -4,7 +4,10 @@ import createNextIntlPlugin from "next-intl/plugin";
 const nextConfig: NextConfig = {
   output: "standalone",
   images: {
-    remotePatterns: [{ hostname: "images.unsplash.com", protocol: "https" }],
+    remotePatterns: [
+      { hostname: "images.unsplash.com", protocol: "https" },
+      { hostname: "firebasestorage.googleapis.com", protocol: "https" },
+    ],
   },
 };
 

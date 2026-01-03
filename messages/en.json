@@ -235,7 +235,8 @@
       "selectNationality": "Select your nationality",
       "gender": "Gender",
       "idType": "ID Type",
-      "idNumber": "ID Number"
+      "idNumber": "ID Number",
+      "idDocument": "ID Document Photo"
     },
     "genders": {
       "male": "Male",
@@ -263,7 +264,26 @@
       "iqamaStartWith2": "Iqama number must start with 2",
       "iqamaDigitsOnly": "Iqama number must only contain digits",
       "iqamaLength": "Iqama number must be 10 digits",
-      "somethingWentWrong": "Something went wrong"
+      "somethingWentWrong": "Something went wrong",
+      "idDocumentRequired": "Please upload a photo of your ID document"
+    },
+    "idUpload": {
+      "title": "ID Document Photo",
+      "helper": "Upload a clear photo of your ID document for verification",
+      "dropzone": "Drop your ID photo here or click to browse",
+      "browseFiles": "Browse Files",
+      "acceptedFormats": "Accepted formats: JPG, PNG, PDF (Max 5MB)",
+      "uploading": "Uploading...",
+      "uploaded": "Uploaded",
+      "remove": "Remove",
+      "errors": {
+        "invalidFileType": "Please upload a JPG, PNG, or PDF file",
+        "fileTooLarge": "File size must be less than 5MB",
+        "uploadFailed": "Failed to upload file. Please try again."
+      },
+      "success": {
+        "uploaded": "ID document uploaded successfully"
+      }
     },
     "privacy": {
       "title": "Privacy & Security",
@@ -454,6 +474,11 @@
     "email": "Email",
     "nationality": "Nationality",
     "gender": "Gender",
+    "idDocument": "ID Document",
+    "idDocumentExpired": {
+      "title": "ID Document Expired",
+      "message": "Your uploaded ID document has expired. Please go back and upload it again."
+    },
     "nextSteps": {
       "virtualTitle": "Virtual Visit Tips",
       "virtualTip1": "You will receive a confirmation email with a meeting link to join your appointment.",
@@ -471,6 +496,33 @@
     },
     "errors": {
       "somethingWentWrong": "Something went wrong"
+    }
+  },
+  "PaymentPage": {
+    "paymentSummary": "Payment Summary",
+    "total": "Total",
+    "securePayment": "Your payment is secured with 256-bit SSL encryption",
+    "paymentMethods": "Accepted payment methods",
+    "payNow": "Pay Now",
+    "processing": "Processing Payment",
+    "processingDescription": "Please wait while we process your payment...",
+    "creatingAppointment": "Creating Appointment",
+    "creatingAppointmentDescription": "Payment successful! Creating your appointment...",
+    "redirecting": "Redirecting to confirmation...",
+    "errorCode": "Error Code",
+    "goHome": "Go Home",
+    "tryAgain": "Try Again",
+    "success": {
+      "title": "Payment Successful!",
+      "message": "Your payment has been processed successfully."
+    },
+    "failed": {
+      "title": "Payment Failed",
+      "message": "We couldn't process your payment. Please try again."
+    },
+    "errors": {
+      "paymentFailed": "Payment failed. Please try again.",
+      "appointmentCreationFailed": "Payment successful but appointment creation failed. Please contact support."
     }
   }
 }

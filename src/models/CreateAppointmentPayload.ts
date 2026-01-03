@@ -1,3 +1,5 @@
+export type PaymentStatusType = "pending" | "paid" | "failed";
+
 export interface CreateAppointmentPayload {
   patientMrn: string;
   serviceId: number;
@@ -14,4 +16,9 @@ export interface CreateAppointmentPayload {
   lastName: string;
   middleName: string;
   serviceName: string;
+  // Payment fields (for virtual visits)
+  paymentReference?: string;
+  paymentStatus?: PaymentStatusType;
+  paymentAmount?: number;
+  paymentCurrency?: string;
 }

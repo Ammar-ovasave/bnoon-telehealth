@@ -235,7 +235,8 @@
       "selectNationality": "اختر جنسيتك",
       "gender": "الجنس",
       "idType": "نوع الهوية",
-      "idNumber": "رقم الهوية"
+      "idNumber": "رقم الهوية",
+      "idDocument": "صورة وثيقة الهوية"
     },
     "genders": {
       "male": "ذكر",
@@ -263,7 +264,26 @@
       "iqamaStartWith2": "يجب أن يبدأ رقم الإقامة بالرقم 2",
       "iqamaDigitsOnly": "يجب أن يحتوي رقم الإقامة على أرقام فقط",
       "iqamaLength": "يجب أن يكون رقم الإقامة 10 أرقام",
-      "somethingWentWrong": "حدث خطأ ما"
+      "somethingWentWrong": "حدث خطأ ما",
+      "idDocumentRequired": "يرجى رفع صورة من وثيقة الهوية"
+    },
+    "idUpload": {
+      "title": "صورة وثيقة الهوية",
+      "helper": "ارفع صورة واضحة من وثيقة هويتك للتحقق",
+      "dropzone": "اسحب صورة الهوية هنا أو انقر للتصفح",
+      "browseFiles": "تصفح الملفات",
+      "acceptedFormats": "الصيغ المقبولة: JPG، PNG، PDF (الحد الأقصى 5 ميجابايت)",
+      "uploading": "جاري الرفع...",
+      "uploaded": "تم الرفع",
+      "remove": "إزالة",
+      "errors": {
+        "invalidFileType": "يرجى رفع ملف بصيغة JPG أو PNG أو PDF",
+        "fileTooLarge": "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
+        "uploadFailed": "فشل رفع الملف. يرجى المحاولة مرة أخرى."
+      },
+      "success": {
+        "uploaded": "تم رفع وثيقة الهوية بنجاح"
+      }
     },
     "privacy": {
       "title": "الخصوصية والأمان",
@@ -454,6 +474,11 @@
     "email": "البريد الإلكتروني",
     "nationality": "الجنسية",
     "gender": "الجنس",
+    "idDocument": "وثيقة الهوية",
+    "idDocumentExpired": {
+      "title": "انتهت صلاحية وثيقة الهوية",
+      "message": "انتهت صلاحية وثيقة الهوية المرفوعة. يرجى العودة ورفعها مرة أخرى."
+    },
     "nextSteps": {
       "virtualTitle": "نصائح للاستشارة الافتراضية",
       "virtualTip1": "ستتلقى رسالة تأكيد عبر البريد الإلكتروني تتضمن رابط الانضمام إلى موعدك.",
@@ -471,6 +496,33 @@
     },
     "errors": {
       "somethingWentWrong": "حدث خطأ ما"
+    }
+  },
+  "PaymentPage": {
+    "paymentSummary": "ملخص الدفع",
+    "total": "الإجمالي",
+    "securePayment": "دفعتك محمية بتشفير SSL بـ 256 بت",
+    "paymentMethods": "طرق الدفع المقبولة",
+    "payNow": "ادفع الآن",
+    "processing": "جاري معالجة الدفع",
+    "processingDescription": "يرجى الانتظار بينما نعالج دفعتك...",
+    "creatingAppointment": "جاري إنشاء الموعد",
+    "creatingAppointmentDescription": "تمت عملية الدفع بنجاح! جاري إنشاء موعدك...",
+    "redirecting": "جاري التحويل إلى صفحة التأكيد...",
+    "errorCode": "رمز الخطأ",
+    "goHome": "الصفحة الرئيسية",
+    "tryAgain": "حاول مرة أخرى",
+    "success": {
+      "title": "تمت عملية الدفع بنجاح!",
+      "message": "تمت معالجة دفعتك بنجاح."
+    },
+    "failed": {
+      "title": "فشلت عملية الدفع",
+      "message": "لم نتمكن من معالجة دفعتك. يرجى المحاولة مرة أخرى."
+    },
+    "errors": {
+      "paymentFailed": "فشلت عملية الدفع. يرجى المحاولة مرة أخرى.",
+      "appointmentCreationFailed": "تمت عملية الدفع بنجاح لكن فشل إنشاء الموعد. يرجى التواصل مع الدعم."
     }
   }
 }

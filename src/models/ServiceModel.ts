@@ -9,6 +9,9 @@ export interface Service {
   imageWidth?: number;
   imageHeight?: number;
   imageClassName?: string;
+  // Pricing fields (placeholders - update with actual prices from business team)
+  price: number; // Price in SAR
+  currency: string; // "SAR"
 }
 
 export const services: Service[] = [
@@ -16,10 +19,12 @@ export const services: Service[] = [
     id: "having-child",
     title: "Having a Child",
     description:
-      "Start your parenthood journey with Bnoon to help you start or grow your family whether you’re facing primary or secondary infertility, seeking family balancing, or exploring ART to prevent genetic conditions.",
+      "Start your parenthood journey with Bnoon to help you start or grow your family whether you're facing primary or secondary infertility, seeking family balancing, or exploring ART to prevent genetic conditions.",
     icon: "👩🏻‍🍼",
     imageSrc: `/icons/Icons-51.png`,
     imageClassName: "h-[80px] w-[80px]",
+    price: 350,
+    currency: "SAR",
   },
   {
     id: "general-fertility",
@@ -31,6 +36,8 @@ export const services: Service[] = [
     imageClassName: "h-[80px] w-[80px] object-cover",
     imageWidth: 100,
     imageHeight: 100,
+    price: 350,
+    currency: "SAR",
   },
   {
     id: "fertility-preservation",
@@ -40,6 +47,8 @@ export const services: Service[] = [
     icon: "🔒",
     imageSrc: "/icons/Icons-15.png",
     imageClassName: "h-[80px] w-[70px]",
+    price: 500,
+    currency: "SAR",
   },
   // {
   //   id: "learning-fertility",
@@ -51,10 +60,12 @@ export const services: Service[] = [
     id: "pregnancy-followup",
     title: "Gynecology and Maternity Services",
     description:
-      "Comprehensive women’s health and pregnancy care — from puberty to post-menopause. Our gynecologists offer personalized support, from prenatal and postnatal care to managing PCOS, endometriosis, menopause, and more.",
+      "Comprehensive women's health and pregnancy care — from puberty to post-menopause. Our gynecologists offer personalized support, from prenatal and postnatal care to managing PCOS, endometriosis, menopause, and more.",
     icon: "🤰🏻",
     imageSrc: `/icons/Asset47.svg`,
     imageClassName: "mb-2",
+    price: 300,
+    currency: "SAR",
   },
   {
     id: "male-andrology",
@@ -66,6 +77,8 @@ export const services: Service[] = [
     imageWidth: 100,
     imageHeight: 100,
     imageClassName: "object-cover",
+    price: 350,
+    currency: "SAR",
   },
   // {
   //   id: "gynecology-problem",

@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
@@ -15,7 +15,18 @@ import {
   Video,
   Building,
   CheckCircle2,
+  FileText,
+  Camera,
+  ExternalLink,
+  AlertTriangle,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { formatInTimeZone } from "date-fns-tz";
@@ -38,6 +49,9 @@ import { containsArabic } from "@/services/containsArabic";
 import { doctors } from "@/models/DoctorModel";
 import { services } from "@/models/ServiceModel";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
+import { PaymentSummary } from "@/components/payment/PaymentSummary";
+import { PaymentButton } from "@/components/payment/PaymentButton";
+import { PendingAppointmentData } from "@/models/PaymentModel";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
 
@@ -46,18 +60,56 @@ export function PageContent() {
   const tGenders = useTranslations("VirtualVisitInfoPage.genders");
   const tDoctors = useTranslations("DoctorsPage");
   const tServices = useTranslations("ServicesPage.services");
+  const tPayment = useTranslations("PaymentPage");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(false);
+  const [idDocumentUrl, setIdDocumentUrl] = useState<string>("");
+  const [idDocumentFileName, setIdDocumentFileName] = useState<string>("");
+  const [idDocumentExpired, setIdDocumentExpired] = useState(false);
 
   // Get all URL params
   const selectedDoctorId = decodeURIComponent(searchParams.get("selectedDoctor") ?? "");
   const selectedServiceId = decodeURIComponent(searchParams.get("selectedService") ?? "");
   const selectedTimeSlot = decodeURIComponent(searchParams.get("selectedTimeSlot") ?? "");
   const visitType = searchParams.get("visitType") as "clinic" | "virtual";
+
+  // Retrieve ID document from sessionStorage and verify it exists (for virtual visits)
+  useEffect(() => {
+    async function checkIdDocument() {
+      if (visitType === "virtual" && typeof window !== "undefined") {
+        const storedUrl = sessionStorage.getItem("idDocumentUrl");
+        const storedFileName = sessionStorage.getItem("idDocumentFileName");
+
+        if (storedUrl && storedFileName) {
+          // Verify the file still exists in storage
+          try {
+            const response = await fetch(`/api/upload-id-document?url=${encodeURIComponent(storedUrl)}`);
+            const data = await response.json();
+
+            if (data.exists) {
+              setIdDocumentUrl(storedUrl);
+              setIdDocumentFileName(storedFileName);
+            } else {
+              // File expired - clear sessionStorage and show warning
+              sessionStorage.removeItem("idDocumentUrl");
+              sessionStorage.removeItem("idDocumentFileName");
+              sessionStorage.removeItem("uploadSessionId");
+              setIdDocumentExpired(true);
+            }
+          } catch {
+            // On error, still try to show the document
+            setIdDocumentUrl(storedUrl);
+            setIdDocumentFileName(storedFileName);
+          }
+        }
+      }
+    }
+    checkIdDocument();
+  }, [visitType]);
   const fullName = decodeURIComponent(searchParams.get("fullName") ?? "");
   const email = decodeURIComponent(searchParams.get("email") ?? "");
   const nationality = decodeURIComponent(searchParams.get("nationality") ?? "");
@@ -98,6 +150,47 @@ export function PageContent() {
     return apiServicesData?.[0];
   }, [apiServicesData, selectedService?.title]);
 
+  // Prepare appointment data for payment (virtual visits only)
+  const pendingAppointmentData: PendingAppointmentData | null = useMemo(() => {
+    if (visitType !== "virtual") return null;
+    if (!currentUserData?.mrn || !statusesData || !branchesData?.length || !selectedFertiSmartService) {
+      return null;
+    }
+
+    const status = statusesData.find((item) => item.name === "Approved/Confirmed");
+    if (!status) return null;
+
+    const splitName = fullName.split(" ");
+    return {
+      patientMrn: currentUserData.mrn,
+      serviceId: selectedFertiSmartService.id ?? 0,
+      serviceName: selectedFertiSmartService.name ?? "",
+      resourceIds: [selectedResource?.id ?? 0],
+      startTime: selectedTimeSlot,
+      endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
+      branchId: branchesData[0].id ?? 0,
+      statusId: status.id ?? 0,
+      statusName: status.name ?? "",
+      description: "Virtual Visit",
+      email,
+      phoneNumber: currentUserData.contactNumber ?? "",
+      firstName: splitName[0],
+      lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
+      middleName: splitName.length > 2 ? splitName[1] : "",
+    };
+  }, [
+    visitType,
+    currentUserData?.mrn,
+    currentUserData?.contactNumber,
+    statusesData,
+    branchesData,
+    selectedFertiSmartService,
+    selectedResource?.id,
+    selectedTimeSlot,
+    fullName,
+    email,
+  ]);
+
   // Format date and time
   const dateObj = selectedTimeSlot ? parseISO(selectedTimeSlot) : new Date();
   const formattedDate = formatInTimeZone(dateObj, KSA_TIMEZONE, "EEEE, d MMMM yyyy", {
@@ -111,7 +204,26 @@ export function PageContent() {
   const doctorDisplayName = isArabic && selectedDoctor?.arName ? selectedDoctor.arName : selectedDoctor?.name ?? "";
 
   const handleBack = () => {
-    router.back();
+    // Navigate back to the form page with all current data preserved
+    const formPath = visitType === "virtual" ? "virtual-visit-info" : "in-person-appointment-info";
+    const editParams = new URLSearchParams();
+
+    // Preserve appointment selection params
+    editParams.set("selectedDoctor", selectedDoctorId);
+    editParams.set("selectedService", selectedServiceId);
+    editParams.set("selectedTimeSlot", selectedTimeSlot);
+    editParams.set("visitType", visitType);
+
+    // Preserve form data so user can edit
+    if (fullName) editParams.set("fullName", fullName);
+    if (email) editParams.set("email", email);
+    if (nationality) editParams.set("nationality", nationality);
+    if (gender) editParams.set("gender", gender);
+    if (idType) editParams.set("idType", idType);
+    if (idTypeName) editParams.set("idTypeName", idTypeName);
+    if (idNumber) editParams.set("idNumber", idNumber);
+
+    router.push(`/${locale}/${formPath}?${editParams.toString()}`);
   };
 
   const handleConfirm = useCallback(async () => {
@@ -196,6 +308,30 @@ export function PageContent() {
       mutatePatient(undefined);
       mutateCurrentUser(undefined);
 
+      // Move ID document from temp to permanent storage
+      if (idDocumentUrl && newCurrentUser?.mrn) {
+        try {
+          await fetch("/api/upload-id-document", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              tempUrl: idDocumentUrl,
+              patientMrn: newCurrentUser.mrn,
+            }),
+          });
+        } catch (error) {
+          console.error("Failed to move ID document to permanent storage:", error);
+          // Don't fail the appointment creation if this fails
+        }
+      }
+
+      // Clear ID document from sessionStorage after successful submission
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("idDocumentUrl");
+        sessionStorage.removeItem("idDocumentFileName");
+        sessionStorage.removeItem("uploadSessionId");
+      }
+
       const newSearchParams = new URLSearchParams(searchParams.toString());
       newSearchParams.append("appointmentId", createAppointmentResponse.id.toString());
       router.replace(`/appointment-confirmation?${newSearchParams.toString()}`);
@@ -238,7 +374,7 @@ export function PageContent() {
         <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 dark:bg-bnoon-teal/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <div className="relative mx-auto max-w-2xl lg:max-w-4xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Header */}
         <div className="mb-8 text-center animate-fade-in-up">
           <div className="mb-6 flex justify-center">
@@ -275,87 +411,89 @@ export function PageContent() {
             </div>
           )}
 
-          {/* Appointment Details */}
-          <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-            <h4 className="text-sm font-semibold text-bnoon-navy dark:text-white uppercase tracking-wide mb-4">
-              {t("appointmentDetails")}
-            </h4>
+          {/* Two-column grid for Appointment + Patient Info */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-100 dark:divide-gray-700 border-b border-gray-100 dark:border-gray-700">
+            {/* Appointment Details */}
+            <div className="p-6">
+              <h4 className="text-sm font-semibold text-bnoon-navy dark:text-white uppercase tracking-wide mb-4">
+                {t("appointmentDetails")}
+              </h4>
 
-            <div className="space-y-4">
-              {/* Service */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
-                  <Stethoscope className="h-5 w-5 text-bnoon-teal" />
-                </div>
-                <div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("service")}</span>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {selectedService ? tServices(`${selectedService.id}.title`) : ""}
-                  </p>
-                </div>
-              </div>
-
-              {/* Date */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
-                  <Calendar className="h-5 w-5 text-bnoon-teal" />
-                </div>
-                <div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("date")}</span>
-                  <p className="font-medium text-gray-900 dark:text-white">{formattedDate}</p>
-                </div>
-              </div>
-
-              {/* Time */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
-                  <Clock className="h-5 w-5 text-bnoon-teal" />
-                </div>
-                <div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("time")}</span>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {formattedTime} <span className="text-xs text-gray-500 dark:text-gray-400">({t("ksaTime")})</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Visit Type */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
-                  {visitType === "virtual" ? (
-                    <Video className="h-5 w-5 text-bnoon-teal" />
-                  ) : (
-                    <Building className="h-5 w-5 text-bnoon-teal" />
-                  )}
-                </div>
-                <div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">{t("visitType")}</span>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {visitType === "virtual" ? t("virtualVisit") : t("clinicVisit")}
-                  </p>
-                </div>
-              </div>
-
-              {/* Location (for clinic visits) */}
-              {visitType === "clinic" && branchData?.branch && (
+              <div className="space-y-4">
+                {/* Service */}
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
-                    <MapPin className="h-5 w-5 text-bnoon-teal" />
+                    <Stethoscope className="h-5 w-5 text-bnoon-teal" />
                   </div>
                   <div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("location")}</span>
-                    <p className="font-medium text-gray-900 dark:text-white">{branchData.branch.name}</p>
-                    {branchData.branch.address && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{branchData.branch.address}</p>
-                    )}
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("service")}</span>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {selectedService ? tServices(`${selectedService.id}.title`) : ""}
+                    </p>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
 
-          {/* Patient Information */}
-          <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                {/* Date */}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
+                    <Calendar className="h-5 w-5 text-bnoon-teal" />
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("date")}</span>
+                    <p className="font-medium text-gray-900 dark:text-white">{formattedDate}</p>
+                  </div>
+                </div>
+
+                {/* Time */}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
+                    <Clock className="h-5 w-5 text-bnoon-teal" />
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("time")}</span>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {formattedTime} <span className="text-xs text-gray-500 dark:text-gray-400">({t("ksaTime")})</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Visit Type */}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
+                    {visitType === "virtual" ? (
+                      <Video className="h-5 w-5 text-bnoon-teal" />
+                    ) : (
+                      <Building className="h-5 w-5 text-bnoon-teal" />
+                    )}
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("visitType")}</span>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {visitType === "virtual" ? t("virtualVisit") : t("clinicVisit")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Location (for clinic visits) */}
+                {visitType === "clinic" && branchData?.branch && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
+                      <MapPin className="h-5 w-5 text-bnoon-teal" />
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{t("location")}</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{branchData.branch.name}</p>
+                      {branchData.branch.address && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{branchData.branch.address}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Patient Information */}
+            <div className="p-6">
             <h4 className="text-sm font-semibold text-bnoon-navy dark:text-white uppercase tracking-wide mb-4">
               {t("patientInformation")}
             </h4>
@@ -434,6 +572,76 @@ export function PageContent() {
                   </div>
                 </div>
               )}
+
+              {/* ID Document (for virtual visits) */}
+              {visitType === "virtual" && idDocumentUrl && idDocumentFileName && (
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30">
+                    {idDocumentFileName.toLowerCase().endsWith(".pdf") ? (
+                      <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    ) : (
+                      <Camera className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t("idDocument")}</span>
+                    {idDocumentFileName.toLowerCase().endsWith(".pdf") ? (
+                      <a
+                        href={idDocumentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 font-medium text-bnoon-teal hover:text-bnoon-teal/80 transition-colors truncate"
+                      >
+                        {idDocumentFileName}
+                        <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                      </a>
+                    ) : (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button
+                            type="button"
+                            className="flex items-center gap-1 font-medium text-bnoon-teal hover:text-bnoon-teal/80 transition-colors truncate text-start"
+                          >
+                            {idDocumentFileName}
+                            <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-3xl">
+                          <DialogHeader>
+                            <DialogTitle>{t("idDocument")}</DialogTitle>
+                          </DialogHeader>
+                          <div className="relative w-full aspect-[4/3] bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={idDocumentUrl}
+                              alt={idDocumentFileName}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Expired ID Document Warning */}
+              {visitType === "virtual" && idDocumentExpired && (
+                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                        {t("idDocumentExpired.title")}
+                      </p>
+                      <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                        {t("idDocumentExpired.message")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             </div>
           </div>
 
@@ -489,6 +697,17 @@ export function PageContent() {
           </div>
         </div>
 
+        {/* Payment Summary (Virtual Visits Only) */}
+        {visitType === "virtual" && selectedService && (
+          <div className="mt-8 animate-fade-in-up animation-delay-150">
+            <PaymentSummary
+              serviceName={tServices(`${selectedService.id}.title`)}
+              price={selectedService.price}
+              currency={selectedService.currency}
+            />
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex flex-col-reverse sm:flex-row gap-4 mt-8 animate-fade-in-up animation-delay-200">
           <Button
@@ -501,14 +720,32 @@ export function PageContent() {
             <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
             {t("buttons.edit")}
           </Button>
-          <Button
-            size="lg"
-            onClick={handleConfirm}
-            className="flex-1"
-            disabled={loading}
-          >
-            {loading ? t("buttons.confirming") : t("buttons.confirm")}
-          </Button>
+
+          {/* Virtual visits require payment */}
+          {visitType === "virtual" && selectedService && pendingAppointmentData ? (
+            <div className="flex-1">
+              <PaymentButton
+                amount={selectedService.price}
+                currency={selectedService.currency}
+                email={email}
+                fullName={fullName}
+                phoneNumber={currentUserData?.contactNumber ?? ""}
+                appointmentData={pendingAppointmentData}
+                disabled={loading || !pendingAppointmentData}
+                onPaymentStarted={() => setLoading(true)}
+              />
+            </div>
+          ) : (
+            /* Clinic visits - direct confirmation (payment at clinic) */
+            <Button
+              size="lg"
+              onClick={handleConfirm}
+              className="flex-1"
+              disabled={loading}
+            >
+              {loading ? t("buttons.confirming") : t("buttons.confirm")}
+            </Button>
+          )}
         </div>
       </div>
     </div>

@@ -7,13 +7,23 @@ import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 
 export default function VirtualVisitInfoPage() {
+  const searchParams = useSearchParams();
   const { isLoading, fullName: currentUserFullName, data: currentUserData } = useCurrentUser();
   const { isLoading: loadingPatientData, fullName, data: patientData } = useFertiSmartPatient();
   const { isLoading: loadingCountries, nationalities } = useFertiSmartCountries();
   const { isLoading: loadingIdTypes } = useFertiSmartIDTypes();
   const t = useTranslations("VirtualVisitInfoPage");
+
+  // Check if we have form data from URL params (coming back from review page)
+  const urlFullName = searchParams.get("fullName");
+  const urlEmail = searchParams.get("email");
+  const urlNationality = searchParams.get("nationality");
+  const urlGender = searchParams.get("gender") as "male" | "female" | null;
+  const urlIdType = searchParams.get("idType");
+  const urlIdNumber = searchParams.get("idNumber");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
@@ -44,14 +54,15 @@ export default function VirtualVisitInfoPage() {
         ) : (
           <VirtualVisitForm
             defaultValues={{
-              fullName: fullName || currentUserFullName || "",
-              email: patientData?.emailAddress || currentUserData?.emailAddress || "",
-              gender: patientData?.sex === 1 ? "male" : "female",
-              idNumber: patientData?.identityId ?? "",
-              idType: patientData?.identityIdType?.id?.toString(),
-              nationality: patientData?.nationality?.name
+              // URL params take priority (when coming back from review page)
+              fullName: urlFullName || fullName || currentUserFullName || "",
+              email: urlEmail || patientData?.emailAddress || currentUserData?.emailAddress || "",
+              gender: urlGender || (patientData?.sex === 1 ? "male" : "female"),
+              idNumber: urlIdNumber || patientData?.identityId || "",
+              idType: urlIdType || patientData?.identityIdType?.id?.toString(),
+              nationality: urlNationality || (patientData?.nationality?.name
                 ? nationalities?.find((item) => item === patientData?.nationality?.name) ?? ""
-                : "",
+                : ""),
             }}
           />
         )}

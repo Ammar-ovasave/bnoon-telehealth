@@ -6,13 +6,17 @@ import InPersonForm from "./_components/InPersonForm";
 import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 
 export default function InPersonAppointmentInfoPage() {
   const t = useTranslations("InPersonAppointmentInfoPage");
+  const searchParams = useSearchParams();
   const { isLoading } = useCurrentUser();
   const { isLoading: loadingPatientData, fullName } = useFertiSmartPatient();
   const { isLoading: loadingCountries } = useFertiSmartCountries();
-  console.log("initial fullName", isLoading, loadingCountries, loadingPatientData, fullName);
+
+  // Check if we have form data from URL params (coming back from review page)
+  const urlFullName = searchParams.get("fullName");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
@@ -42,7 +46,7 @@ export default function InPersonAppointmentInfoPage() {
             </div>
           </div>
         ) : (
-          <InPersonForm defaultValus={{ fullName }} />
+          <InPersonForm defaultValus={{ fullName: urlFullName || fullName }} />
         )}
 
         {/* Visit Information */}

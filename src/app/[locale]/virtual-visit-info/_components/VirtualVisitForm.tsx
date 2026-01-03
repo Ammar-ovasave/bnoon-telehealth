@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, User, Mail, Globe, Users, CreditCard, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, User, Mail, Globe, Users, CreditCard, Lock, Camera } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -9,6 +9,8 @@ import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
 import { useTranslations } from "next-intl";
+import IDPhotoUpload from "@/components/IDPhotoUpload";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 interface FormData {
   fullName: string;
@@ -41,6 +43,23 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
   const tIdTypes = useTranslations("idTypes");
   const { nationalities } = useFertiSmartCountries();
   const { data: patientData } = useFertiSmartPatient();
+  const { data: currentUserData } = useCurrentUser();
+
+  // ID Document upload state
+  const [idDocumentUrl, setIdDocumentUrl] = useState<string>("");
+  const [idDocumentFileName, setIdDocumentFileName] = useState<string>("");
+
+  // Generate a unique session ID for temp file uploads
+  const [uploadSessionId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const existingSessionId = sessionStorage.getItem("uploadSessionId");
+      if (existingSessionId) return existingSessionId;
+      const newSessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      sessionStorage.setItem("uploadSessionId", newSessionId);
+      return newSessionId;
+    }
+    return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  });
 
   // Check if user is registered (has existing profile with identity data)
   // Registered users should not be able to edit their identity fields
@@ -150,6 +169,10 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
         return t("errors.iqamaLength");
       }
     }
+    // ID document photo is required
+    if (!idDocumentUrl) {
+      return t("errors.idDocumentRequired");
+    }
   }, [
     formData.fullName,
     formData.email,
@@ -159,6 +182,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
     formData.idNumber,
     isSaudiNational,
     didSelectIqamaNo,
+    idDocumentUrl,
     t,
   ]);
 
@@ -166,6 +190,12 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
   const handleContinueToReview = useCallback(() => {
     if (validateForm) {
       return toast.error(validateForm);
+    }
+
+    // Store ID document info in sessionStorage (cannot pass via URL params)
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("idDocumentUrl", idDocumentUrl);
+      sessionStorage.setItem("idDocumentFileName", idDocumentFileName);
     }
 
     // Build URL with all existing params plus the new form data
@@ -190,6 +220,8 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
     formData.idType,
     formData.idNumber,
     selectedIdType?.name,
+    idDocumentUrl,
+    idDocumentFileName,
     router,
   ]);
 
@@ -403,6 +435,33 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
             />
             {errors.idNumber && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.idNumber}</p>}
           </div>
+
+          {/* ID Document Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <div className="flex items-center gap-2">
+                <Camera className="h-4 w-4 text-gray-500" />
+                {t("labels.idDocument")} *
+              </div>
+            </label>
+            <IDPhotoUpload
+              sessionId={uploadSessionId}
+              onUploadComplete={(url, fileName) => {
+                setIdDocumentUrl(url);
+                setIdDocumentFileName(fileName);
+              }}
+              onUploadRemove={() => {
+                setIdDocumentUrl("");
+                setIdDocumentFileName("");
+              }}
+              uploadedUrl={idDocumentUrl}
+              uploadedFileName={idDocumentFileName}
+              disabled={isRegisteredUser}
+            />
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              {t("idUpload.helper")}
+            </p>
+          </div>
         </div>
 
         {/* Action Buttons */}
@@ -418,7 +477,8 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
               !formData.nationality ||
               !formData.gender ||
               !formData.idType ||
-              !formData.idNumber
+              !formData.idNumber ||
+              !idDocumentUrl
             }
             size="lg"
             className="px-8 py-3 text-lg font-semibold w-full md:w-auto"

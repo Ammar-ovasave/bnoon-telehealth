@@ -1,3 +1,24 @@
+## [1.0.0-staging.5](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/compare/v1.0.0-staging.4...v1.0.0-staging.5) (2026-01-03)
+
+### ✨ Features
+
+* add loading state to doctor selection and improve select-date-time UI ([17c7c64](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/17c7c64afef2e356d1aa163ecf17d7a31008bf1e))
+* add payment integration with Amazon Payment Services and ID document upload ([2cbe1ec](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/2cbe1ec78d0ef0c1f322d54ed36b752ebb813124))
+* **BNOON-28:** redesign homepage with clinics-first UX ([8590850](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/8590850dc928248aa6025b6af3366f590a19740c))
+* **BNOON-30, BNOON-31:** navbar logo cleanup and larger clinic images ([d1070ac](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/d1070ac9a53745dd091f14318df7db76a8eff259))
+* **BNOON-32:** update services layout to 3+2 row format ([3860552](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/386055271b2ad39dcb50a4ca67232a289a370ce6))
+* **BNOON-33:** localize service name in review page ([d291717](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/d291717c3118fb1fa1407d7541d2c6ec19e8b9f2))
+* **BNOON-34:** improve next steps tips separation for virtual vs in-person visits ([d62d2e3](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/d62d2e3bd7480e26352226f8d289661e08252a9c))
+* **BNOON-5:** remove unavailable doctors instead of disabling them ([f0f669a](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/f0f669a69b4f773f280cee2b6a335dad55aaac97))
+* **BNOON-5:** remove unavailable doctors with smooth animations ([860ec56](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/860ec56fbe98a5d948e4751e9a4b3189b421f75d))
+* multiple UI improvements and health check endpoints ([6d2b012](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/6d2b01279df6f55197ad463cef96037765a273fd))
+* update brand colors to navy primary ([#004](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/issues/004)E78) ([8574a14](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/8574a14c3b100d9bd640b61b5ec9e6bc896624bb)), closes [#004E78](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/issues/004E78) [#39bced](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/issues/39bced) [#004E78](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/issues/004E78)
+* update clinic cards and images ([74c9206](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/74c9206931f160feda4f1e80278d4fdc98540359))
+
+### 🐛 Bug Fixes
+
+* **deps:** package-lock.json ([6492ff1](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/commit/6492ff11bfb348e93b1292328c3e08f77a1f1e0c))
+
 ## [1.0.0-staging.4](https://dev.azure.com/ovasave-production/ovasave/_git/bnoon-telehealth/compare/v1.0.0-staging.3...v1.0.0-staging.4) (2026-01-02)
 
 ### 🐛 Bug Fixes

@@ -10,7 +10,7 @@ const Footer: FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-bnoon-navy dark:bg-gray-950 text-white border-t border-bnoon-navy dark:border-gray-800">
+    <footer className="bg-bnoon-navy dark:bg-gray-950 text-white font-bold border-t border-bnoon-navy dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand Section */}
@@ -27,7 +27,7 @@ const Footer: FC = () => {
                 ? "مركز الإخصاب وصحة المرأة. جزء من شبكة جلوبال فيرتيليتي."
                 : "The Fertility & Women's Health Center. Part of Global Fertility Network."}
             </p>
-            <p className="text-xs text-white/60 font-medium">
+            <p className="text-xs text-white/60">
               {locale === "ar"
                 ? "أكبر شبكة مستقلة لخدمات الإخصاب في المملكة العربية السعودية"
                 : "The largest stand-alone fertility services network in KSA"}
@@ -65,8 +65,8 @@ const Footer: FC = () => {
             </h3>
             <ul className="space-y-2 text-sm text-white/70 dark:text-gray-400">
               <li>
-                <a href="tel:+966114448080" className="hover:text-white transition-colors" dir="ltr">
-                  +966 11 444 8080
+                <a href="tel:+966920010022" className="hover:text-white transition-colors" dir="ltr">
+                  +966 92 001 0022
                 </a>
               </li>
               <li>
@@ -75,7 +75,7 @@ const Footer: FC = () => {
                 </a>
               </li>
               <li className="text-white/50 dark:text-gray-500">
-                {locale === "ar" ? "الرياض - جدة - المملكة العربية السعودية" : "Riyadh - Jeddah - Saudi Arabia"}
+                {locale === "ar" ? "الرياض | جدة | الأحساء" : "Riyadh | Jeddah | Al Ahsa"}
               </li>
             </ul>
             {/* Social Links */}

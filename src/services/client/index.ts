@@ -5,6 +5,8 @@ import { SendOTPPayload } from "@/models/SendOTPPayload";
 import { SwitchBranchPayload } from "@/models/SwitchBranchPayload";
 import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
 import { UpdatePatientPayload } from "@/models/UpdatePatientPayload";
+import { BnoonUser, UpdateBnoonUserPayload } from "@/models/BnoonUser";
+import { ClinicBranchID } from "@/models/ClinicModel";
 import axios from "axios";
 
 const instance = axios.create({
@@ -135,5 +137,110 @@ export async function switchBranch(payload: SwitchBranchPayload) {
   } catch (e) {
     console.log("--- switchBranch error", e);
     return false;
+  }
+}
+
+// ============================================
+// Bnoon Auth System (New)
+// ============================================
+
+export interface BnoonUserResponse extends Omit<BnoonUser, "createdAt" | "updatedAt" | "lastLoginAt"> {
+  isProfileComplete: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BnoonAuthResponse {
+  success: boolean;
+  isNew: boolean;
+  isProfileComplete: boolean;
+  user: BnoonUserResponse;
+}
+
+export interface BranchMrnResponse {
+  branchId: string;
+  mrn: string;
+  isNew: boolean;
+  fertiSmartBranchId: number;
+}
+
+/**
+ * Send OTP to phone number (new Bnoon auth flow)
+ * No branch or MRN required
+ */
+export async function sendBnoonOTP(phone: string) {
+  try {
+    const res = await instance.post<{ success: boolean; length: number; phone: string }>(
+      `/api/auth/send-otp`,
+      { phone }
+    );
+    return res.data;
+  } catch (e) {
+    console.log("--- sendBnoonOTP error", e);
+    return null;
+  }
+}
+
+/**
+ * Verify OTP and authenticate (new Bnoon auth flow)
+ * Creates new user if first time
+ */
+export async function verifyBnoonOTP(phone: string, code: string) {
+  try {
+    const res = await instance.post<BnoonAuthResponse>(
+      `/api/auth/verify-otp`,
+      { phone, code }
+    );
+    return res.data;
+  } catch (e) {
+    console.log("--- verifyBnoonOTP error", e);
+    return null;
+  }
+}
+
+/**
+ * Get current Bnoon user profile
+ */
+export async function getBnoonUser() {
+  try {
+    const res = await instance.get<BnoonUserResponse>(`/api/users/me`);
+    return res.data;
+  } catch (e) {
+    console.log("--- getBnoonUser error", e);
+    return null;
+  }
+}
+
+/**
+ * Update Bnoon user profile
+ * Also syncs to all FertiSmart branches
+ */
+export async function updateBnoonUser(data: UpdateBnoonUserPayload) {
+  try {
+    const res = await instance.patch<BnoonUserResponse & { syncResults: { branchId: string; success: boolean }[] }>(
+      `/api/users/me`,
+      data
+    );
+    return res.data;
+  } catch (e) {
+    console.log("--- updateBnoonUser error", e);
+    return null;
+  }
+}
+
+/**
+ * Get or create FertiSmart MRN for a specific branch
+ * Implements lazy patient creation
+ */
+export async function getOrCreateBranchMrn(branchId: ClinicBranchID) {
+  try {
+    const res = await instance.post<BranchMrnResponse>(
+      `/api/users/me/branch-mrn`,
+      { branchId }
+    );
+    return res.data;
+  } catch (e) {
+    console.log("--- getOrCreateBranchMrn error", e);
+    return null;
   }
 }

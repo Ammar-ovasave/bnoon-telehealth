@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { doctors as fullDoctorsList } from "@/models/DoctorModel";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Filter, Stethoscope, Building2, Video, Check } from "lucide-react";
+import { ArrowLeft, Filter, Building2, Video, Check } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { AvailabilityFilter } from "@/models/VisitTypeModel";
 import DoctorCard from "@/components/DoctorCard";

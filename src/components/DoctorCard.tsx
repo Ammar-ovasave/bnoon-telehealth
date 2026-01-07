@@ -22,16 +22,6 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
   const locale = useLocale();
   const doctorName = getDoctorName(doctor, locale);
 
-  const getAvailabilityText = () => {
-    if (doctor.availability.clinic && doctor.availability.virtual) {
-      return t("availability.clinicAndVirtual");
-    } else if (doctor.availability.clinic) {
-      return t("availability.clinicOnly");
-    } else {
-      return t("availability.virtualOnly");
-    }
-  };
-
   const getAvailabilityIcons = () => {
     const icons = [];
     if (doctor.availability.clinic) {

@@ -51,7 +51,7 @@ export function ThemeToggle() {
     );
   }
 
-  const currentTheme = themes.find((t) => t.value === theme) || themes[0];
+  const _currentTheme = themes.find((t) => t.value === theme) || themes[0];
   const CurrentIcon = resolvedTheme === "dark" ? Moon : Sun;
 
   return (

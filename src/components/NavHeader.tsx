@@ -13,12 +13,11 @@ import { useTranslations, useLocale } from "next-intl";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import { Calendar, LogOut, Menu, X, User } from "lucide-react";
 import Image from "next/image";
-import { ThemeToggle, ThemeToggleCompact } from "./ThemeToggle";
+import { ThemeToggle } from "./ThemeToggle";
 
 function NavHeader() {
   const { data: currentUserData, isLoading } = useCurrentUser();
   const t = useTranslations("NavHeader");
-  const locale = useLocale();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Build display name from first and last name only

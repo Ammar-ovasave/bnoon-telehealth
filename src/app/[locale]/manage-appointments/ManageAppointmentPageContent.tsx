@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Calendar, CalendarDays, Plus } from "lucide-react";
+import { AlertCircle, Calendar, Plus } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslations, useLocale } from "next-intl";
 import { useMemo, useEffect, useRef, useCallback, useState } from "react";
@@ -11,7 +11,6 @@ import useCurrentBranch from "@/hooks/useCurrentBranch";
 import useSwitchBranch from "@/hooks/useSwitchBranch";
 import AppointmentCard from "./_components/AppointmentCard";
 import ClinicBranchSelect from "@/components/ClinicBranchSelect";
-import Image from "next/image";
 import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
 
 export default function ManageAppointmentPageContent() {

@@ -430,7 +430,7 @@ describe("NavHeader User Info Display", () => {
 
   describe("Loading state handling", () => {
     it("should handle loading state (undefined data)", () => {
-      const isLoading = true;
+      const _isLoading = true;
       const userData: CurrentUserType | undefined = undefined;
 
       // During loading, user info should not be shown
@@ -439,7 +439,7 @@ describe("NavHeader User Info Display", () => {
     });
 
     it("should show user info after loading completes", () => {
-      const isLoading = false;
+      const _isLoading = false;
       const userData: CurrentUserType = {
         firstName: "Ahmed",
         middleName: "Mohamed",

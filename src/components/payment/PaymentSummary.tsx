@@ -2,7 +2,6 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { CreditCard, ShieldCheck } from "lucide-react";
-import Image from "next/image";
 
 interface PaymentSummaryProps {
   serviceName: string;

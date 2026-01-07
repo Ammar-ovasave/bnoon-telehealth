@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   try {
     const payload: CreatePaymentSessionRequest = await request.json();
     const url = new URL(request.url);
-    const cookieStore = await cookies();
+    const _cookieStore = await cookies();
 
     // Validate required fields
     if (!payload.amount || !payload.email || !payload.fullName || !payload.appointmentData) {

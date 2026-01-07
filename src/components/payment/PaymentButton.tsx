@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Loader2 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
@@ -31,7 +31,6 @@ export function PaymentButton({
   const t = useTranslations("PaymentPage");
   const locale = useLocale();
   const [loading, setLoading] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
 
   // Format price for display
   const formattedAmount = new Intl.NumberFormat(locale === "ar" ? "ar-SA" : "en-SA", {

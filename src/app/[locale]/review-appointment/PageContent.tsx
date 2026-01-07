@@ -60,7 +60,7 @@ export function PageContent() {
   const tGenders = useTranslations("VirtualVisitInfoPage.genders");
   const tDoctors = useTranslations("DoctorsPage");
   const tServices = useTranslations("ServicesPage.services");
-  const tPayment = useTranslations("PaymentPage");
+  const _tPayment = useTranslations("PaymentPage");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const router = useRouter();
@@ -364,6 +364,7 @@ export function PageContent() {
     mutateCurrentUser,
     searchParams,
     router,
+    idDocumentUrl,
   ]);
 
   return (

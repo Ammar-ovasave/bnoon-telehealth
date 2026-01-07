@@ -43,7 +43,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
   const tIdTypes = useTranslations("idTypes");
   const { nationalities } = useFertiSmartCountries();
   const { data: patientData } = useFertiSmartPatient();
-  const { data: currentUserData } = useCurrentUser();
+  const { data: _currentUserData } = useCurrentUser();
 
   // ID Document upload state
   const [idDocumentUrl, setIdDocumentUrl] = useState<string>("");

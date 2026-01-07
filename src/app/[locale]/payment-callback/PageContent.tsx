@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { CheckCircle2, XCircle, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { createAppointment } from "@/services/client";
@@ -29,7 +29,7 @@ export function PaymentCallbackContent() {
 
   const [state, setState] = useState<PaymentState>("processing");
   const [paymentResult, setPaymentResult] = useState<PaymentResult | null>(null);
-  const [appointmentId, setAppointmentId] = useState<number | null>(null);
+  const [_appointmentId, setAppointmentId] = useState<number | null>(null);
 
   // Process payment callback
   const processCallback = useCallback(async () => {
@@ -73,6 +73,7 @@ export function PaymentCallbackContent() {
         error: "Failed to process payment",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   // Create appointment after successful payment

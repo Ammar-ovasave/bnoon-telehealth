@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { ArrowLeft, ArrowRight, Phone, Shield, ChevronDown, Smartphone } from "lucide-react";
+import { ArrowLeft, ArrowRight, Shield, ChevronDown, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { countryCodes } from "@/constants";
 import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";

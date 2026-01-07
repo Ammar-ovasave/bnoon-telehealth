@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAPS } from "@/services/amazon-payment-services";
 import { getPaymentByMerchantReference, updatePaymentStatus } from "@/firestore/payments";
-import { isPaymentSuccess, APSCallbackParams } from "@/models/PaymentModel";
+import { isPaymentSuccess } from "@/models/PaymentModel";
 
 /**
  * POST /api/payments/callback

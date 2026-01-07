@@ -39,7 +39,7 @@ extends:
 
     # Verification
     enableVerification: true
-    serviceUrl: 'https://bnoon-telehealth-staging.azurewebsites.net/en'
+    serviceUrl: 'https://bnoon-telehealth-staging.azurewebsites.net'
     verificationTimeout: 300
 
     # Quality Gates (adjust as needed)

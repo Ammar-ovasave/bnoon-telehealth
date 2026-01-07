@@ -144,7 +144,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -sf http://localhost:3000/en || exit 1
+    CMD curl -sf http://localhost:3000/api/health || exit 1
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "server.js"]

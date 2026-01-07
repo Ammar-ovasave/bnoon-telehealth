@@ -43,5 +43,5 @@ extends:
     verificationTimeout: 300
 
     # Quality Gates
-    testScript: 'npm test -- --ci --reporters=default --reporters=jest-junit --coverage --coverageReporters=cobertura --coverageReporters=lcov --coverageReporters=text'
+    testScript: 'npm test'
     coverageThreshold: 0

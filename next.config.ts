@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
       { hostname: "firebasestorage.googleapis.com", protocol: "https" },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/health",
+        destination: "/api/health",
+      },
+    ];
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();

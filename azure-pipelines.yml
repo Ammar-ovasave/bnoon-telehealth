@@ -42,7 +42,6 @@ extends:
     serviceUrl: 'https://bnoon-telehealth-staging.azurewebsites.net'
     verificationTimeout: 300
 
-    # Quality Gates (adjust as needed)
-    # Skip tests for now since no test files exist
-    testScript: 'echo "No tests configured"'
+    # Quality Gates
+    testScript: 'npm test -- --ci --reporters=default --reporters=jest-junit --coverage --coverageReporters=cobertura --coverageReporters=lcov --coverageReporters=text'
     coverageThreshold: 0

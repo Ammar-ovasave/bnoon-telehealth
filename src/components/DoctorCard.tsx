@@ -106,7 +106,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
           </div>
         </div>
 
-        <CardTitle className="text-lg font-bold text-bnoon-navy dark:text-white mb-1 leading-tight">
+        <CardTitle className="text-lg font-bold text-gray-900 dark:text-white mb-1 leading-tight">
           {doctorName}
         </CardTitle>
         <CardDescription className="text-bnoon-teal text-sm font-semibold">

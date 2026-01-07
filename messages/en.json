@@ -43,7 +43,9 @@
     "buttons": {
       "selectClinic": "Select Clinic",
       "openingSoon": "Opening Soon"
-    }
+    },
+    "loading": "Loading..."
+
   },
   "ServicesPage": {
     "title": "What Are You Interested In?",
@@ -83,7 +85,7 @@
     "description": "Choose from our trusted team of experts — highly qualified, board-certified consultants dedicated to providing expert guidance, advanced treatments, and innovative, personalized care.",
     "visitType": {
       "title": "Select Visit Type",
-      "description": "Choose how you'd like to have your consultation - whether visiting us at the clinic or remotely through a virtual consultation. Both options provide excellent care tailored to your needs.",
+      "description": "Choose how you'd like to have your consultation - whether visiting us at the clinic or remotely through a virtual consultation. Both options provide quality care tailored to your needs.",
       "clinic": {
         "title": "Clinic Visit",
         "description": "Visit our clinic for an in-person consultation and comprehensive examination.",
@@ -161,7 +163,7 @@
   },
   "SelectDateAndTimePage": {
     "title": "Select Date & Time",
-    "description": "Choose your preferred appointment date and time. Available slots are highlighted on the left.",
+    "description": "Choose your preferred appointment date and time. Available slots are highlighted below.",
     "selectDate": "Select Date",
     "selectTime": "Select Time",
     "visitTypes": {
@@ -226,7 +228,7 @@
     }
   },
   "VirtualVisitInfoPage": {
-    "title": "Personal Information",
+    "title": "Submit Your Personal Information",
     "description": "Please provide your personal information to complete your visit booking. This information helps us provide you with the best possible care.",
     "labels": {
       "fullName": "Full Name",
@@ -292,7 +294,7 @@
     "buttons": {
       "back": "Back",
       "confirm": "Confirm",
-      "loading": "Loading"
+      "loading": "Loading..."
     },
     "registeredUserNotice": {
       "message": "Your personal information is locked because you already have a profile on file. Only your email can be updated for this appointment.",
@@ -343,7 +345,7 @@
     }
   },
   "ManageAppointmentsPage": {
-    "title": "Manage Your Appointment",
+    "title": "Manage Your Appointments",
     "description": "View, reschedule, or cancel your appointments.",
     "clinicBranchSelect": {
       "label": "Clinic Branch",
@@ -442,7 +444,7 @@
     "buttons": {
       "back": "Back",
       "confirm": "Confirm",
-      "loading": "Loading"
+      "loading": "Loading..."
     },
     "registeredUserNotice": {
       "message": "Your name is locked because you already have a profile on file.",

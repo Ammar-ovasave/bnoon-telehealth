@@ -118,21 +118,6 @@ export default function ManageAppointmentPageContent() {
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Header */}
         <div className="mb-10 text-center animate-fade-in-up">
-          <div className="mb-6 flex justify-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-bnoon-teal to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg shadow-bnoon-teal/20">
-              <Image
-                src={`/icons/Calender.png`}
-                alt="Manage Your Appointment"
-                width={100}
-                height={100}
-                className="w-10 h-10 object-contain"
-              />
-            </div>
-          </div>
-          <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <CalendarDays className="w-4 h-4" />
-            <span>{locale === "ar" ? "مواعيدي" : "My Appointments"}</span>
-          </div>
           <h1 className="mb-4 text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
           <p className="mx-auto max-w-2xl text-gray-600 dark:text-gray-300 text-base leading-relaxed">{t("description")}</p>
         </div>

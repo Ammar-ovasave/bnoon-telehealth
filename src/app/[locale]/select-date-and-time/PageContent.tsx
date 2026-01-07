@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { ArrowLeft, ArrowRight, CalendarDays, Clock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { add, addMonths, format } from "date-fns";
+import { add, format } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
@@ -80,11 +80,11 @@ export default function SelectDateAndTimePage() {
     setSelectedTimeSlot(timeSlotId);
   };
 
-  const after6Month = addMonths(new Date(), 6);
+  const tomorrow = add(new Date(), { days: 1 });
+  tomorrow.setHours(0, 0, 0, 0);
+  const sixWeeksFromTomorrow = add(tomorrow, { weeks: 6 });
   const isDateDisabled = (date: Date) => {
-    const today = add(new Date(), { days: 1 });
-    today.setHours(0, 0, 0, 0);
-    return date < today || date > after6Month;
+    return date < tomorrow || date > sixWeeksFromTomorrow;
   };
 
   const newUrlSearchParams = useMemo(() => {
@@ -147,7 +147,7 @@ export default function SelectDateAndTimePage() {
                           src={selectedDoctor.photo}
                           alt={getDoctorName(selectedDoctor, locale)}
                           fill
-                          className={cn("object-cover", selectedDoctor.imageClassName)}
+                          className={cn("object-cover rounded-full", selectedDoctor.imageClassName)}
                         />
                       </div>
                     </div>

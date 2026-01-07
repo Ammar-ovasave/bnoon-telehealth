@@ -109,10 +109,6 @@ export default function DoctorsListPage() {
         <div className="relative mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-24">
           {/* Header */}
           <div className="text-center mb-10 md:mb-12 animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <Stethoscope className="w-4 h-4" />
-              <span>{locale === "ar" ? "اختر طبيبك" : "Choose Your Doctor"}</span>
-            </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bnoon-navy dark:text-white mb-4 leading-tight">
               {t("title")}
             </h1>
@@ -127,7 +123,7 @@ export default function DoctorsListPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <h2 className="text-lg font-bold text-bnoon-navy dark:text-white mb-1">{t("visitType.title")}</h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t("visitType.description")}</p>
+                  <p className="text-base text-gray-500 dark:text-gray-400">{t("visitType.description")}</p>
                 </div>
 
                 {/* Visit Type Pills */}
@@ -147,9 +143,9 @@ export default function DoctorsListPage() {
                     )}
                   >
                     {availabilityFilter === "clinic" ? (
-                      <Check className="w-4 h-4" />
+                      <Check className="w-4 h-4 scale-[2.5] transform" />
                     ) : (
-                      <Building2 className="w-4 h-4" />
+                      <Building2 className="w-4 h-4 scale-[2.5] transform" />
                     )}
                     <span>{t("visitType.clinic.title")}</span>
                     <span className={cn(
@@ -175,9 +171,9 @@ export default function DoctorsListPage() {
                     )}
                   >
                     {availabilityFilter === "virtual" ? (
-                      <Check className="w-4 h-4" />
+                      <Check className="w-4 h-4 scale-[2.5] transform" />
                     ) : (
-                      <Video className="w-4 h-4" />
+                      <Video className="w-4 h-4 scale-[2.5] transform" />
                     )}
                     <span>{t("visitType.virtual.title")}</span>
                     <span className={cn(
@@ -193,8 +189,8 @@ export default function DoctorsListPage() {
               {/* Hint message when no type selected */}
               {!availabilityFilter && (
                 <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                  <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-2">
-                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                  <p className="text-sm text-[#800020] dark:text-amber-400 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#800020] rounded-full animate-pulse" />
                     {locale === "ar"
                       ? "يرجى اختيار نوع الزيارة لتتمكن من حجز موعد مع الطبيب"
                       : "Please select a visit type to book an appointment with a doctor"}

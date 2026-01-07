@@ -231,6 +231,7 @@ export default function DoctorsListPage() {
                       selectedDoctor={selectedDoctor}
                       setSelectedDoctor={handleDoctorChange}
                       isLoading={loadingDoctor === doctor.id}
+                      disabled={!availabilityFilter}
                     />
                   </motion.div>
                 ))}

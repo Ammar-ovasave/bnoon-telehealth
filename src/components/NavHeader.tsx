@@ -13,7 +13,6 @@ import { useTranslations, useLocale } from "next-intl";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import { Calendar, LogOut, Menu, X, User } from "lucide-react";
 import Image from "next/image";
-import { ThemeToggle } from "./ThemeToggle";
 
 function NavHeader() {
   const { data: currentUserData, isLoading } = useCurrentUser();
@@ -30,25 +29,17 @@ function NavHeader() {
     <header className="bg-white dark:bg-gray-900 sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <Link href={"/"} className="flex items-center">
+          {/* Logo - links to bnoon.sa */}
+          <a href="https://bnoon.sa" target="_blank" rel="noopener noreferrer" className="flex items-center">
             <Image
               src="/images/bnoon-logo.svg"
               alt="Bnoon - بنون"
               width={120}
               height={50}
-              className="h-9 md:h-10 w-auto dark:hidden"
+              className="h-9 md:h-10 w-auto"
               priority
             />
-            <Image
-              src="/images/bnoon-logo-white.svg"
-              alt="Bnoon - بنون"
-              width={120}
-              height={50}
-              className="h-9 md:h-10 w-auto hidden dark:block"
-              priority
-            />
-          </Link>
+          </a>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-4">
@@ -92,7 +83,7 @@ function NavHeader() {
                 <Link href={"/login"}>
                   <Button
                     variant="outline"
-                    className="rounded-full px-6 border-bnoon-teal text-bnoon-teal hover:bg-bnoon-teal hover:text-white transition-all duration-300"
+                    className="rounded-full px-6 border-gray-200 text-bnoon-navy hover:bg-bnoon-teal hover:text-white hover:border-bnoon-teal transition-all duration-300"
                   >
                     {t("login")}
                   </Button>
@@ -100,16 +91,12 @@ function NavHeader() {
               </>
             )}
 
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
             {/* Language Switcher - always at the end */}
             <LanguageSwitcher />
           </nav>
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
-            <ThemeToggle />
             <LanguageSwitcher />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -196,7 +183,7 @@ const LanguageSwitcher: FC = () => {
   return (
     <Link
       href={newUrl}
-      className="px-3 py-1.5 text-sm font-medium text-bnoon-navy dark:text-white border border-gray-200 dark:border-gray-700 rounded-full hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+      className="px-4 py-2 text-base font-medium text-bnoon-navy border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
     >
       {label}
     </Link>

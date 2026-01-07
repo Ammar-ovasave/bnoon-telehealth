@@ -646,56 +646,6 @@ export function PageContent() {
             </div>
           </div>
 
-          {/* Next Steps / Tips */}
-          <div className="p-6">
-            {visitType === "virtual" ? (
-              <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
-                    <Video className="h-5 w-5 text-blue-600 dark:text-blue-300" />
-                  </div>
-                  <h4 className="font-semibold text-blue-900 dark:text-blue-100">{t("nextSteps.virtualTitle")}</h4>
-                </div>
-                <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                    {t("nextSteps.virtualTip1")}
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                    {t("nextSteps.virtualTip2")}
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                    {t("nextSteps.virtualTip3")}
-                  </li>
-                </ul>
-              </div>
-            ) : (
-              <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center">
-                    <Building className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
-                  </div>
-                  <h4 className="font-semibold text-emerald-900 dark:text-emerald-100">{t("nextSteps.clinicTitle")}</h4>
-                </div>
-                <ul className="space-y-2 text-sm text-emerald-800 dark:text-emerald-200">
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2 flex-shrink-0" />
-                    {t("nextSteps.clinicTip1")}
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2 flex-shrink-0" />
-                    {t("nextSteps.clinicTip2")}
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2 flex-shrink-0" />
-                    {t("nextSteps.clinicTip3")}
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Payment Summary (Virtual Visits Only) */}

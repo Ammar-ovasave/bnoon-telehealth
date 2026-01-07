@@ -299,7 +299,7 @@ export default function SelectDateAndTimePage() {
                   <span className="font-bold">
                     {format(
                       availabilityData?.find((slot) => slot.start === selectedTimeSlot)?.start ?? new Date().toISOString(),
-                      locale === "ar" ? "dd MMMM yyyy hh:mm aa" : "EEEE, MMMM do, yyyy hh:mm aa",
+                      locale === "ar" ? "dd MMMM yyyy hh:mm aa" : "EEEE, MMMM d, yyyy hh:mm aa",
                       { locale: dateFnsLocale }
                     )}
                   </span>
@@ -346,7 +346,7 @@ export default function SelectDateAndTimePage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t("summary.date")}</p>
                 <p className="font-semibold text-bnoon-navy dark:text-white">
                   {selectedDate
-                    ? format(selectedDate, locale === "ar" ? "dd MMMM yyyy" : "EEEE, MMMM do, yyyy", { locale: dateFnsLocale })
+                    ? format(selectedDate, locale === "ar" ? "dd MMMM yyyy" : "EEEE, MMMM d, yyyy", { locale: dateFnsLocale })
                     : t("messages.notSelected")}
                 </p>
               </div>

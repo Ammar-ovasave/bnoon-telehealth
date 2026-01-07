@@ -27,23 +27,22 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
     <Link href={`/doctors?${newUrlSearchParams.toString()}`}>
       <Card
         className={cn(
-          "cursor-pointer relative gap-0 justify-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden h-full border-0 shadow-md group",
-          "dark:bg-gray-800 dark:shadow-lg dark:shadow-black/20"
+          "cursor-pointer relative gap-0 justify-center transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden h-full border-0 shadow-md group"
         )}
       >
         {/* Hover Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-bnoon-teal/0 to-cyan-500/0 group-hover:from-bnoon-teal/5 group-hover:to-cyan-500/5 dark:group-hover:from-bnoon-teal/10 dark:group-hover:to-cyan-500/10 transition-all duration-300 pointer-events-none" />
-        
-        <CardHeader className="text-center px-5 py-6 gap-0 relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-bnoon-teal/0 to-cyan-500/0 group-hover:from-bnoon-teal/5 group-hover:to-cyan-500/5 transition-all duration-300 pointer-events-none" />
+
+        <CardHeader className="text-center px-4 py-4 gap-0 relative flex flex-col items-center justify-center">
           {/* Icon Container */}
-          <div className="flex justify-center mb-4">
-            <div className="relative w-20 h-20 flex items-center justify-center">
+          <div className="flex justify-center items-center mb-3">
+            <div className="relative w-16 h-16 flex items-center justify-center">
               {/* Background Circle */}
-              <div className="absolute inset-0 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300" />
-              <div className="absolute inset-0 bg-white dark:bg-gray-700 rounded-2xl shadow-sm" />
-              
+              <div className="absolute inset-0 bg-bnoon-teal/10 rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300" />
+              <div className="absolute inset-0 bg-white rounded-2xl shadow-sm" />
+
               {/* Icon */}
-              <div className="relative z-10">
+              <div className="relative z-10 flex items-center justify-center">
                 {service.imageSrc ? (
                   <Image
                     width={service.imageWidth ?? 50}
@@ -51,30 +50,29 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
                     src={service.imageSrc}
                     alt={service.title}
                     className={cn(
-                      "h-12 w-12 object-contain transition-all duration-300",
-                      "dark:invert dark:brightness-200 dark:hue-rotate-180 dark:saturate-150",
+                      "h-10 w-10 object-contain transition-all duration-300",
                       service.imageClassName
                     )}
                   />
                 ) : (
-                  <span className="text-3xl">{service.icon}</span>
+                  <span className="text-2xl">{service.icon}</span>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Title */}
-          <CardTitle className="text-base font-bold text-bnoon-navy dark:text-white mb-2 group-hover:text-bnoon-teal transition-colors duration-300">
+          {/* Title - aligned and bigger */}
+          <CardTitle className="text-lg font-bold text-bnoon-navy mb-2 group-hover:text-bnoon-teal transition-colors duration-300 min-h-[3.5rem] flex items-center justify-center">
             {t(`services.${service.id}.title`)}
           </CardTitle>
 
           {/* Description */}
-          <CardDescription className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+          <CardDescription className="text-xs text-gray-500 leading-relaxed">
             {t(`services.${service.id}.description`)}
           </CardDescription>
 
           {/* Arrow Indicator */}
-          <div className="mt-4 flex justify-center">
+          <div className="mt-3 flex justify-center">
             <div className="flex items-center gap-1 text-bnoon-teal text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <span>{t("buttons.selectService") || "اختر"}</span>
               <ArrowRight className="w-3 h-3 rtl:scale-x-[-1]" />

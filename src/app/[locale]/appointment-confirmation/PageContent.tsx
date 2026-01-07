@@ -141,11 +141,8 @@ export const PageContent: FC = () => {
           {/* Success Header */}
           <div className="text-center mb-10 animate-fade-in-up">
             <div className="flex justify-center mb-6">
-              <div className="relative">
-                <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-xl animate-pulse" />
-                <div className="relative w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                  <CheckCircle className="h-10 w-10 text-white" />
-                </div>
+              <div className="w-16 h-16 bg-bnoon-teal/10 rounded-full flex items-center justify-center border-2 border-bnoon-teal">
+                <Check className="h-8 w-8 text-bnoon-teal" strokeWidth={3} />
               </div>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
@@ -244,21 +241,14 @@ export const PageContent: FC = () => {
                   </span>
                 </div>
                 {patientCountry?.name && (
-                  <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
-                    <span className="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-2">
+                  <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                    <span className="text-gray-500 text-sm flex items-center gap-2">
                       <Globe className="h-4 w-4" />
                       {t("patientInformation.nationality")}
                     </span>
-                    <span className="font-semibold text-bnoon-navy dark:text-white">{patientCountry?.name ?? "-"}</span>
+                    <span className="font-semibold text-bnoon-navy">{patientCountry?.name ?? "-"}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
-                  <span className="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    {t("patientInformation.gender")}
-                  </span>
-                  <span className="font-semibold text-bnoon-navy dark:text-white">{gender}</span>
-                </div>
                 {idType || idNumber ? (
                   <div className="flex justify-between items-center py-3">
                     <span className="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-2">

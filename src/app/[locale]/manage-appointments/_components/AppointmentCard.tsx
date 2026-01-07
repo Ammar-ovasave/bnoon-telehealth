@@ -365,16 +365,10 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
             )}
             {nationality?.name && (
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.nationality")}</p>
-                <p className="font-medium text-gray-900 dark:text-white">{nationality?.name ?? "-"}</p>
+                <p className="text-sm text-gray-600">{t("patientInformation.nationality")}</p>
+                <p className="font-medium text-gray-900">{nationality?.name ?? "-"}</p>
               </div>
             )}
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.gender")}</p>
-              <p className="font-medium text-gray-900 dark:text-white">
-                {patientData?.sex === 0 ? t("patientInformation.genders.female") : t("patientInformation.genders.male")}
-              </p>
-            </div>
             {patientData?.identityId && (
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -428,7 +422,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
                     <p className="text-sm text-green-800 dark:text-green-200">
                       {t("reschedule.selected")}:{" "}
                       <span className="font-medium">
-                        {format(selectedRescheduleDate, "EEEE, MMMM do, yyyy", { locale: dateFnsLocale })}
+                        {format(selectedRescheduleDate, "EEEE, MMMM d, yyyy", { locale: dateFnsLocale })}
                       </span>
                     </p>
                     {!isKSA && (
@@ -439,10 +433,10 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
                               availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
                                 new Date().toISOString(),
                               KSA_TIMEZONE,
-                              "EEEE, MMMM do, yyyy",
+                              "EEEE, MMMM d, yyyy",
                               { locale: dateFnsLocale }
                             )
-                          : formatInTimeZone(selectedRescheduleDate, KSA_TIMEZONE, "EEEE, MMMM do, yyyy", {
+                          : formatInTimeZone(selectedRescheduleDate, KSA_TIMEZONE, "EEEE, MMMM d, yyyy", {
                               locale: dateFnsLocale,
                             })}
                       </p>

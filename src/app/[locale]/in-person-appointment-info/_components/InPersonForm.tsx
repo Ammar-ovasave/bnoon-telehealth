@@ -76,31 +76,11 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
         handleContinueToReview();
       }}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-        {/* Registered user notice */}
-        {isRegisteredUser && (
-          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <div className="flex items-start gap-3">
-              <Lock className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm text-blue-800 dark:text-blue-200">
-                  {t("registeredUserNotice.message")}
-                </p>
-                <a
-                  href="mailto:info@bnoon.sa"
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium mt-1 inline-block"
-                >
-                  {t("registeredUserNotice.contactSupport")}
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
         <div className="space-y-6">
           {/* Full Name */}
           <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-gray-500" />
                 {t("labels.fullName")} *
@@ -114,12 +94,32 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
               placeholder={t("placeholders.fullName")}
               disabled={isRegisteredUser}
               className={cn(
-                "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent dark:bg-gray-700 dark:text-white",
-                errors.fullName ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600",
-                isRegisteredUser && "bg-gray-100 dark:bg-gray-600 cursor-not-allowed opacity-75"
+                "w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/100 focus:border-transparent",
+                errors.fullName ? "border-red-500" : "border-gray-300",
+                isRegisteredUser && "bg-gray-100 cursor-not-allowed opacity-75"
               )}
             />
-            {errors.fullName && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.fullName}</p>}
+            {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
+
+            {/* Registered user notice - moved under full name input */}
+            {isRegisteredUser && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <Lock className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm text-blue-800">
+                      {t("registeredUserNotice.message")}
+                    </p>
+                    <a
+                      href="mailto:info@bnoon.sa"
+                      className="text-sm text-blue-600 hover:underline font-medium mt-1 inline-block"
+                    >
+                      {t("registeredUserNotice.contactSupport")}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

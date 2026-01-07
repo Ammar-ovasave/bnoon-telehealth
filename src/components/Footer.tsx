@@ -15,22 +15,24 @@ const Footer: FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand Section */}
           <div className="space-y-4">
-            <Image
-              src="/images/bnoon-logo-white.svg"
-              alt="Bnoon - بنون"
-              width={120}
-              height={50}
-              className="h-10 w-auto"
-            />
-            <p className="text-sm text-white/80 dark:text-gray-400 leading-relaxed">
+            <a href="https://bnoon.sa" target="_blank" rel="noopener noreferrer">
+              <Image
+                src="/images/bnoon-logo-white.svg"
+                alt="Bnoon - بنون"
+                width={120}
+                height={50}
+                className="h-10 w-auto"
+              />
+            </a>
+            <p className="text-sm text-white/80 leading-relaxed">
               {locale === "ar"
-                ? "مركز الإخصاب وصحة المرأة. جزء من شبكة جلوبال فيرتيليتي."
-                : "The Fertility & Women's Health Center. Part of Global Fertility Network."}
+                ? "الشبكة الرائدة لمراكز الإخصاب وصحة المرأة في المملكة العربية السعودية"
+                : "The leading network of fertility & women's health centers in Saudi Arabia"}
             </p>
             <p className="text-xs text-white/60">
               {locale === "ar"
-                ? "أكبر شبكة مستقلة لخدمات الإخصاب في المملكة العربية السعودية"
-                : "The largest stand-alone fertility services network in KSA"}
+                ? "جزء من جلوبال فيرتيليتي"
+                : "Part of Global Fertility"}
             </p>
           </div>
 
@@ -107,14 +109,14 @@ const Footer: FC = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-white/10 dark:border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/50 dark:text-gray-500">
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-white/50">
             © {currentYear} Bnoon. {locale === "ar" ? "جميع الحقوق محفوظة." : "All rights reserved."}
           </p>
-          <p className="text-xs text-white/50 dark:text-gray-500">
+          <p className="text-xs text-white/50">
             {locale === "ar"
-              ? "جزء من شبكة جلوبال فيرتيليتي (GFN)"
-              : "Part of Global Fertility Network (GFN)"}
+              ? "جزء من جلوبال فيرتيليتي"
+              : "Part of Global Fertility"}
           </p>
         </div>
       </div>

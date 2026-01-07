@@ -447,8 +447,8 @@
       "loading": "Loading..."
     },
     "registeredUserNotice": {
-      "message": "Your name is locked because you already have a profile on file.",
-      "contactSupport": "Need to update your info? Contact support"
+      "message": "Thank you for being a loyal patient at Bnoon. Your name is locked because you have a medical file at our clinic.",
+      "contactSupport": "Need to update your info? Contact Bnoon support."
     }
   },
   "NavHeader": {

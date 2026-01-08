@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { ArrowLeft, ArrowRight, Shield, ChevronDown, Smartphone } from "lucide-react";
+import { ArrowLeft, ArrowRight, Shield, ChevronDown, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { countryCodes } from "@/constants";
 import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
@@ -196,7 +196,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                 {showOtpInput ? (
                   <Shield className="h-10 w-10 text-white" />
                 ) : (
-                  <Smartphone className="h-10 w-10 text-white" />
+                  <Phone className="h-10 w-10 text-white" />
                 )}
               </div>
             </div>

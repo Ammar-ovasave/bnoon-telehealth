@@ -39,6 +39,7 @@
   --color-bnoon-navy: var(--bnoon-navy);
   --color-bnoon-cream: var(--bnoon-cream);
   --color-bnoon-light: var(--bnoon-light);
+  --color-bnoon-gray: var(--bnoon-gray);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

@@ -47,7 +47,7 @@ export default function ClinicBranchSelect({ className }: ClinicBranchSelectProp
             </div>
             <div>
               <p className="text-sm font-semibold uppercase tracking-wide text-bnoon-teal">{t("label")}</p>
-              <h2 className="text-xl font-bold text-bnoon-navy dark:text-white">{t("heading")}</h2>
+              <h2 className="text-xl font-bold text-bnoon-gray dark:text-white">{t("heading")}</h2>
             </div>
           </div>
 

@@ -200,7 +200,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                 )}
               </div>
             </div>
-            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-navy dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {showOtpInput ? t("title.verifyPhone") : t("title.enterPhone")}
             </h1>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-md mx-auto leading-relaxed">

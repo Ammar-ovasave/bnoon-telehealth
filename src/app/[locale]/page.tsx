@@ -26,7 +26,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           {/* Header Section */}
           <div className="text-center mb-8 md:mb-10">
-            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-navy dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {locale === "ar"
                 ? "اختر أقرب مركز بنون إليك"
                 : "Select Your Nearest Bnoon Clinic"}

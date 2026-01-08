@@ -34,7 +34,7 @@ export default function InPersonAppointmentInfoPage() {
               <Image src={`/icons/Location1.png`} alt={t("title")} width={50} height={50} />
             </div>
           </div>
-          <h1 className="text-2xl md:text-4xl rtl:text-3xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
+          <h1 className="text-2xl md:text-4xl rtl:text-3xl font-bold text-bnoon-gray dark:text-white mb-4">{t("title")}</h1>
           <p className="text-sm md:text-base ltr:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
         </div>
 
@@ -56,7 +56,7 @@ export default function InPersonAppointmentInfoPage() {
               <Image src={`/icons/Location1.png`} alt={t("visitDetails.title")} width={25} height={25} />
             </div>
             <div>
-              <h4 className="text-sm font-medium text-bnoon-teal mb-1">{t("visitDetails.title")}</h4>
+              <h4 className="text-sm font-medium text-bnoon-gray mb-1">{t("visitDetails.title")}</h4>
               <p className="text-sm text-bnoon-navy dark:text-gray-300">{t("visitDetails.description")}</p>
             </div>
           </div>

@@ -272,7 +272,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Left Column - Appointment Info */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("appointmentDetails.title")}</h3>
+          <h3 className="text-lg font-semibold text-bnoon-gray dark:text-white mb-3">{t("appointmentDetails.title")}</h3>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <Image
@@ -338,7 +338,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
 
         {/* Right Column - Patient Info */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("patientInformation.title")}</h3>
+          <h3 className="text-lg font-semibold text-bnoon-gray dark:text-white mb-3">{t("patientInformation.title")}</h3>
           <div className="space-y-3">
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.fullName")}</p>
@@ -396,7 +396,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-4">
               {/* Date Selection */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t("reschedule.selectDate")}</h3>
+                <h3 className="text-lg font-semibold text-bnoon-gray dark:text-white">{t("reschedule.selectDate")}</h3>
                 <div className="flex justify-center">
                   <CalendarComponent
                     mode="single"
@@ -447,7 +447,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
 
               {/* Time Selection */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t("reschedule.selectTime")}</h3>
+                <h3 className="text-lg font-semibold text-bnoon-gray dark:text-white">{t("reschedule.selectTime")}</h3>
                 {!selectedRescheduleDate ? (
                   <div className="text-center py-8">
                     <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />

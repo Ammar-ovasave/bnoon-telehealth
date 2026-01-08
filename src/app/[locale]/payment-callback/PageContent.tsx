@@ -161,7 +161,7 @@ export function PaymentCallbackContent() {
                 <Loader2 className="w-12 h-12 text-bnoon-teal animate-spin" />
               </div>
             </div>
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {state === "processing" ? t("processing") : t("creatingAppointment")}
             </h1>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">
@@ -180,7 +180,7 @@ export function PaymentCallbackContent() {
                 <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
               </div>
             </div>
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {t("success.title")}
             </h1>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-6">
@@ -200,7 +200,7 @@ export function PaymentCallbackContent() {
                 <XCircle className="w-12 h-12 text-red-600 dark:text-red-400" />
               </div>
             </div>
-            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {t("failed.title")}
             </h1>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-2">

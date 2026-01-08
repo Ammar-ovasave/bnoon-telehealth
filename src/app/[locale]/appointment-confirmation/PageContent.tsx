@@ -145,7 +145,7 @@ export const PageContent: FC = () => {
                 <Check className="h-8 w-8 text-bnoon-teal" strokeWidth={3} />
               </div>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-gray dark:text-white mb-4">{t("title")}</h1>
             <p className="text-base text-gray-600 dark:text-gray-300 max-w-xl mx-auto leading-relaxed">{t("description")}</p>
             
             {/* Confirmation Badge */}
@@ -172,7 +172,7 @@ export const PageContent: FC = () => {
           <div className="grid lg:grid-cols-2 gap-6 animate-fade-in-up animation-delay-200">
             {/* Appointment Details */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-bold text-bnoon-navy dark:text-white mb-6 flex items-center gap-3">
+              <h2 className="text-lg font-bold text-bnoon-gray dark:text-white mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
                   <Image
                     src={"/icons/Calender.png"}
@@ -217,7 +217,7 @@ export const PageContent: FC = () => {
 
             {/* Patient Information */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-bold text-bnoon-navy dark:text-white mb-6 flex items-center gap-3">
+              <h2 className="text-lg font-bold text-bnoon-gray dark:text-white mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
                   <User className="h-5 w-5 text-bnoon-teal" />
                 </div>
@@ -264,7 +264,7 @@ export const PageContent: FC = () => {
 
           {/* Next Steps */}
           <div className="mt-8 animate-fade-in-up animation-delay-300">
-            <h3 className="text-lg font-bold text-bnoon-navy dark:text-white mb-4">{t("nextSteps.title")}</h3>
+            <h3 className="text-lg font-bold text-bnoon-gray dark:text-white mb-4">{t("nextSteps.title")}</h3>
 
             {/* General confirmation message - varies by visit type */}
             <div className="p-4 bg-gradient-to-r from-bnoon-teal/10 to-cyan-500/10 dark:from-bnoon-teal/20 dark:to-cyan-500/20 rounded-xl border border-bnoon-teal/20 dark:border-bnoon-teal/30 mb-4">

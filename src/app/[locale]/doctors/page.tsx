@@ -109,7 +109,7 @@ export default function DoctorsListPage() {
         <div className="relative mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-24">
           {/* Header */}
           <div className="text-center mb-10 md:mb-12 animate-fade-in-up">
-            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-navy dark:text-white mb-4 leading-tight">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-4 leading-tight">
               {t("title")}
             </h1>
             <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
@@ -122,7 +122,7 @@ export default function DoctorsListPage() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 dark:border-gray-700">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h2 className="text-lg font-bold text-bnoon-navy dark:text-white mb-1">{t("visitType.title")}</h2>
+                  <h2 className="text-lg font-bold text-bnoon-gray dark:text-white mb-1">{t("visitType.title")}</h2>
                   <p className="text-base text-gray-500 dark:text-gray-400">{t("visitType.description")}</p>
                 </div>
 
@@ -252,7 +252,7 @@ export default function DoctorsListPage() {
                     <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
                       <Filter className="h-8 w-8 text-gray-400" />
                     </div>
-                    <h3 className="text-xl font-bold text-bnoon-navy dark:text-white mb-3">{t("noDoctorsFound.title")}</h3>
+                    <h3 className="text-xl font-bold text-bnoon-gray dark:text-white mb-3">{t("noDoctorsFound.title")}</h3>
                     <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noDoctorsFound.description")}</p>
                   </div>
                 </motion.div>

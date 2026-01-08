@@ -29,7 +29,7 @@ export const PageContent: FC = () => {
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-5xl pb-24">
         {/* Header */}
         <div className="text-center mb-10 md:mb-12 animate-fade-in-up">
-          <h1 className="text-2xl md:text-4xl font-bold text-bnoon-navy dark:text-white mb-4 leading-tight">
+          <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-4 leading-tight">
             {t("title")}
           </h1>
           <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">

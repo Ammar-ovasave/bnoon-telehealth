@@ -24,7 +24,7 @@ const VisitTypeCard: FC<VisitTypeCardProps> = ({ visitType }) => {
       <Card className={cn("cursor-pointer relative transition-all duration-300 hover:shadow-xl overflow-hidden h-full")}>
         <CardHeader className="text-center">
           <div className="text-6xl mb-4">{visitType.icon}</div>
-          <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{visitType.title}</CardTitle>
+          <CardTitle className="text-2xl font-bold text-bnoon-gray dark:text-white mb-2">{visitType.title}</CardTitle>
           <CardDescription className="text-base text-gray-600 dark:text-gray-300 leading-relaxed">
             {visitType.description}
           </CardDescription>

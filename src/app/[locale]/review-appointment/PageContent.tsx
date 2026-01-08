@@ -383,7 +383,7 @@ export function PageContent() {
               <CheckCircle2 className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="mb-3 text-2xl md:text-4xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
+          <h1 className="mb-3 text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white">{t("title")}</h1>
           <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed max-w-md mx-auto">{t("description")}</p>
         </div>
 
@@ -402,7 +402,7 @@ export function PageContent() {
                 />
               )}
               <div className="flex-1">
-                <h3 className="font-semibold text-bnoon-navy dark:text-white text-lg">{doctorDisplayName}</h3>
+                <h3 className="font-semibold text-bnoon-gray dark:text-white text-lg">{doctorDisplayName}</h3>
                 {selectedDoctor.specialty && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                     {tDoctors(`doctors.${selectedDoctor.id}.specialty`) || selectedDoctor.specialty}
@@ -416,7 +416,7 @@ export function PageContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-100 dark:divide-gray-700 border-b border-gray-100 dark:border-gray-700">
             {/* Appointment Details */}
             <div className="p-6">
-              <h4 className="text-sm font-semibold text-bnoon-navy dark:text-white uppercase tracking-wide mb-4">
+              <h4 className="text-sm font-semibold text-bnoon-gray dark:text-white uppercase tracking-wide mb-4">
                 {t("appointmentDetails")}
               </h4>
 
@@ -495,7 +495,7 @@ export function PageContent() {
 
             {/* Patient Information */}
             <div className="p-6">
-            <h4 className="text-sm font-semibold text-bnoon-navy dark:text-white uppercase tracking-wide mb-4">
+            <h4 className="text-sm font-semibold text-bnoon-gray dark:text-white uppercase tracking-wide mb-4">
               {t("patientInformation")}
             </h4>
 

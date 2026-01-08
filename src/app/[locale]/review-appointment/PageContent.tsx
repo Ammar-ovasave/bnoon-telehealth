@@ -383,8 +383,8 @@ export function PageContent() {
               <CheckCircle2 className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="mb-3 text-2xl sm:text-3xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
-          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed max-w-md mx-auto">{t("description")}</p>
+          <h1 className="mb-3 text-2xl md:text-4xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed max-w-md mx-auto">{t("description")}</p>
         </div>
 
         {/* Main Content Card */}

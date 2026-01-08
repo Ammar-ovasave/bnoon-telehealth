@@ -34,8 +34,8 @@ export default function InPersonAppointmentInfoPage() {
               <Image src={`/icons/Location1.png`} alt={t("title")} width={50} height={50} />
             </div>
           </div>
-          <h1 className="text-4xl rtl:text-3xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
-          <p className="ltr:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
+          <h1 className="text-2xl md:text-4xl rtl:text-3xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
+          <p className="text-sm md:text-base ltr:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
         </div>
 
         {/* Form */}

@@ -157,7 +157,7 @@ const PrepareForVideoCallPage: FC = () => {
           </div>
         )}
       </div>
-      <h1 className={cn("w-full text-center text-2xl font-semibold")}>{`Teleconsultation`}</h1>
+      <h1 className={cn("w-full text-center text-2xl md:text-4xl font-semibold")}>{`Teleconsultation`}</h1>
       <div className="mx-auto mt-4 mb-4">
         <Link
           href={enableJoinCallButton ? `/video-call/${appointmentData?.id}/join?${videoCallInitialSearchParams.toString()}` : "#"}

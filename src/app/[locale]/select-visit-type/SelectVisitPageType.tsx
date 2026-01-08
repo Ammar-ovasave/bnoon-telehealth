@@ -9,8 +9,8 @@ export const PageContent: FC = () => {
       <div className="container mx-auto px-4 py-8 max-w-4xl pb-30">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Visit Type</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <h1 className="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Select Visit Type</h1>
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Choose how you&apos;d like to have your consultation. Both options provide excellent care tailored to your needs.
           </p>
         </div>

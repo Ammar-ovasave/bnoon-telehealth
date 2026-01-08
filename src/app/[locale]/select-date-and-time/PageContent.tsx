@@ -130,8 +130,8 @@ export default function SelectDateAndTimePage() {
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-32">
         {/* Header */}
         <div className="text-center mb-10 animate-fade-in-up">
-          <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
-          <p className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6">{t("description")}</p>
+          <h1 className="text-2xl md:text-4xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6">{t("description")}</p>
 
           {/* Doctor Info Card with Visit Type */}
           {selectedDoctor && (

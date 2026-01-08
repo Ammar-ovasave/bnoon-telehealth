@@ -117,8 +117,8 @@ export default function ManageAppointmentPageContent() {
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Header */}
         <div className="mb-10 text-center animate-fade-in-up">
-          <h1 className="mb-4 text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
-          <p className="mx-auto max-w-2xl text-gray-600 dark:text-gray-300 text-base leading-relaxed">{t("description")}</p>
+          <h1 className="mb-4 text-2xl md:text-4xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
+          <p className="text-sm md:text-base mx-auto max-w-2xl text-gray-600 dark:text-gray-300 leading-relaxed">{t("description")}</p>
         </div>
 
         {/* Branch Selector */}

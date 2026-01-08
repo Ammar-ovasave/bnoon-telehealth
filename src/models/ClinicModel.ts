@@ -59,7 +59,7 @@ export const clinicLocations: ClinicLocation[] = [
     city: "Al Ahsa",
     address: "Almoosa Specialist Hospital, North Tower, Floor 12",
     doctors: "12 specialists",
-    imageSrc: "/images/bnoon-alahsa-exterior.png",
+    imageSrc: "/images/bnoon-alahsa.png",
     contactEmail: "info.jeddah@bnoon.sa",
     contactNumber: "+966126800800",
     apiUrl: "https://overhaughty-branda-dowerless.ngrok-free.dev",

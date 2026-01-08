@@ -11,6 +11,7 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
@@ -142,11 +143,14 @@ export default function DoctorsListPage() {
                       clinicDoctorsCount === 0 && "opacity-50 cursor-not-allowed hover:scale-100 active:scale-100"
                     )}
                   >
-                    {availabilityFilter === "clinic" ? (
-                      <Check className="w-4 h-4 scale-[2.5] transform" />
-                    ) : (
-                      <Building2 className="w-4 h-4 scale-[2.5] transform" />
-                    )}
+                    <span className="flex items-center justify-center w-10 h-10">
+                      {availabilityFilter === "clinic" ? (
+                        <Check className="w-6 h-6" />
+                      ) : (
+                        <Image src="/icons/Location1.png" alt="Clinic Visit" width={30} height={30} />
+                      )}
+                    </span>
+                    
                     <span>{t("visitType.clinic.title")}</span>
                     <span className={cn(
                       "text-xs px-2 py-0.5 rounded-full font-bold",
@@ -170,11 +174,13 @@ export default function DoctorsListPage() {
                       virtualDoctorsCount === 0 && "opacity-50 cursor-not-allowed hover:scale-100 active:scale-100"
                     )}
                   >
-                    {availabilityFilter === "virtual" ? (
-                      <Check className="w-4 h-4 scale-[2.5] transform" />
-                    ) : (
-                      <Video className="w-4 h-4 scale-[2.5] transform" />
-                    )}
+                   <span className="flex items-center justify-center w-10 h-10">
+                      {availabilityFilter === "virtual" ? (
+                        <Check className="w-6 h-6" />
+                      ) : (
+                        <Image src="/icons/Virtualvisit.png" alt="Clinic Visit" width={30} height={30} />
+                      )}
+                    </span>
                     <span>{t("visitType.virtual.title")}</span>
                     <span className={cn(
                       "text-xs px-2 py-0.5 rounded-full font-bold",

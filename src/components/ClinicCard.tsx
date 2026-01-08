@@ -10,6 +10,11 @@ import useSwitchBranch from "@/hooks/useSwitchBranch";
 import LoadingOverlay from "./LoadingOverlay";
 import { useTranslations } from "next-intl";
 
+const clinicImageScaleMap: Record<string, number> = {
+  "riyadh-king-salman": 1.4,
+  "jeddah": 1.25
+}
+
 const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -41,6 +46,11 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
           alt={`${clinic.name} clinic`}
           fill
           className="object-cover"
+          style={{
+            transform: clinicImageScaleMap[clinic.id]
+              ? `scale(${clinicImageScaleMap[clinic.id]})`
+              : undefined,
+          }}
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80" />

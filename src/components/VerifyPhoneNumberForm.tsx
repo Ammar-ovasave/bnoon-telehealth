@@ -307,7 +307,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                       </>
                     )}
                   </Button>
-                </div>
+            </div>
               </div>
             </div>
           )}

@@ -176,7 +176,7 @@ export function PaymentCallbackContent() {
         {state === "success" && (
           <div className="text-center animate-fade-in-up">
             <div className="mb-8">
-              <div className="w-24 h-24 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 mx-auto bg-green-100 dark:bg-green-900/30 rounded-base flex items-center justify-center">
                 <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
               </div>
             </div>
@@ -196,7 +196,7 @@ export function PaymentCallbackContent() {
         {state === "failed" && (
           <div className="text-center animate-fade-in-up">
             <div className="mb-8">
-              <div className="w-24 h-24 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 mx-auto bg-red-100 dark:bg-red-900/30 rounded-base flex items-center justify-center">
                 <XCircle className="w-12 h-12 text-red-600 dark:text-red-400" />
               </div>
             </div>

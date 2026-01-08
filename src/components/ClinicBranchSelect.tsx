@@ -42,7 +42,7 @@ export default function ClinicBranchSelect({ className }: ClinicBranchSelectProp
         <div className="absolute -top-16 -right-16 size-40 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20 blur-3xl" />
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex size-14 items-center justify-center rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal">
+            <div className="flex size-14 items-center justify-center rounded-base bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal">
               <Image src={`/icons/ClinicBuilding.png`} alt={t("label")} width={100} height={100} />
             </div>
             <div>

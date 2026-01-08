@@ -130,7 +130,7 @@ export default function ManageAppointmentPageContent() {
         {appointmentNotFound && appointmentIdFromUrl && !isInitializing && !isLoading && (
           <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl animate-fade-in-up">
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 w-10 h-10 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center">
+              <div className="flex-shrink-0 w-10 h-10 bg-amber-100 dark:bg-amber-900/40 rounded-base flex items-center justify-center">
                 <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div>

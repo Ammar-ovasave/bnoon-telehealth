@@ -57,7 +57,7 @@ export default function Home() {
             {Object.entries(clinicsByCity).map(([city, clinics]) => (
               <div
                 key={city}
-                className="flex items-center gap-1.5 bg-white dark:bg-gray-800 px-2.5 py-1 rounded-full shadow-sm border border-gray-200 dark:border-gray-700"
+                className="flex items-center gap-1.5 bg-white dark:bg-gray-800 px-2.5 py-1 rounded-base shadow-sm border border-gray-200 dark:border-gray-700"
               >
                 <div className="w-1.5 h-1.5 bg-bnoon-navy rounded-full" />
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{getTranslatedCity(city)}</span>

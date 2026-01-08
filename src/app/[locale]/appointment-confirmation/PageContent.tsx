@@ -141,7 +141,7 @@ export const PageContent: FC = () => {
           {/* Success Header */}
           <div className="text-center mb-10 animate-fade-in-up">
             <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-bnoon-teal/10 rounded-full flex items-center justify-center border-2 border-bnoon-teal">
+              <div className="w-16 h-16 bg-bnoon-teal/10 rounded-base flex items-center justify-center border-2 border-bnoon-teal">
                 <Check className="h-8 w-8 text-bnoon-teal" strokeWidth={3} />
               </div>
             </div>
@@ -280,7 +280,7 @@ export const PageContent: FC = () => {
             {selectedVisitType === "virtual" ? (
               <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-blue-100 dark:bg-blue-800 rounded-base flex items-center justify-center">
                     <Video className="h-4 w-4 text-blue-600 dark:text-blue-300" />
                   </div>
                   <h4 className="font-semibold text-blue-900 dark:text-blue-100 text-sm">{t("nextSteps.virtualTitle")}</h4>
@@ -299,7 +299,7 @@ export const PageContent: FC = () => {
             ) : (
               <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-800 rounded-base flex items-center justify-center">
                     <Building className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
                   </div>
                   <h4 className="font-semibold text-emerald-900 dark:text-emerald-100 text-sm">{t("nextSteps.clinicTitle")}</h4>

@@ -249,7 +249,7 @@ export default function DoctorsListPage() {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 max-w-md mx-auto">
-                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-base flex items-center justify-center mx-auto mb-6">
                       <Filter className="h-8 w-8 text-gray-400" />
                     </div>
                     <h3 className="text-xl font-bold text-bnoon-gray dark:text-white mb-3">{t("noDoctorsFound.title")}</h3>

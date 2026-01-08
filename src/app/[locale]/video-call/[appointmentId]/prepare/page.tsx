@@ -135,7 +135,7 @@ const PrepareForVideoCallPage: FC = () => {
           <button
             onClick={permissions.microphone ? toggleMicrophone : requestPermissions}
             className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full text-white transition-colors",
+              "flex h-12 w-12 items-center justify-center rounded-base text-white transition-colors",
               permissions.microphone ? "bg-primary hover:bg-primary/90" : "bg-destructive hover:bg-destructive/90"
             )}
           >
@@ -144,7 +144,7 @@ const PrepareForVideoCallPage: FC = () => {
           <button
             onClick={permissions.camera ? toggleCamera : requestPermissions}
             className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full text-white transition-colors",
+              "flex h-12 w-12 items-center justify-center rounded-base text-white transition-colors",
               permissions.camera ? "bg-primary hover:bg-primary/90" : "bg-destructive hover:bg-destructive/90"
             )}
           >

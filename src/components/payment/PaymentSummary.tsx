@@ -25,7 +25,7 @@ export function PaymentSummary({ serviceName, price, currency }: PaymentSummaryP
       {/* Header */}
       <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-base flex items-center justify-center">
             <CreditCard className="w-5 h-5 text-bnoon-teal" />
           </div>
           <h3 className="font-semibold text-bnoon-gray dark:text-white">

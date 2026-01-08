@@ -212,7 +212,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
       {/* Highlighted Badge */}
       {isHighlighted && (
         <div className="flex items-center gap-2 mb-4 pb-3 border-b border-bnoon-teal/20">
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal rounded-full text-xs font-medium">
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal rounded-base text-xs font-medium">
             <Mail className="w-3 h-3" />
             {t("fromNotification")}
           </div>
@@ -224,7 +224,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
         <div className="flex flex-col md:flex-row items-center gap-3 mb-2 md:mb-0">
           <div
             className={cn(
-              "px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2",
+              "px-3 py-1 rounded-base text-sm font-medium flex items-center gap-2",
               getAppointmentStatusColor(appointment.status?.name ?? "")
             )}
           >

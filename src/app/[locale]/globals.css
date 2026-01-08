@@ -41,6 +41,7 @@
   --color-bnoon-light: var(--bnoon-light);
   --color-bnoon-gray: var(--bnoon-gray);
   --radius-sm: calc(var(--radius) - 4px);
+  --radius-base: calc(var(--radius) - 7px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);

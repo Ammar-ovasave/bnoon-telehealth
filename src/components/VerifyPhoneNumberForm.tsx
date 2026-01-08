@@ -120,10 +120,8 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
       return toast.error(t("errors.invalidOTP"));
     }
     mutateCurrentUser(undefined);
-    setTimeout(() => {
-      setIsLoading(false);
-      onVerifyPhoneSuccess();
-    }, 200);
+    setIsLoading(false);
+    onVerifyPhoneSuccess();
   };
 
   const handleCountryCodeSelect = (code: string) => {

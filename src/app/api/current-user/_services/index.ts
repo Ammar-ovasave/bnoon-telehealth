@@ -1,5 +1,5 @@
 import { AUTH_TOKEN_NAME } from "@/constants";
-import { verifyToken } from "@/lib/verifyToken";
+import { verifyBnoonToken } from "@/lib/verifyToken";
 import { cookies } from "next/headers";
 
 export async function getCurrentUser() {
@@ -9,7 +9,7 @@ export async function getCurrentUser() {
     if (!authToken?.value) {
       return null;
     }
-    const decodedToken = verifyToken({ secret: process.env.JWT_SECRET ?? "", token: authToken?.value ?? "" });
+    const decodedToken = verifyBnoonToken({ secret: process.env.JWT_SECRET ?? "", token: authToken?.value ?? "" });
     if (!decodedToken) {
       return null;
     }

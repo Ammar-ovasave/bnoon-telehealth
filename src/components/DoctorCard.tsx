@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 import { useTranslations, useLocale } from "next-intl";
 import { getDoctorName } from "@/lib/getDoctorName";
 import clsx from "clsx";
+import { FEATURE_FLAGS } from "@/constants";
 
 interface DoctorCardProps {
   doctor: DoctorModel;
@@ -35,7 +36,8 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
         </div>
       );
     }
-    if (doctor.availability.virtual) {
+    // Only show virtual badge if feature is enabled
+    if (doctor.availability.virtual && FEATURE_FLAGS.VIRTUAL_APPOINTMENTS_ENABLED) {
       icons.push(
         <div
           key="virtual"

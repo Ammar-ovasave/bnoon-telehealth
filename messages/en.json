@@ -1,7 +1,19 @@
 {
   "visitStatus": {
+    "Waiting For Approval": "Waiting for Approval",
     "Approved/Confirmed": "Confirmed",
-    "Cancelled": "Cancelled"
+    "Arrived Waiting!": "Arrived - Waiting",
+    "Procedure Started": "In Progress",
+    "Completed": "Completed",
+    "Patient No-Show": "No Show",
+    "Cancelled": "Cancelled",
+    "No Answer": "No Answer",
+    "Will Callback": "Will Callback",
+    "On The Way Coming": "On The Way",
+    "Booked Today": "Booked Today",
+    "Patient Confirmed": "Patient Confirmed",
+    "Locked": "Locked",
+    "Unlocked": "Unlocked"
   },
   "visitTypes": {
     "clinic": "In-Clinic Appointment",
@@ -13,6 +25,9 @@
     "Iqama No": "Iqama No",
     "Passport": "Passport",
     "License Number": "License Number"
+  },
+  "BranchGuard": {
+    "selectClinicMessage": "Please select a clinic to continue booking"
   },
   "HomePage": {
     "title": "Select Your Nearest Bnoon Clinic",
@@ -94,7 +109,8 @@
       "virtual": {
         "title": "Virtual Visit",
         "description": "Consult with your doctor from the comfort of your home via video call.",
-        "selectButton": "Select a virtual visit"
+        "selectButton": "Select a virtual visit",
+        "comingSoon": "Coming Soon"
       }
     },
     "availability": {
@@ -361,8 +377,7 @@
       "description": "The requested appointment was not found or has been cancelled"
     },
     "buttons": {
-      "bookNewAppointment": "Book New Appointment",
-      "bookAnotherAppointment": "Book Another Appointment"
+      "bookAppointment": "Book Appointment"
     },
     "appointmentCard": {
       "confirmation": "Confirmation",
@@ -525,6 +540,47 @@
     "errors": {
       "paymentFailed": "Payment failed. Please try again.",
       "appointmentCreationFailed": "Payment successful but appointment creation failed. Please contact support."
+    }
+  },
+  "ProfileCompletionForm": {
+    "title": "Complete Your Profile",
+    "description": "Please provide your details to continue with your appointment booking.",
+    "labels": {
+      "firstName": "First Name",
+      "middleName": "Middle Name",
+      "lastName": "Last Name",
+      "emailAddress": "Email Address",
+      "gender": "Gender",
+      "dateOfBirth": "Date of Birth",
+      "nationality": "Nationality",
+      "selectNationality": "Select your nationality"
+    },
+    "placeholders": {
+      "firstName": "Enter your first name",
+      "middleName": "Enter your middle name (optional)",
+      "lastName": "Enter your last name",
+      "emailAddress": "Enter your email address"
+    },
+    "genders": {
+      "male": "Male",
+      "female": "Female"
+    },
+    "buttons": {
+      "completeProfile": "Complete Profile",
+      "saving": "Saving..."
+    },
+    "errors": {
+      "firstNameRequired": "First name is required",
+      "firstNameMinLength": "First name must be at least 2 characters",
+      "lastNameRequired": "Last name is required",
+      "lastNameMinLength": "Last name must be at least 2 characters",
+      "genderRequired": "Please select your gender",
+      "dobRequired": "Date of birth is required",
+      "emailInvalid": "Please enter a valid email address",
+      "updateFailed": "Failed to update profile. Please try again."
+    },
+    "messages": {
+      "profileUpdated": "Profile updated successfully!"
     }
   }
 }

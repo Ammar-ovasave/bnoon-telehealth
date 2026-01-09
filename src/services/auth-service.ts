@@ -3,6 +3,7 @@ import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
 import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
 import { addBranchMapping, updateBranchSyncTime } from "@/firestore/users";
 import axios from "@/services/axios";
+import { Axios, AxiosError } from "axios";
 
 interface SyncResult {
   branchId: string;
@@ -31,9 +32,9 @@ export async function getFertiSmartBranches(
   apiUrl: string
 ): Promise<{ id: number; name: string }[]> {
   try {
-    const res = await axios.get<{ id: number; name: string; mrnPrefix: string }[]>(
-      `${apiUrl}/branches`
-    );
+    const res = await axios.get<
+      { id: number; name: string; mrnPrefix: string }[]
+    >(`${apiUrl}/branches`);
     return res.data;
   } catch (error) {
     console.error("--- getFertiSmartBranches error", error);
@@ -43,20 +44,30 @@ export async function getFertiSmartBranches(
 
 /**
  * Create a patient in FertiSmart
+ * @param apiUrl - The FertiSmart API URL
+ * @param user - The Bnoon user from Firestore
+ * @param fertiSmartBranchId - The FertiSmart branch ID
+ * @param patientName - Optional name override from the form
  */
 async function createFertiSmartPatient(
   apiUrl: string,
   user: BnoonUser,
-  fertiSmartBranchId: number
+  fertiSmartBranchId: number,
+  patientName?: { firstName: string; middleName: string; lastName: string }
 ): Promise<FertiSmartPatientModel | null> {
   try {
+    // Use provided name or fall back to user profile
+    const firstName = patientName?.firstName || user.firstName || "-";
+    const middleName = patientName?.middleName || user.middleName || "-";
+    const lastName = patientName?.lastName || user.lastName || "-";
+
     const payload = {
       patient: {
-        firstName: user.firstName || "-",
-        lastName: user.lastName || "-",
-        middleName: user.middleName || "-",
+        firstName,
+        lastName,
+        middleName,
         contactNumber: user.phone,
-        sex: user.sex,
+        sex: user.sex ?? 0, // Default to female (0) if not set
         dob: user.dob,
       },
       branchId: fertiSmartBranchId,
@@ -70,7 +81,11 @@ async function createFertiSmartPatient(
     console.log("--- Created FertiSmart patient", res.data);
     return res.data;
   } catch (error) {
-    console.error("--- createFertiSmartPatient error", error);
+    if (error instanceof AxiosError) {
+      console.error("--- createFertiSmartPatient error data:", error.response?.data);
+    } else {
+      console.error("--- createFertiSmartPatient error", error);
+    }
     return null;
   }
 }
@@ -100,12 +115,15 @@ async function updateFertiSmartPatient(
     await axios.patch(`${apiUrl}/patients/${mrn}`, payload);
 
     // Also update sex if present
-    if (user.sex !== undefined) {
+    if (user.sex != undefined) {
       try {
         await axios.patch(`${apiUrl}/patients/${mrn}/sex`, { sex: user.sex });
       } catch (sexError) {
         // Sex update might fail for couple files, ignore
-        console.warn("--- updateFertiSmartPatient sex update failed (might be couple file)", sexError);
+        console.warn(
+          "--- updateFertiSmartPatient sex update failed (might be couple file)",
+          sexError
+        );
       }
     }
 
@@ -139,23 +157,33 @@ async function findFertiSmartPatientByPhone(
 }
 
 /**
+ * Verify a patient exists in FertiSmart by MRN
+ */
+async function verifyPatientExistsInFertiSmart(
+  apiUrl: string,
+  mrn: string
+): Promise<boolean> {
+  try {
+    const res = await axios.get(`${apiUrl}/patients/${mrn}`);
+    return !!res.data?.mrn;
+  } catch (error) {
+    // 404 or any error means patient doesn't exist
+    return false;
+  }
+}
+
+/**
  * Get or create FertiSmart patient for a specific branch
  * This is the lazy creation logic
+ * @param user - The Bnoon user from Firestore
+ * @param branchId - The clinic branch ID
+ * @param patientName - Optional name from the form (used when creating new patient)
  */
 export async function getOrCreateBranchMrn(
   user: BnoonUser,
-  branchId: ClinicBranchID
+  branchId: ClinicBranchID,
+  patientName?: { firstName: string; middleName: string; lastName: string }
 ): Promise<BranchMrnResult | null> {
-  // Check if user already has MRN for this branch
-  const existingMapping = user.branchMappings?.[branchId];
-  if (existingMapping?.mrn) {
-    return {
-      mrn: existingMapping.mrn,
-      isNew: false,
-      fertiSmartBranchId: existingMapping.fertiSmartBranchId,
-    };
-  }
-
   // Get the clinic API URL
   const apiUrl = getClinicApiUrl(branchId);
   if (!apiUrl) {
@@ -163,8 +191,30 @@ export async function getOrCreateBranchMrn(
     return null;
   }
 
+  // Check if user already has MRN for this branch
+  const existingMapping = user.branchMappings?.[branchId];
+  if (existingMapping?.mrn) {
+    // Verify the patient actually exists in FertiSmart
+    const patientExists = await verifyPatientExistsInFertiSmart(apiUrl, existingMapping.mrn);
+    if (patientExists) {
+      return {
+        mrn: existingMapping.mrn,
+        isNew: false,
+        fertiSmartBranchId: existingMapping.fertiSmartBranchId,
+      };
+    }
+    // Patient doesn't exist in FertiSmart - need to create them
+    console.log("--- getOrCreateBranchMrn: Patient not found in FertiSmart, will create", {
+      branchId,
+      mrn: existingMapping.mrn,
+    });
+  }
+
   // First, check if patient already exists in FertiSmart by phone
-  const existingPatient = await findFertiSmartPatientByPhone(apiUrl, user.phone);
+  const existingPatient = await findFertiSmartPatientByPhone(
+    apiUrl,
+    user.phone
+  );
   if (existingPatient?.mrn) {
     // Patient exists, get the FertiSmart branch ID
     const fertiSmartBranchId = existingPatient.branch?.id ?? 0;
@@ -198,7 +248,8 @@ export async function getOrCreateBranchMrn(
   const newPatient = await createFertiSmartPatient(
     apiUrl,
     user,
-    fertiSmartBranchId
+    fertiSmartBranchId,
+    patientName
   );
 
   if (!newPatient?.mrn) {
@@ -302,8 +353,10 @@ export function getUserBranches(user: BnoonUser): {
   branchId: string;
   mapping: BranchMapping;
 }[] {
-  return Object.entries(user.branchMappings || {}).map(([branchId, mapping]) => ({
-    branchId,
-    mapping,
-  }));
+  return Object.entries(user.branchMappings || {}).map(
+    ([branchId, mapping]) => ({
+      branchId,
+      mapping,
+    })
+  );
 }

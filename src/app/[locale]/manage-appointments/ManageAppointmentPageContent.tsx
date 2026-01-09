@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Calendar, Plus } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import { useTranslations, useLocale } from "next-intl";
 import { useMemo, useEffect, useRef, useCallback, useState } from "react";
 import Link from "next/link";
@@ -9,9 +8,11 @@ import { useSearchParams } from "next/navigation";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
 import useCurrentBranch from "@/hooks/useCurrentBranch";
 import useSwitchBranch from "@/hooks/useSwitchBranch";
+import useNearestUpcomingAppointment from "@/hooks/useNearestUpcomingAppointment";
 import AppointmentCard from "./_components/AppointmentCard";
 import ClinicBranchSelect from "@/components/ClinicBranchSelect";
 import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
+import AppointmentCardSkeleton from "./_components/AppointmentCardSkeleton";
 
 export default function ManageAppointmentPageContent() {
   const t = useTranslations("ManageAppointmentsPage");
@@ -20,6 +21,7 @@ export default function ManageAppointmentPageContent() {
   const { data, isLoading } = useCurrentUserAppointments();
   const { data: currentBranchData, isLoading: isLoadingBranch } = useCurrentBranch();
   const { handleSwitchBranch, loading: isSwitchingBranch } = useSwitchBranch();
+  const { appointment: nearestAppointment, isLoading: isLoadingNearestAppointment } = useNearestUpcomingAppointment();
   const [hasAutoSwitched, setHasAutoSwitched] = useState(false);
   const isAutoSwitching = useRef(false);
   const highlightedAppointmentRef = useRef<HTMLDivElement>(null);
@@ -37,31 +39,61 @@ export default function ManageAppointmentPageContent() {
     return clinic.id as ClinicBranchID;
   }, [branchFromUrl]);
 
-  // Determine if we need to auto-switch to branch from URL
+  // Get first available branch (non-coming-soon) as fallback
+  const firstAvailableBranch = useMemo((): ClinicBranchID => {
+    const availableBranch = clinicLocations.find((c) => !c.isCommingSoon);
+    return (availableBranch?.id ?? "riyadh-granada") as ClinicBranchID;
+  }, []);
+
+  // Determine target branch with priority:
+  // 1. Branch from URL (deep linking)
+  // 2. Nearest upcoming appointment's branch from Firestore
+  // 3. First available branch in dropdown
+  const targetBranchId = useMemo((): ClinicBranchID | null => {
+    // Priority 1: Branch from URL (for deep linking)
+    if (validBranchFromUrl) return validBranchFromUrl;
+
+    // Priority 2: Nearest upcoming appointment's branch
+    if (nearestAppointment?.branchId) {
+      const clinic = clinicLocations.find((c) => c.id === nearestAppointment.branchId);
+      if (clinic && !clinic.isCommingSoon) {
+        return nearestAppointment.branchId as ClinicBranchID;
+      }
+    }
+
+    // Priority 3: First available branch (if no branch currently selected)
+    if (!currentBranchData?.branch?.id) {
+      return firstAvailableBranch;
+    }
+
+    return null;
+  }, [validBranchFromUrl, nearestAppointment, currentBranchData?.branch?.id, firstAvailableBranch]);
+
+  // Determine if we need to auto-switch
   const needsAutoSwitch = useMemo(() => {
     // Still loading initial data
-    if (isLoadingBranch) return false;
-    // No branch specified in URL
-    if (!validBranchFromUrl) return false;
+    if (isLoadingBranch || isLoadingNearestAppointment) return false;
+    // No target branch determined
+    if (!targetBranchId) return false;
     // Already on the target branch
-    if (currentBranchData?.branch?.id === validBranchFromUrl) return false;
+    if (currentBranchData?.branch?.id === targetBranchId) return false;
     // Haven't switched yet this session
     return !hasAutoSwitched;
-  }, [isLoadingBranch, validBranchFromUrl, currentBranchData?.branch?.id, hasAutoSwitched]);
+  }, [isLoadingBranch, isLoadingNearestAppointment, targetBranchId, currentBranchData?.branch?.id, hasAutoSwitched]);
 
-  // Perform auto-switch to branch from URL
+  // Perform auto-switch to target branch
   const performAutoSwitch = useCallback(async () => {
-    if (!validBranchFromUrl || hasAutoSwitched || isAutoSwitching.current) return;
+    if (!targetBranchId || hasAutoSwitched || isAutoSwitching.current) return;
 
     setHasAutoSwitched(true);
     isAutoSwitching.current = true;
 
-    await handleSwitchBranch({ payload: { branchId: validBranchFromUrl } });
+    await handleSwitchBranch({ payload: { branchId: targetBranchId } });
 
     isAutoSwitching.current = false;
-  }, [validBranchFromUrl, handleSwitchBranch, hasAutoSwitched]);
+  }, [targetBranchId, handleSwitchBranch, hasAutoSwitched]);
 
-  // Auto-switch to branch from URL on first load
+  // Auto-switch to target branch on first load
   useEffect(() => {
     if (needsAutoSwitch) {
       performAutoSwitch();
@@ -69,7 +101,7 @@ export default function ManageAppointmentPageContent() {
   }, [needsAutoSwitch, performAutoSwitch]);
 
   // Show loading while auto-switching or switching branches
-  const isInitializing = isLoadingBranch || needsAutoSwitch || isSwitchingBranch;
+  const isInitializing = isLoadingBranch || isLoadingNearestAppointment || needsAutoSwitch || isSwitchingBranch;
 
   // Check if highlighted appointment exists and scroll to it
   useEffect(() => {
@@ -116,19 +148,29 @@ export default function ManageAppointmentPageContent() {
 
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Header */}
-        <div className="mb-10 text-center animate-fade-in-up">
+        <div className="mb-10 text-center">
           <h1 className="mb-4 text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
           <p className="mx-auto max-w-2xl text-gray-600 dark:text-gray-300 text-base leading-relaxed">{t("description")}</p>
         </div>
 
         {/* Branch Selector */}
-        <div className="animate-fade-in-up animation-delay-100">
-          <ClinicBranchSelect className="mb-8" />
+        <div>
+          <ClinicBranchSelect className="mb-6" isSwitching={isSwitchingBranch} />
+        </div>
+
+        {/* Book Appointment Button - Always visible */}
+        <div className="mb-8">
+          <Link href={bookAppointmentUrl}>
+            <Button size="lg" className="w-full sm:w-auto">
+              <Plus className="w-4 h-4" />
+              {t("buttons.bookAppointment")}
+            </Button>
+          </Link>
         </div>
 
         {/* Appointment Not Found Message */}
         {appointmentNotFound && appointmentIdFromUrl && !isInitializing && !isLoading && (
-          <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl animate-fade-in-up">
+          <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0 w-10 h-10 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center">
                 <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -146,16 +188,14 @@ export default function ManageAppointmentPageContent() {
         )}
 
         {/* Appointments List */}
-        <div className="space-y-4 animate-fade-in-up animation-delay-200">
+        <div className="space-y-4">
           {isInitializing || isLoading ? (
-            <div className="flex flex-col justify-center items-center py-16">
-              <div className="w-16 h-16 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center mb-4">
-                <Spinner className="w-8 h-8 text-bnoon-teal" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                {locale === "ar" ? "جاري تحميل المواعيد..." : "Loading appointments..."}
-              </p>
-            </div>
+            // Skeleton loading state
+            <>
+              <AppointmentCardSkeleton />
+              <AppointmentCardSkeleton />
+              <AppointmentCardSkeleton />
+            </>
           ) : (currentUserAppointmentsData?.length ?? 0) === 0 ? (
             <div className="py-16 text-center">
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-lg border border-gray-100 dark:border-gray-700 max-w-md mx-auto">
@@ -163,23 +203,16 @@ export default function ManageAppointmentPageContent() {
                   <Calendar className="h-10 w-10 text-gray-400" />
                 </div>
                 <h3 className="mb-3 text-xl font-bold text-bnoon-navy dark:text-white">{t("noAppointmentsFound.title")}</h3>
-                <p className="mb-8 text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noAppointmentsFound.description")}</p>
-                <Link href={bookAppointmentUrl}>
-                  <Button size="lg" className="w-full">
-                    <Plus className="w-4 h-4" />
-                    {t("buttons.bookNewAppointment")}
-                  </Button>
-                </Link>
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noAppointmentsFound.description")}</p>
               </div>
             </div>
           ) : (
-            currentUserAppointmentsData?.map((appointment, index) => {
+            currentUserAppointmentsData?.map((appointment) => {
               const isHighlighted = appointmentIdFromUrl === String(appointment.id);
               return (
                 <div
                   key={appointment.id}
                   ref={isHighlighted ? highlightedAppointmentRef : undefined}
-                  className={`animate-fade-in-up animation-delay-${(index % 5) * 100}`}
                 >
                   <AppointmentCard appointment={appointment} isHighlighted={isHighlighted} />
                 </div>
@@ -187,18 +220,6 @@ export default function ManageAppointmentPageContent() {
             })
           )}
         </div>
-
-        {/* Book New Appointment */}
-        {(currentUserAppointmentsData?.length ?? 0) > 0 && (
-          <div className="mt-10 text-center animate-fade-in-up animation-delay-300">
-            <Link href={bookAppointmentUrl}>
-              <Button size="lg" className="px-8">
-                <Plus className="w-4 h-4" />
-                {t("buttons.bookAnotherAppointment")}
-              </Button>
-            </Link>
-          </div>
-        )}
       </div>
     </div>
   );

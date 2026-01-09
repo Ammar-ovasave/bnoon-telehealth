@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { doctors as fullDoctorsList } from "@/models/DoctorModel";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,15 +11,29 @@ import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import BranchGuard from "@/components/BranchGuard";
+import { FEATURE_FLAGS } from "@/constants";
 
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
   const [loadingDoctor, setLoadingDoctor] = useState<string | null>(null);
-  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>();
+  // Default to "clinic" if virtual appointments are disabled
+  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter | undefined>(
+    FEATURE_FLAGS.VIRTUAL_APPOINTMENTS_ENABLED ? undefined : "clinic"
+  );
   const router = useRouter();
   const t = useTranslations("DoctorsPage");
   const locale = useLocale();
+
+  // Sync URL with default "clinic" selection when virtual appointments are disabled
+  useEffect(() => {
+    if (!FEATURE_FLAGS.VIRTUAL_APPOINTMENTS_ENABLED && !searchParams.get("selectedVisitType")) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("selectedVisitType", "clinic");
+      router.replace(`${window.location.pathname}?${newSearchParams.toString()}`, { scroll: false });
+    }
+  }, []);
 
   const handleSetAvailabilityFilter = (value: AvailabilityFilter) => {
     const newSearchParams = new URLSearchParams(searchParams);
@@ -29,16 +43,22 @@ export default function DoctorsListPage() {
   };
 
   const handleBack = () => {
-    router.back();
+    // Explicitly navigate to interest page with current locale and preserved params
+    const backParams = new URLSearchParams();
+    const selectedClinicLocation = searchParams.get("selectedClinicLocation");
+    if (selectedClinicLocation) {
+      backParams.set("selectedClinicLocation", selectedClinicLocation);
+    }
+    router.push(`/${locale}/interest?${backParams.toString()}`);
   };
 
   const handleDoctorChange = (doctor: string) => {
     if (loadingDoctor) return; // Prevent double clicks
     setLoadingDoctor(doctor);
     setSelectedDoctor(doctor);
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("selectedDoctor", doctor);
-    router.push(`/select-date-and-time?${searchParams.toString()}`);
+    const params = new URLSearchParams(window.location.search);
+    params.set("selectedDoctor", doctor);
+    router.push(`/${locale}/select-date-and-time?${params.toString()}`);
   };
 
   const { data: resourcesData, isLoading: isLoadingResources } = useFertiSmartResources();
@@ -89,6 +109,7 @@ export default function DoctorsListPage() {
   const virtualDoctorsCount = baseDoctors.filter((d) => d.availability.virtual).length;
 
   return (
+    <BranchGuard>
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -108,7 +129,7 @@ export default function DoctorsListPage() {
       ) : (
         <div className="relative mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-24">
           {/* Header */}
-          <div className="text-center mb-10 md:mb-12 animate-fade-in-up">
+          <div className="text-center mb-10 md:mb-12">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bnoon-navy dark:text-white mb-4 leading-tight">
               {t("title")}
             </h1>
@@ -118,7 +139,7 @@ export default function DoctorsListPage() {
           </div>
 
           {/* Visit Type Selector - Compact Pills */}
-          <div className="animate-fade-in-up animation-delay-200 mb-8">
+          <div className="mb-8">
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 dark:border-gray-700">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
@@ -156,33 +177,24 @@ export default function DoctorsListPage() {
                     </span>
                   </button>
 
-                  {/* Virtual Visit Pill */}
-                  <button
-                    onClick={() => handleSetAvailabilityFilter("virtual")}
-                    disabled={virtualDoctorsCount === 0}
-                    className={cn(
-                      "flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border-2 cursor-pointer",
-                      "hover:scale-[1.02] active:scale-[0.98]",
-                      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bnoon-navy/50",
-                      availabilityFilter === "virtual"
-                        ? "bg-bnoon-navy text-white border-bnoon-navy shadow-lg shadow-bnoon-navy/30"
-                        : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 shadow-sm hover:border-bnoon-navy hover:bg-bnoon-navy/5 dark:hover:bg-bnoon-navy/10 hover:shadow-md",
-                      virtualDoctorsCount === 0 && "opacity-50 cursor-not-allowed hover:scale-100 active:scale-100"
-                    )}
-                  >
-                    {availabilityFilter === "virtual" ? (
-                      <Check className="w-4 h-4 scale-[2.5] transform" />
-                    ) : (
+                  {/* Virtual Visit Pill - Always shown but disabled with "Coming Soon" */}
+                  <div className="relative">
+                    <button
+                      disabled={true}
+                      className={cn(
+                        "flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border-2",
+                        "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-700",
+                        "opacity-60 cursor-not-allowed"
+                      )}
+                    >
                       <Video className="w-4 h-4 scale-[2.5] transform" />
-                    )}
-                    <span>{t("visitType.virtual.title")}</span>
-                    <span className={cn(
-                      "text-xs px-2 py-0.5 rounded-full font-bold",
-                      availabilityFilter === "virtual" ? "bg-white/20" : "bg-bnoon-navy/10 dark:bg-bnoon-navy/20 text-bnoon-navy dark:text-bnoon-teal"
-                    )}>
-                      {virtualDoctorsCount}
+                      <span>{t("visitType.virtual.title")}</span>
+                    </button>
+                    {/* Coming Soon Badge */}
+                    <span className="absolute -top-2 ltr:-right-2 rtl:-left-2 bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">
+                      {t("visitType.virtual.comingSoon")}
                     </span>
-                  </button>
+                  </div>
                 </div>
               </div>
 
@@ -201,7 +213,7 @@ export default function DoctorsListPage() {
           </div>
 
           {/* Doctors Grid - Always Visible */}
-          <div className="animate-fade-in-up animation-delay-300">
+          <div>
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               layout
@@ -261,7 +273,7 @@ export default function DoctorsListPage() {
           </div>
 
           {/* Back Button */}
-          <div className="mt-12 text-center animate-fade-in-up animation-delay-300">
+          <div className="mt-12 text-center">
             <Button onClick={handleBack} variant="outline" size="lg" className="px-8 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
               <ArrowLeft className="rtl:scale-x-[-1]" />
               {t("buttons.backToServiceSelection")}
@@ -270,5 +282,6 @@ export default function DoctorsListPage() {
         </div>
       )}
     </div>
+    </BranchGuard>
   );
 }

@@ -1,6 +1,7 @@
-import { FertiSmartPatientModel } from "./FertiSmartPatientModel";
+import { BnoonJWTPayload } from "./BnoonUser";
 
-export type CurrentUserType = Pick<
-  FertiSmartPatientModel,
-  "mrn" | "firstName" | "lastName" | "contactNumber" | "emailAddress" | "middleName"
->;
+/**
+ * Current user type from JWT token
+ * Uses Bnoon-only auth (no legacy FertiSmart support)
+ */
+export type CurrentUserType = BnoonJWTPayload;

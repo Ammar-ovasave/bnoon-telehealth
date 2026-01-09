@@ -8,6 +8,7 @@ import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
+import BranchGuard from "@/components/BranchGuard";
 
 export default function VirtualVisitInfoPage() {
   const searchParams = useSearchParams();
@@ -26,6 +27,7 @@ export default function VirtualVisitInfoPage() {
   const urlIdNumber = searchParams.get("idNumber");
 
   return (
+    <BranchGuard>
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -35,10 +37,10 @@ export default function VirtualVisitInfoPage() {
 
       <div className="relative mx-auto px-4 py-8 max-w-2xl pb-30">
         {/* Header */}
-        <div className="text-center mb-8 animate-fade-in-up">
+        <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-bnoon-navy/10 dark:bg-bnoon-navy/20 p-4 rounded-2xl">
-              <User className="h-8 w-8 text-bnoon-navy dark:text-bnoon-teal" />
+            <div className="w-20 h-20 bg-[#004e77] rounded-2xl flex items-center justify-center shadow-lg shadow-[#004e77]/20">
+              <User className="h-10 w-10 text-white" />
             </div>
           </div>
           <h1 className="text-4xl rtl:text-3xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
@@ -80,5 +82,6 @@ export default function VirtualVisitInfoPage() {
         </div>
       </div>
     </div>
+    </BranchGuard>
   );
 }

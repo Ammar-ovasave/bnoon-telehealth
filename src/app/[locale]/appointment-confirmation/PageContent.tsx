@@ -1,13 +1,14 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, User, Mail, Globe, Users, CreditCard, CalendarDays, Sparkles, Video, Building, Copy, Check } from "lucide-react";
+import { CheckCircle, User, Mail, Globe, Users, CreditCard, CalendarDays, Sparkles, Video, Building, Copy, Check, Phone } from "lucide-react";
 import Link from "next/link";
 import { clinicLocations } from "@/models/ClinicModel";
 import { services } from "@/models/ServiceModel";
 import { FC, useMemo, useState, useCallback } from "react";
 import { doctors } from "@/models/DoctorModel";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import useCurrentBranch from "@/hooks/useCurrentBranch";
 import { format } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
@@ -53,6 +54,8 @@ export const PageContent: FC = () => {
   const { data: appointmentData, isLoading: loadingAppointment } = useFertiSmartAppointment({ id: appointmentId ?? undefined });
 
   const { data: currentUserData, isLoading: loadingCurrentUser } = useCurrentUser();
+
+  const { data: branchData } = useCurrentBranch();
 
   const { data: patientData, isLoading: loadingPatient, fullName } = useFertiSmartPatient();
   const gender = useMemo(() => {
@@ -110,7 +113,9 @@ export const PageContent: FC = () => {
 
   const confirmationNumber = appointmentData?.id;
 
-  const clinic = useMemo(() => clinicLocations.find((clinic) => clinic.id === selectedClinicLocation), [selectedClinicLocation]);
+  // Try URL param first, fall back to current branch
+  const clinicId = selectedClinicLocation !== "-" ? selectedClinicLocation : branchData?.branch?.id;
+  const clinic = useMemo(() => clinicLocations.find((c) => c.id === clinicId), [clinicId]);
 
   const clinicName = useMemo(() => {
     if (!clinic?.id) return clinic?.name ?? "-";
@@ -139,7 +144,7 @@ export const PageContent: FC = () => {
       ) : (
         <div className="relative mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-4xl">
           {/* Success Header */}
-          <div className="text-center mb-10 animate-fade-in-up">
+          <div className="text-center mb-10">
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-bnoon-teal/10 rounded-full flex items-center justify-center border-2 border-bnoon-teal">
                 <Check className="h-8 w-8 text-bnoon-teal" strokeWidth={3} />
@@ -169,7 +174,7 @@ export const PageContent: FC = () => {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6 animate-fade-in-up animation-delay-200">
+          <div className="grid lg:grid-cols-2 gap-6">
             {/* Appointment Details */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
               <h2 className="text-lg font-bold text-bnoon-navy dark:text-white mb-6 flex items-center gap-3">
@@ -233,11 +238,11 @@ export const PageContent: FC = () => {
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
                   <span className="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
+                    <Phone className="h-4 w-4" />
                     {t("patientInformation.mobileNumber")}
                   </span>
                   <span dir="ltr" className="font-semibold text-bnoon-navy dark:text-white">
-                    {currentUserData?.contactNumber}
+                    {currentUserData?.phone}
                   </span>
                 </div>
                 {patientCountry?.name && (
@@ -263,7 +268,7 @@ export const PageContent: FC = () => {
           </div>
 
           {/* Next Steps */}
-          <div className="mt-8 animate-fade-in-up animation-delay-300">
+          <div className="mt-8">
             <h3 className="text-lg font-bold text-bnoon-navy dark:text-white mb-4">{t("nextSteps.title")}</h3>
 
             {/* General confirmation message - varies by visit type */}
@@ -319,7 +324,7 @@ export const PageContent: FC = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col items-center sm:flex-row gap-4 justify-center mt-10 animate-fade-in-up animation-delay-400">
+          <div className="flex flex-col items-center sm:flex-row gap-4 justify-center mt-10">
             <Link href="/manage-appointments">
               <Button size="lg" className="px-8">
                 <CalendarDays className="h-4 w-4" />

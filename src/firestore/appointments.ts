@@ -18,7 +18,17 @@ export async function createNewAppointmentDB(params: CreateDBAppointmentParamsTy
 
 export async function updateAppointmentDB(appointmentId: string, updateData: UpdateAppointmentPayload) {
   try {
-    const res = await db.collection(APPOINTMENTS_COLLECTION_NAME).doc(appointmentId.toString()).update(updateData);
+    // Use set with merge to handle both existing and non-existing documents
+    const res = await db
+      .collection(APPOINTMENTS_COLLECTION_NAME)
+      .doc(appointmentId.toString())
+      .set(
+        {
+          ...updateData,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
     return res;
   } catch (error) {
     console.log("--- updateAppointmentDB error", error);
@@ -48,5 +58,43 @@ export async function getAppointmentsForReminder(params: { startTimeFrom: string
   } catch (error) {
     console.log("--- getAppointmentsForReminder error", error);
     return [];
+  }
+}
+
+/**
+ * Get the nearest upcoming appointment for a user by phone number
+ * Returns SINGLE appointment with the closest future startTime
+ * Excludes cancelled appointments
+ */
+export async function getNearestUpcomingAppointmentByPhone(phone: string): Promise<CreateDBAppointmentParamsType | null> {
+  try {
+    const now = new Date().toISOString();
+
+    // Query appointments for this phone number with startTime >= now
+    // Ordered by startTime ASC to get the nearest one first
+    const snapshot = await db
+      .collection(APPOINTMENTS_COLLECTION_NAME)
+      .where("phoneNumber", "==", phone)
+      .where("startTime", ">=", now)
+      .orderBy("startTime", "asc")
+      .limit(10) // Fetch a few in case some are cancelled
+      .get();
+
+    if (snapshot.empty) {
+      return null;
+    }
+
+    // Find the first non-cancelled appointment
+    for (const doc of snapshot.docs) {
+      const data = doc.data() as CreateDBAppointmentParamsType;
+      if (data.statusName !== "Cancelled") {
+        return { ...data, id: doc.id };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.log("--- getNearestUpcomingAppointmentByPhone error", error);
+    return null;
   }
 }

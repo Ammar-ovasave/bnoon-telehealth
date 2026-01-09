@@ -1,13 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
-import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import { cn } from "@/lib/utils";
 import { FertiSmartAppointmentModel } from "@/models/FertiSmartAppointmentModel";
 import { format, add } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
-import { CheckCircle, Clock, Mail, Phone, RefreshCw, X } from "lucide-react";
+import { CheckCircle, Clock, Mail, Phone, RefreshCw, X, Play, UserX, PhoneOff, Lock, Unlock, Calendar } from "lucide-react";
 import { FC, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
@@ -29,7 +28,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import Link from "next/link";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
-import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
 import useFertiSmartAppointmentStatuses from "@/hooks/useFertiSmartAppointmentStatuses";
 import Image from "next/image";
 import { services } from "@/models/ServiceModel";
@@ -51,44 +49,37 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
   const [isRescheduling, setIsRescheduling] = useState(false);
   const { mutate: mutateCurrentUserAppointments } = useCurrentUserAppointments();
 
-  const { data: apiServicesData } = useFertiSmartAPIServices();
-
-  const service = useMemo(() => {
-    return apiServicesData?.find((item) => item.id === appointment.service?.id);
-  }, [apiServicesData, appointment.service?.id]);
-
+  // Use service name directly from appointment object
   const serviceTitle = useMemo(() => {
-    if (!service?.name) return service?.name ?? "-";
+    const serviceName = appointment.service?.name;
+    if (!serviceName) return "-";
 
-    // Try to match the API service name with ServiceModel service titles
-    const matchedService = services.find((s) => s.title.toLowerCase() === service.name?.toLowerCase());
-
+    // Try to match with ServiceModel for localized display
+    const matchedService = services.find((s) => s.title.toLowerCase() === serviceName.toLowerCase());
     if (matchedService?.id) {
       return tServices(`services.${matchedService.id}.title`);
     }
 
-    // Fallback to API service name if no match found
-    return service.name;
-  }, [service?.name, tServices]);
+    // Fallback to API service name
+    return serviceName;
+  }, [appointment.service?.name, tServices]);
 
-  const { data: resourcesData } = useFertiSmartResources();
+  // Use doctor name directly from appointment object
+  const doctorName = appointment.resources?.[0]?.name ?? "";
 
-  const resourceId = appointment.resources?.[0]?.id;
-  const resource = useMemo(() => resourcesData?.find((resource) => resource.id === resourceId), [resourceId, resourcesData]);
-
-  // Map API resource name to DoctorModel for localized display
+  // Map to DoctorModel for localized display
   const doctorFromModel = useMemo(() => {
-    if (!resource?.linkedUserFullName) return undefined;
-    return doctors.find((doctor) => resource.linkedUserFullName?.toLocaleLowerCase().includes(doctor.name.toLocaleLowerCase()));
-  }, [resource?.linkedUserFullName]);
+    if (!doctorName) return undefined;
+    return doctors.find((doctor) => doctorName.toLowerCase().includes(doctor.name.toLowerCase()));
+  }, [doctorName]);
 
   const displayDoctorName = useMemo(() => {
     if (doctorFromModel) {
       return getDoctorName(doctorFromModel, locale);
     }
-    // Fallback to API name if no match found
-    return resource?.linkedUserFullName ?? "";
-  }, [doctorFromModel, locale, resource?.linkedUserFullName]);
+    // Fallback to API name
+    return doctorName;
+  }, [doctorFromModel, locale, doctorName]);
 
   const userTimezone = useMemo(() => {
     if (typeof window !== "undefined") {
@@ -122,10 +113,17 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
 
   const isVirtuaAppointment = appointment.description?.toLocaleLowerCase().includes("virtual");
 
-  // Check if appointment is completed or cancelled - hide action buttons for these
-  const isAppointmentCompleted = appointment.status?.name?.toLocaleLowerCase().includes("completed");
-  const isAppointmentCancelled = appointment.status?.name?.toLocaleLowerCase() === "cancelled";
-  const canModifyAppointment = !isAppointmentCompleted && !isAppointmentCancelled;
+  // Check if appointment can be modified based on status
+  // Final statuses: completed, cancelled, no-show, locked - cannot be modified
+  // In-progress statuses: procedure started, arrived waiting - cannot be modified
+  const FINAL_STATUSES = ["completed", "cancelled", "patient no-show", "locked"];
+  const IN_PROGRESS_STATUSES = ["procedure started", "arrived waiting!"];
+
+  const statusLower = appointment.status?.name?.toLowerCase() ?? "";
+
+  const isAppointmentFinal = FINAL_STATUSES.some((s) => statusLower.includes(s));
+  const isAppointmentInProgress = IN_PROGRESS_STATUSES.some((s) => statusLower === s);
+  const canModifyAppointment = !isAppointmentFinal && !isAppointmentInProgress;
 
   const { data: patientData, fullName } = useFertiSmartPatient();
 
@@ -136,6 +134,9 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
       return country.id === patientData?.nationality?.id;
     });
   }, [countriesData, patientData?.nationality?.id]);
+
+  // Get resource ID from appointment for rescheduling availability
+  const resourceId = appointment.resources?.[0]?.id;
 
   const { data: availabilityData, isLoading: loadingTimeslots } = useFertiSmartResourceAvailability({
     resourceId: resourceId?.toString(),
@@ -205,7 +206,7 @@ const AppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted 
       className={cn(
         "bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 shadow-sm border transition-all duration-300",
         isHighlighted
-          ? "border-bnoon-teal ring-2 ring-bnoon-teal/30 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 animate-highlight-pulse"
+          ? "border-bnoon-teal ring-2 ring-bnoon-teal/30 bg-bnoon-teal/5 dark:bg-bnoon-teal/10"
           : "border-gray-200 dark:border-gray-700"
       )}
     >
@@ -584,12 +585,41 @@ interface AppointmentCardProps {
 
 const getAppointmentStatusColor = (status: string) => {
   switch (status) {
+    // Confirmed states - Green
     case "Approved/Confirmed":
-      return "bg-primary/10 text-primary";
-    case "Approved/Confirmed":
-      return "bg-primary/10 text-primary";
+    case "Patient Confirmed":
+    case "Booked Today":
+      return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
+
+    // Pending states - Amber
+    case "Waiting For Approval":
+      return "bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400";
+
+    // In Progress states - Blue
+    case "Arrived Waiting!":
+    case "Procedure Started":
+    case "On The Way Coming":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
+
+    // Completed - Purple
+    case "Completed":
+      return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400";
+
+    // Negative final states - Red
     case "Cancelled":
+    case "Patient No-Show":
       return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
+
+    // Follow-up states - Orange
+    case "No Answer":
+    case "Will Callback":
+      return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400";
+
+    // System states - Gray
+    case "Locked":
+    case "Unlocked":
+      return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+
     default:
       return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
   }
@@ -597,22 +627,49 @@ const getAppointmentStatusColor = (status: string) => {
 
 const getAppointmentStatusIcon = (status: string) => {
   switch (status) {
-    case "upcoming":
-      return <Clock className="h-4 w-4" />;
-    case "completed":
+    // Confirmed states
+    case "Approved/Confirmed":
+    case "Patient Confirmed":
+    case "Booked Today":
       return <CheckCircle className="h-4 w-4" />;
+
+    // Pending
+    case "Waiting For Approval":
+      return <Clock className="h-4 w-4" />;
+
+    // In Progress
+    case "Arrived Waiting!":
+    case "On The Way Coming":
+      return <Clock className="h-4 w-4" />;
+
+    case "Procedure Started":
+      return <Play className="h-4 w-4" />;
+
+    // Completed
+    case "Completed":
+      return <CheckCircle className="h-4 w-4" />;
+
+    // Negative
     case "Cancelled":
       return <X className="h-4 w-4" />;
+
+    case "Patient No-Show":
+      return <UserX className="h-4 w-4" />;
+
+    // Follow-up
+    case "No Answer":
+    case "Will Callback":
+      return <PhoneOff className="h-4 w-4" />;
+
+    // System
+    case "Locked":
+      return <Lock className="h-4 w-4" />;
+
+    case "Unlocked":
+      return <Unlock className="h-4 w-4" />;
+
     default:
-      return (
-        <Image
-          src={`/icons/Calender.png`}
-          alt="Manage Your Appointment"
-          width={100}
-          height={100}
-          className="h-[20px] w-[20px] object-cover"
-        />
-      );
+      return <Calendar className="h-4 w-4" />;
   }
 };
 

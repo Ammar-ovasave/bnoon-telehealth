@@ -1,35 +1,15 @@
 import { cookies } from "next/headers";
-import { getCurrentUser } from "../../current-user/_services";
-import { UpdatePatientPayload } from "@/models/UpdatePatientPayload";
-import { getPatient } from "@/services/appointment-services";
-import { signJwt } from "@/services/signJwt";
-import { AUTH_TOKEN_NAME } from "@/constants";
 import axios from "@/services/axios";
+import { UpdatePatientPayload } from "@/models/UpdatePatientPayload";
 
 export async function PATCH(request: Request) {
   try {
-    const [currentUser, cookiesStore, requestJson] = await Promise.all([getCurrentUser(), cookies(), request.json()]);
+    const [cookiesStore, requestJson] = await Promise.all([cookies(), request.json()]);
     const payload: UpdatePatientPayload = requestJson;
-    if (currentUser?.mrn !== payload.mrn) {
-      return Response.error();
-    }
+
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
     const res = await updatePatient({ ...payload, baseAPIURL: baseAPIURL });
-    const patient = await getPatient({ mrn: payload.mrn, baseAPIURL: baseAPIURL ?? null });
-    if (!patient?.mrn) {
-      console.log("--- update patient get patient error", patient);
-      return Response.error();
-    }
-    const authToken = signJwt({
-      mrn: patient.mrn,
-      firstName: patient.firstName ?? "",
-      middleName: patient.middleName ?? "",
-      lastName: patient.lastName ?? "",
-      contactNumber: patient.contactNumber ?? "",
-      emailAddress: patient.emailAddress ?? "",
-      branchId: patient.branch?.id ?? 0,
-    });
-    cookiesStore.set({ name: AUTH_TOKEN_NAME, value: authToken, httpOnly: true, secure: true });
+
     return Response.json(res);
   } catch (e) {
     console.log("---- error update patient", e);

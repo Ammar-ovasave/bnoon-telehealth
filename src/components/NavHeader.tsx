@@ -7,16 +7,15 @@ import { FC, useCallback, useState } from "react";
 import { logout } from "@/services/client";
 import { Spinner } from "./ui/spinner";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import useCurrentBranch from "@/hooks/useCurrentBranch";
-import { Badge } from "./ui/badge";
+import { mutate } from "swr";
 import { useTranslations, useLocale } from "next-intl";
-import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import { Calendar, LogOut, Menu, X, User } from "lucide-react";
 import Image from "next/image";
 
 function NavHeader() {
   const { data: currentUserData, isLoading } = useCurrentUser();
   const t = useTranslations("NavHeader");
+  const locale = useLocale();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Build display name from first and last name only
@@ -25,12 +24,15 @@ function NavHeader() {
     .join(" ")
     .trim();
 
+  // Logo URL based on locale - English goes to /en, Arabic goes to root
+  const logoUrl = locale === "en" ? "https://bnoon.sa/en" : "https://bnoon.sa";
+
   return (
     <header className="bg-white dark:bg-gray-900 sticky top-0 z-50 border-b border-gray-100 dark:border-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo - links to bnoon.sa */}
-          <a href="https://bnoon.sa" target="_blank" rel="noopener noreferrer" className="flex items-center">
+          <a href={logoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center">
             <Image
               src="/images/bnoon-logo.svg"
               alt="Bnoon - بنون"
@@ -44,7 +46,7 @@ function NavHeader() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-4">
             {/* Primary Navigation */}
-            {!isLoading && currentUserData?.mrn && (
+            {!isLoading && currentUserData?.userId && (
               <Link
                 href={"/manage-appointments"}
                 className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-bnoon-teal hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10 rounded-lg transition-colors"
@@ -55,40 +57,33 @@ function NavHeader() {
             )}
 
             {/* Separator */}
-            {!isLoading && currentUserData?.mrn && (
+            {!isLoading && currentUserData?.userId && (
               <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
             )}
 
             {/* User Area - grouped together */}
-            {!isLoading && currentUserData?.mrn ? (
+            {!isLoading && currentUserData?.userId ? (
               <div className="flex items-center gap-3">
-                {/* User Info with Branch */}
+                {/* User Info */}
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
                   <div className="w-7 h-7 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
                     <User className="w-4 h-4 text-bnoon-teal" />
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-bnoon-navy dark:text-white max-w-[120px] truncate leading-tight">
-                      {displayName || currentUserData.mrn}
-                    </span>
-                    <BranchNameInline />
-                  </div>
+                  <span className="text-sm font-medium text-bnoon-navy dark:text-white max-w-[120px] truncate">
+                    {displayName || currentUserData.phone}
+                  </span>
                 </div>
                 <LogoutButton />
               </div>
             ) : (
-              <>
-                {/* Branch badge for non-logged in users */}
-                <BranchName />
-                <Link href={"/login"}>
-                  <Button
-                    variant="outline"
-                    className="rounded-full px-6 border-gray-200 text-bnoon-navy hover:bg-bnoon-teal hover:text-white hover:border-bnoon-teal transition-all duration-300"
-                  >
-                    {t("login")}
-                  </Button>
-                </Link>
-              </>
+              <Link href={"/login"}>
+                <Button
+                  variant="outline"
+                  className="rounded-full px-6 border-gray-200 text-bnoon-navy hover:bg-bnoon-teal hover:text-white hover:border-bnoon-teal transition-all duration-300"
+                >
+                  {t("login")}
+                </Button>
+              </Link>
             )}
 
             {/* Language Switcher - always at the end */}
@@ -109,10 +104,10 @@ function NavHeader() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100 dark:border-gray-800 animate-fade-in">
+          <div className="md:hidden py-4 border-t border-gray-100 dark:border-gray-800">
             <div className="flex flex-col gap-3">
               {/* User Info Card - Mobile */}
-              {!isLoading && currentUserData?.mrn && (
+              {!isLoading && currentUserData?.userId && (
                 <div className="flex items-center gap-3 px-3 py-3 bg-gradient-to-r from-gray-50 to-bnoon-teal/5 dark:from-gray-800 dark:to-bnoon-teal/10 rounded-xl border border-gray-100 dark:border-gray-700">
                   <div className="w-12 h-12 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
                     <User className="w-6 h-6 text-bnoon-teal" />
@@ -121,21 +116,15 @@ function NavHeader() {
                     <p className="text-sm font-semibold text-bnoon-navy dark:text-white truncate">
                       {displayName || t("guest")}
                     </p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        MRN: {currentUserData.mrn}
-                      </span>
-                      <BranchNameMobile />
-                    </div>
+                    <span dir="ltr" className="text-xs text-gray-500 dark:text-gray-400">
+                      {currentUserData.phone}
+                    </span>
                   </div>
                 </div>
               )}
 
-              {/* Branch badge for non-logged in users */}
-              {!currentUserData?.mrn && <BranchName />}
-
               {/* Navigation Links */}
-              {!isLoading && currentUserData?.mrn && (
+              {!isLoading && currentUserData?.userId && (
                 <Link
                   href={"/manage-appointments"}
                   className="flex items-center gap-3 py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-bnoon-teal bg-white dark:bg-gray-800 hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10 rounded-xl border border-gray-100 dark:border-gray-700 transition-colors"
@@ -147,7 +136,7 @@ function NavHeader() {
               )}
 
               {/* Auth Actions */}
-              {!isLoading && currentUserData?.mrn ? (
+              {!isLoading && currentUserData?.userId ? (
                 <LogoutButton isMobile />
               ) : (
                 <Link href={"/login"} onClick={() => setMobileMenuOpen(false)}>
@@ -190,95 +179,26 @@ const LanguageSwitcher: FC = () => {
   );
 };
 
-const BranchName: FC = () => {
-  const { data, isLoading } = useCurrentBranch();
-  const t = useTranslations("HomePage");
-
-  // Show skeleton while loading
-  if (isLoading) {
-    return (
-      <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-    );
-  }
-
-  if (!data?.branch?.id) return null;
-
-  const branchName = t(`clinics.${data.branch.id}.name`);
-
-  return (
-    <Badge className="bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal border-bnoon-teal/20 dark:border-bnoon-teal/30 hover:bg-bnoon-teal/20 dark:hover:bg-bnoon-teal/30 px-3 py-1">
-      {branchName}
-    </Badge>
-  );
-};
-
-// Inline version for desktop user card - shows as small text below name
-const BranchNameInline: FC = () => {
-  const { data, isLoading } = useCurrentBranch();
-  const t = useTranslations("HomePage");
-
-  // Show skeleton while loading
-  if (isLoading) {
-    return (
-      <div className="h-3 w-16 bg-bnoon-teal/20 rounded animate-pulse" />
-    );
-  }
-
-  if (!data?.branch?.id) return null;
-
-  const branchName = t(`clinics.${data.branch.id}.name`);
-
-  return (
-    <span className="text-[10px] text-bnoon-teal font-medium leading-tight truncate max-w-[120px]">
-      {branchName}
-    </span>
-  );
-};
-
-// Mobile version - shows as a small pill next to MRN
-const BranchNameMobile: FC = () => {
-  const { data, isLoading } = useCurrentBranch();
-  const t = useTranslations("HomePage");
-
-  // Show skeleton while loading
-  if (isLoading) {
-    return (
-      <>
-        <span className="text-gray-300">•</span>
-        <div className="h-3 w-14 bg-bnoon-teal/20 rounded animate-pulse" />
-      </>
-    );
-  }
-
-  if (!data?.branch?.id) return null;
-
-  const branchName = t(`clinics.${data.branch.id}.name`);
-
-  return (
-    <>
-      <span className="text-gray-300">•</span>
-      <span className="text-xs text-bnoon-teal font-medium">
-        {branchName}
-      </span>
-    </>
-  );
-};
-
 const LogoutButton: FC<{ isMobile?: boolean }> = ({ isMobile }) => {
   const [loading, setLoading] = useState(false);
-  const { mutate: mutateCurrentUser } = useCurrentUser();
   const router = useRouter();
   const t = useTranslations("NavHeader");
-  const { mutate: mutatePatient } = useFertiSmartPatient();
 
   const handleClick = useCallback(async () => {
     setLoading(true);
+    // Clear cookies on server first
     await logout();
-    setLoading(false);
-    mutateCurrentUser(undefined);
-    mutatePatient(undefined);
+    // Clear specific SWR caches to undefined (user will appear logged out)
+    await Promise.all([
+      mutate("/api/current-user", undefined, { revalidate: false }),
+      mutate("/api/current-branch", undefined, { revalidate: false }),
+      mutate("/api/get-patient", undefined, { revalidate: false }),
+      mutate("/api/user-appointments/nearest", undefined, { revalidate: false }),
+    ]);
+    // Navigate to home page
     router.replace("/");
-  }, [mutateCurrentUser, mutatePatient, router]);
+    setLoading(false);
+  }, [router]);
 
   if (isMobile) {
     return (

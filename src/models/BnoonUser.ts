@@ -22,19 +22,19 @@ export interface BnoonUser {
   firstName: string;
   middleName: string;
   lastName: string;
-  sex?: 0 | 1; // 0 = female, 1 = male
-  dob?: string; // ISO date string (YYYY-MM-DD)
+  sex?: 0 | 1 | null; // 0 = female, 1 = male, null = not yet provided
+  dob?: string | null; // ISO date string (YYYY-MM-DD)
 
   // Identity documents
   nationality?: {
     id: number;
     name: string;
-  };
+  } | null;
   identityIdType?: {
     id: number;
     name: string;
-  };
-  identityId?: string; // National ID, Iqama, Passport number
+  } | null;
+  identityId?: string | null; // National ID, Iqama, Passport number
 
   // FertiSmart branch mappings
   // Key is ClinicBranchID (e.g., "riyadh-granada", "jeddah", "al-ahsa")
@@ -48,7 +48,7 @@ export interface BnoonUser {
   lastLoginAt: string; // ISO timestamp
 
   // Optional preferences
-  preferredLanguage?: "ar" | "en";
+  preferredLanguage?: "ar" | "en" | null;
 }
 
 /**
@@ -94,7 +94,7 @@ export interface BnoonJWTPayload {
   middleName: string;
   lastName: string;
   emailAddress: string;
-  sex?: 0 | 1;
+  sex?: 0 | 1 | null;
   iat?: number; // Issued at
   exp?: number; // Expiration
 }
@@ -111,7 +111,8 @@ export function isProfileComplete(user: BnoonUser | null): boolean {
       user.lastName &&
       user.lastName !== "-" &&
       user.emailAddress &&
-      user.sex !== undefined
+      user.sex !== undefined &&
+      user.sex !== null
   );
 }
 

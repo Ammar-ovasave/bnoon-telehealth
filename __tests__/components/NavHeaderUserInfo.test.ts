@@ -1,7 +1,7 @@
 /**
  * Tests for NavHeader User Info Display
  *
- * Verifies that user information (name, MRN) is correctly
+ * Verifies that user information (name, phone) is correctly
  * displayed in the navigation header for logged-in users.
  */
 
@@ -22,7 +22,7 @@ describe("NavHeader User Info Display", () => {
     userData: Partial<CurrentUserType> | undefined
   ): string => {
     const displayName = buildDisplayName(userData);
-    return displayName || userData?.mrn || "";
+    return displayName || userData?.phone || "";
   };
 
   // Helper to determine what to show in mobile view name field
@@ -34,9 +34,9 @@ describe("NavHeader User Info Display", () => {
     return displayName || guestLabel;
   };
 
-  // Helper to check if user info should be visible
+  // Helper to check if user has logged in (has userId)
   const shouldShowUserInfo = (userData: Partial<CurrentUserType> | undefined): boolean => {
-    return !!(userData?.mrn);
+    return !!(userData?.userId);
   };
 
   describe("Display name construction", () => {
@@ -44,7 +44,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed",
         lastName: "Radwan",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("Ahmed Radwan");
@@ -54,7 +55,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed",
         lastName: undefined,
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("Ahmed");
@@ -64,7 +66,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: undefined,
         lastName: "Radwan",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("Radwan");
@@ -74,7 +77,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: undefined,
         lastName: undefined,
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("");
@@ -84,7 +88,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "-",
         lastName: "Radwan",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("Radwan");
@@ -94,7 +99,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed",
         lastName: "-",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("Ahmed");
@@ -104,7 +110,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "-",
         lastName: "-",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("");
@@ -118,7 +125,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "",
         lastName: "",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("");
@@ -128,7 +136,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed ",
         lastName: " Radwan",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       // The join will create "Ahmed   Radwan", trim handles edges
@@ -142,45 +151,49 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed",
         lastName: "Radwan",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(getDesktopDisplayText(userData)).toBe("Ahmed Radwan");
     });
 
-    it("should fall back to MRN when name not available", () => {
+    it("should fall back to phone when name not available", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: undefined,
         lastName: undefined,
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
-      expect(getDesktopDisplayText(userData)).toBe("12345");
+      expect(getDesktopDisplayText(userData)).toBe("+966501234567");
     });
 
-    it("should fall back to MRN when names are dashes", () => {
+    it("should fall back to phone when names are dashes", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "-",
         lastName: "-",
-        mrn: "MRN-67890",
+        userId: "+966509876543",
+        phone: "+966509876543",
       };
 
-      expect(getDesktopDisplayText(userData)).toBe("MRN-67890");
+      expect(getDesktopDisplayText(userData)).toBe("+966509876543");
     });
 
     it("should return empty string when no data", () => {
       expect(getDesktopDisplayText(undefined)).toBe("");
     });
 
-    it("should prefer name over MRN", () => {
+    it("should prefer name over phone", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Sarah",
         lastName: "Ali",
-        mrn: "MRN-99999",
+        userId: "+966509999999",
+        phone: "+966509999999",
       };
 
       expect(getDesktopDisplayText(userData)).toBe("Sarah Ali");
-      expect(getDesktopDisplayText(userData)).not.toContain("MRN");
+      expect(getDesktopDisplayText(userData)).not.toContain("+966");
     });
   });
 
@@ -189,7 +202,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed",
         lastName: "Radwan",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(getMobileDisplayName(userData)).toBe("Ahmed Radwan");
@@ -199,7 +213,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: undefined,
         lastName: undefined,
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(getMobileDisplayName(userData, "Guest")).toBe("Guest");
@@ -209,7 +224,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "-",
         lastName: "-",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(getMobileDisplayName(userData, "زائر")).toBe("زائر");
@@ -219,7 +235,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Mohammed",
         lastName: undefined,
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(getMobileDisplayName(userData)).toBe("Mohammed");
@@ -227,29 +244,30 @@ describe("NavHeader User Info Display", () => {
   });
 
   describe("User info visibility", () => {
-    it("should show user info when MRN exists", () => {
+    it("should show user info when userId exists", () => {
       const userData: Partial<CurrentUserType> = {
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(shouldShowUserInfo(userData)).toBe(true);
     });
 
-    it("should NOT show user info when MRN is undefined", () => {
+    it("should NOT show user info when userId is undefined", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed",
         lastName: "Radwan",
-        mrn: undefined,
+        userId: undefined,
       };
 
       expect(shouldShowUserInfo(userData)).toBe(false);
     });
 
-    it("should NOT show user info when MRN is empty string", () => {
+    it("should NOT show user info when userId is empty string", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed",
         lastName: "Radwan",
-        mrn: "",
+        userId: "",
       };
 
       expect(shouldShowUserInfo(userData)).toBe(false);
@@ -259,41 +277,42 @@ describe("NavHeader User Info Display", () => {
       expect(shouldShowUserInfo(undefined)).toBe(false);
     });
 
-    it("should show user info even without name if MRN exists", () => {
+    it("should show user info even without name if userId exists", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: undefined,
         lastName: undefined,
-        mrn: "GUEST-123",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(shouldShowUserInfo(userData)).toBe(true);
     });
   });
 
-  describe("MRN display in mobile view", () => {
-    it("should always show MRN when user is logged in", () => {
+  describe("Phone display in mobile view", () => {
+    it("should always show phone when user is logged in", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed",
         lastName: "Radwan",
-        mrn: "MRN-12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
-      // MRN should be displayed separately in mobile view
-      expect(userData.mrn).toBe("MRN-12345");
+      // Phone should be displayed separately in mobile view
+      expect(userData.phone).toBe("+966501234567");
     });
 
-    it("should handle various MRN formats", () => {
-      const mrnFormats = [
-        "12345",
-        "MRN-12345",
-        "P-000123",
-        "GUEST-ABC",
+    it("should handle various phone formats", () => {
+      const phoneFormats = [
+        "+966501234567",
+        "+971501234567",
+        "+44123456789",
       ];
 
-      mrnFormats.forEach((mrn) => {
-        const userData: Partial<CurrentUserType> = { mrn };
+      phoneFormats.forEach((phone) => {
+        const userData: Partial<CurrentUserType> = { userId: phone, phone };
         expect(shouldShowUserInfo(userData)).toBe(true);
-        expect(userData.mrn).toBe(mrn);
+        expect(userData.phone).toBe(phone);
       });
     });
   });
@@ -303,7 +322,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "أحمد",
         lastName: "رضوان",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("أحمد رضوان");
@@ -313,7 +333,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed",
         lastName: "الرضوان",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("Ahmed الرضوان");
@@ -323,7 +344,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "O'Brien",
         lastName: "Al-Rashid",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       expect(buildDisplayName(userData)).toBe("O'Brien Al-Rashid");
@@ -335,7 +357,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Abdulrahman",
         lastName: "Al-Muhammadiyah",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       const displayName = buildDisplayName(userData);
@@ -347,7 +370,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "Ahmed  Mohamed", // Double space
         lastName: "Radwan",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       // The function doesn't collapse internal spaces, just trims
@@ -360,7 +384,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: null as unknown as string,
         lastName: undefined,
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       // null is falsy, should be filtered out
@@ -371,7 +396,8 @@ describe("NavHeader User Info Display", () => {
       const userData: Partial<CurrentUserType> = {
         firstName: "   ",
         lastName: "   ",
-        mrn: "12345",
+        userId: "+966501234567",
+        phone: "+966501234567",
       };
 
       // Whitespace strings are truthy but trim to empty
@@ -385,10 +411,10 @@ describe("NavHeader User Info Display", () => {
     it("should handle complete user profile", () => {
       const userData: CurrentUserType = {
         firstName: "Ahmed",
-        middleName: "Mohamed", // Should be ignored
+        middleName: "Mohamed", // Should be ignored in display name
         lastName: "Radwan",
-        mrn: "MRN-12345",
-        contactNumber: "+966501234567",
+        userId: "+966501234567",
+        phone: "+966501234567",
         emailAddress: "ahmed@example.com",
       };
 
@@ -396,19 +422,19 @@ describe("NavHeader User Info Display", () => {
       expect(buildDisplayName(userData)).not.toContain("Mohamed");
     });
 
-    it("should work with guest user (no personal info)", () => {
-      const guestUser: Partial<CurrentUserType> = {
+    it("should work with new user (no personal info yet)", () => {
+      const newUser: Partial<CurrentUserType> = {
         firstName: "-",
         middleName: "-",
         lastName: "-",
-        mrn: "GUEST-001",
-        contactNumber: "+966501234567",
-        emailAddress: undefined,
+        userId: "+966501234567",
+        phone: "+966501234567",
+        emailAddress: "",
       };
 
-      expect(buildDisplayName(guestUser)).toBe("");
-      expect(getDesktopDisplayText(guestUser)).toBe("GUEST-001");
-      expect(getMobileDisplayName(guestUser, "Guest")).toBe("Guest");
+      expect(buildDisplayName(newUser)).toBe("");
+      expect(getDesktopDisplayText(newUser)).toBe("+966501234567");
+      expect(getMobileDisplayName(newUser, "Guest")).toBe("Guest");
     });
 
     it("should handle returning patient with full profile", () => {
@@ -416,8 +442,8 @@ describe("NavHeader User Info Display", () => {
         firstName: "Sarah",
         middleName: "Abdullah",
         lastName: "Al-Fahad",
-        mrn: "P-2024-0001",
-        contactNumber: "+966509876543",
+        userId: "+966509876543",
+        phone: "+966509876543",
         emailAddress: "sarah@example.com",
       };
 
@@ -444,8 +470,8 @@ describe("NavHeader User Info Display", () => {
         firstName: "Ahmed",
         middleName: "Mohamed",
         lastName: "Radwan",
-        mrn: "12345",
-        contactNumber: "+966501234567",
+        userId: "+966501234567",
+        phone: "+966501234567",
         emailAddress: "ahmed@example.com",
       };
 
@@ -461,8 +487,8 @@ describe("NavHeader User Info Display", () => {
         firstName: "Ahmed",
         middleName: "Mohamed",
         lastName: "Radwan",
-        mrn: "12345",
-        contactNumber: "+966501234567",
+        userId: "+966501234567",
+        phone: "+966501234567",
         emailAddress: "ahmed@example.com",
       };
 

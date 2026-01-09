@@ -1,0 +1,212 @@
+{
+  "info": {
+    "name": "Bnoon Auth API",
+    "description": "Bnoon-owned authentication and user management system.\n\nThis API provides:\n- Phone-based OTP authentication (no branch required)\n- Bnoon user profile management\n- Lazy FertiSmart patient creation per branch\n- Profile sync to all FertiSmart branches",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "phone",
+      "value": "+966501234567",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phone}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/send-otp",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "send-otp"]
+            },
+            "description": "Send OTP to phone number.\n\n**No branch or MRN required** - this is the new Bnoon-owned auth flow.\n\nThe OTP is stored in an httpOnly cookie (5 min expiry)."
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phone}}\",\n  \"code\": \"1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "verify-otp"]
+            },
+            "description": "Verify OTP and authenticate user.\n\n**Creates new Bnoon user if first time.**\n\nReturns:\n- `isNew`: Whether this is a new user\n- `isProfileComplete`: Whether profile has required fields\n- `user`: User profile data\n\nSets `auth-token` cookie (1 year expiry)."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "logout"]
+            },
+            "description": "Clear auth-token cookie and logout."
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me"]
+            },
+            "description": "Get the current authenticated Bnoon user profile.\n\nReturns:\n- User profile data\n- `isProfileComplete`: Whether required fields are filled\n- `branchMappings`: Map of branchId -> FertiSmart MRN"
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ahmed\",\n  \"middleName\": \"M\",\n  \"lastName\": \"Radwan\",\n  \"emailAddress\": \"ahmed@example.com\",\n  \"sex\": 1,\n  \"dob\": \"1990-01-15\",\n  \"nationality\": {\n    \"id\": 1,\n    \"name\": \"Saudi Arabia\"\n  },\n  \"identityIdType\": {\n    \"id\": 1,\n    \"name\": \"National ID\"\n  },\n  \"identityId\": \"1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me"]
+            },
+            "description": "Update Bnoon user profile.\n\n**Automatically syncs to all FertiSmart branches** where user has MRN mappings.\n\nReturns:\n- Updated user profile\n- `syncResults`: Array of sync results per branch"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Branch MRN",
+      "item": [
+        {
+          "name": "Get or Create Branch MRN",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchId\": \"riyadh-granada\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/me/branch-mrn",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me", "branch-mrn"]
+            },
+            "description": "Get or create FertiSmart MRN for a specific branch.\n\n**Lazy patient creation:**\n- If user already has MRN for branch, returns existing\n- If not, creates FertiSmart patient using Bnoon profile\n\nBranch IDs:\n- `riyadh-granada`\n- `jeddah`\n- `al-ahsa`\n- `riyadh-king-salman` (coming soon)\n\nReturns:\n- `mrn`: FertiSmart MRN\n- `isNew`: Whether patient was just created\n- `fertiSmartBranchId`: FertiSmart internal branch ID"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Legacy Endpoints (Deprecated)",
+      "item": [
+        {
+          "name": "[Legacy] Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/current-user",
+              "host": ["{{base_url}}"],
+              "path": ["api", "current-user"]
+            },
+            "description": "**DEPRECATED** - Use `/api/users/me` instead.\n\nThis endpoint uses the legacy FertiSmart-dependent token format."
+          }
+        },
+        {
+          "name": "[Legacy] Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mrn\": \"{{mrn}}\",\n  \"channel\": \"sms\",\n  \"maxAttempts\": 5,\n  \"purpose\": \"verify phone number\",\n  \"ttlMinutes\": 600\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/send-otp",
+              "host": ["{{base_url}}"],
+              "path": ["api", "send-otp"]
+            },
+            "description": "**DEPRECATED** - Use `/api/auth/send-otp` instead.\n\nRequires MRN (branch-dependent)."
+          }
+        },
+        {
+          "name": "[Legacy] Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"1234\",\n  \"purpose\": \"verify phone number\",\n  \"mrn\": \"{{mrn}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verify-otp"]
+            },
+            "description": "**DEPRECATED** - Use `/api/auth/verify-otp` instead.\n\nRequires MRN (branch-dependent)."
+          }
+        }
+      ]
+    }
+  ]
+}

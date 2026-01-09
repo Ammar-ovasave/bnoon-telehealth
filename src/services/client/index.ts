@@ -98,17 +98,6 @@ export async function sendOTP(params: SendOTPPayload) {
   }
 }
 
-export async function verifyOTP(params: { code: string; purpose: string; mrn: string }) {
-  try {
-    const res = await instance.post<{
-      verified?: boolean;
-    }>(`/api/verify-otp`, params);
-    return res.data;
-  } catch (e) {
-    console.log("--- verifyOTP error", e);
-    return null;
-  }
-}
 
 export async function logout() {
   try {
@@ -185,11 +174,11 @@ export async function sendBnoonOTP(phone: string) {
  * Verify OTP and authenticate (new Bnoon auth flow)
  * Creates new user if first time
  */
-export async function verifyBnoonOTP(phone: string, code: string) {
+export async function verifyBnoonOTP(phone: string, code: string, preferredLanguage?: "ar" | "en") {
   try {
     const res = await instance.post<BnoonAuthResponse>(
       `/api/auth/verify-otp`,
-      { phone, code }
+      { phone, code, preferredLanguage }
     );
     return res.data;
   } catch (e) {
@@ -231,12 +220,17 @@ export async function updateBnoonUser(data: UpdateBnoonUserPayload) {
 /**
  * Get or create FertiSmart MRN for a specific branch
  * Implements lazy patient creation
+ * @param branchId - The clinic branch ID
+ * @param patientName - Optional name to use when creating a new patient (split from fullName)
  */
-export async function getOrCreateBranchMrn(branchId: ClinicBranchID) {
+export async function getOrCreateBranchMrn(
+  branchId: ClinicBranchID,
+  patientName?: { firstName: string; middleName: string; lastName: string }
+) {
   try {
     const res = await instance.post<BranchMrnResponse>(
       `/api/users/me/branch-mrn`,
-      { branchId }
+      { branchId, patientName }
     );
     return res.data;
   } catch (e) {

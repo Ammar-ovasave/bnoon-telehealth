@@ -9,6 +9,7 @@ import { NextResponse } from "next/server";
 interface VerifyOTPRequest {
   phone: string;
   code: string;
+  preferredLanguage?: "ar" | "en";
 }
 
 /**
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
     cookiesStore.delete("otpPhone");
 
     // Get or create user in Firestore
-    const { user, isNew } = await getOrCreateUser(normalizedPhone);
+    const { user, isNew } = await getOrCreateUser(normalizedPhone, body.preferredLanguage);
 
     // Sign JWT with user data
     const token = signBnoonJwt(user);

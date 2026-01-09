@@ -8,6 +8,11 @@ import { NextResponse } from "next/server";
 
 interface BranchMrnRequest {
   branchId: ClinicBranchID;
+  patientName?: {
+    firstName: string;
+    middleName: string;
+    lastName: string;
+  };
 }
 
 /**
@@ -59,7 +64,7 @@ export async function POST(request: Request) {
     }
 
     // Get or create MRN for the branch
-    const result = await getOrCreateBranchMrn(user, body.branchId);
+    const result = await getOrCreateBranchMrn(user, body.branchId, body.patientName);
 
     if (!result) {
       return NextResponse.json(

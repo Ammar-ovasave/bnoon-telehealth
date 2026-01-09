@@ -5,33 +5,7 @@ const JWT_EXPIRES_IN_SECONDS = 60 * 60 * 24 * 365; // 1 year
 const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
 /**
- * Legacy JWT payload structure (FertiSmart-dependent)
- * @deprecated Use signBnoonJwt instead
- */
-export interface LegacyJWTPayload {
-  mrn: string;
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  contactNumber: string;
-  emailAddress: string;
-  branchId: number;
-}
-
-/**
- * Sign a JWT with the legacy FertiSmart-dependent payload
- * @deprecated Use signBnoonJwt instead
- */
-export function signJwt(
-  payload: LegacyJWTPayload,
-  expiresInSeconds = JWT_EXPIRES_IN_SECONDS
-) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: expiresInSeconds });
-}
-
-/**
- * Sign a JWT with the new Bnoon-owned user payload
- * This is the preferred method for new authentication flows
+ * Sign a JWT with the Bnoon user payload
  */
 export function signBnoonJwt(
   user: BnoonUser,

@@ -35,7 +35,8 @@ const AppointmentCall: FC = () => {
     }
   }, [localMicrophoneTrack, enableMic, user]);
 
-  const uid = user?.mrn ?? new Date().toISOString();
+  // Use userId (phone number) as the Agora uid for Bnoon users
+  const uid = user?.userId ?? new Date().toISOString();
 
   const { localCameraTrack } = useLocalCameraTrack(isClient && enableCamera);
   const { token, appId } = useAgoraToken({

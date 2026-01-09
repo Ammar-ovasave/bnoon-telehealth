@@ -3,10 +3,11 @@ import useCurrentUser from "@/hooks/useCurrentUser";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import InPersonForm from "./_components/InPersonForm";
-import Image from "next/image";
+import { MapPin } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
+import BranchGuard from "@/components/BranchGuard";
 
 export default function InPersonAppointmentInfoPage() {
   const t = useTranslations("InPersonAppointmentInfoPage");
@@ -19,6 +20,7 @@ export default function InPersonAppointmentInfoPage() {
   const urlFullName = searchParams.get("fullName");
 
   return (
+    <BranchGuard>
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
       {/* Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -28,10 +30,10 @@ export default function InPersonAppointmentInfoPage() {
 
       <div className="relative container mx-auto px-4 py-8 max-w-2xl pb-30">
         {/* Header */}
-        <div className="text-center mb-8 animate-fade-in-up">
+        <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-bnoon-teal/10 dark:bg-bnoon-teal/20 p-4 rounded-2xl">
-              <Image src={`/icons/Location1.png`} alt={t("title")} width={50} height={50} />
+            <div className="w-20 h-20 bg-[#004e77] rounded-2xl flex items-center justify-center shadow-lg shadow-[#004e77]/20">
+              <MapPin className="w-10 h-10 text-white" strokeWidth={1.5} />
             </div>
           </div>
           <h1 className="text-4xl rtl:text-3xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
@@ -53,7 +55,7 @@ export default function InPersonAppointmentInfoPage() {
         <div className="mt-6 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 rounded-2xl p-4 border border-bnoon-teal/20 dark:border-bnoon-teal/30">
           <div className="flex items-start gap-3">
             <div className="bg-bnoon-teal/10 dark:bg-bnoon-teal/20 p-2 rounded-xl mt-0.5">
-              <Image src={`/icons/Location1.png`} alt={t("visitDetails.title")} width={25} height={25} />
+              <MapPin className="w-6 h-6 text-bnoon-teal" strokeWidth={1.5} />
             </div>
             <div>
               <h4 className="text-sm font-medium text-bnoon-teal mb-1">{t("visitDetails.title")}</h4>
@@ -63,5 +65,6 @@ export default function InPersonAppointmentInfoPage() {
         </div>
       </div>
     </div>
+    </BranchGuard>
   );
 }

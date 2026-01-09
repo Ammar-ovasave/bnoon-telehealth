@@ -1,0 +1,586 @@
+{
+  "info": {
+    "name": "Fertismart API",
+    "description": "Fertismart minimal API for fertility clinic management.\n\n**Important:** All dates are in UTC except 'Dob' which is stored as-is.\n\n**Authentication:** Include 'x-api-key' header in all requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "x-api-key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{fertismart_api_key}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://unvaunted-weedily-jannie.ngrok-free.dev",
+      "type": "string"
+    },
+    {
+      "key": "fertismart_api_key",
+      "value": "your-api-key-here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Patients",
+      "item": [
+        {
+          "name": "Find patients by contact number",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/patients?contactNumber={{contact_number}}",
+              "host": ["{{base_url}}"],
+              "path": ["patients"],
+              "query": [
+                {
+                  "key": "contactNumber",
+                  "value": "{{contact_number}}",
+                  "description": "Phone number with country code (e.g., +966501234567)"
+                }
+              ]
+            },
+            "description": "Returns patients that have a matching contact number."
+          }
+        },
+        {
+          "name": "Create patient (single or couple)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"middleName\": \"\",\n    \"contactNumber\": \"+966501234567\",\n    \"sex\": 1,\n    \"dob\": \"1990-01-15\"\n  },\n  \"partner\": null,\n  \"branchId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/patients",
+              "host": ["{{base_url}}"],
+              "path": ["patients"]
+            },
+            "description": "Creates a new patient file.\n\nPatientSex: 0 = female, 1 = male\n\nMandatory: patient.firstName, patient.lastName, patient.contactNumber, branchId"
+          }
+        },
+        {
+          "name": "Get patient by MRN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/patients/{{mrn}}",
+              "host": ["{{base_url}}"],
+              "path": ["patients", "{{mrn}}"]
+            },
+            "description": "Returns a single patient by MRN (Medical Record Number)."
+          }
+        },
+        {
+          "name": "Patch patient file",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"middleName\": \"M\",\n  \"lastName\": \"Doe\",\n  \"emailAddress\": \"john@example.com\",\n  \"dob\": \"1990-01-15\",\n  \"nationalityId\": 1,\n  \"identityIdTypeId\": 1,\n  \"identityId\": \"1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/patients/{{mrn}}",
+              "host": ["{{base_url}}"],
+              "path": ["patients", "{{mrn}}"]
+            },
+            "description": "Partially updates the patient record. Only provided fields are updated."
+          }
+        },
+        {
+          "name": "Patch patient sex",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sex\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/patients/{{mrn}}/sex",
+              "host": ["{{base_url}}"],
+              "path": ["patients", "{{mrn}}", "sex"]
+            },
+            "description": "Updates patient's sex. Only works for single patient files, not couples.\n\nSex: 0 = female, 1 = male"
+          }
+        },
+        {
+          "name": "List patient appointments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/patients/{{mrn}}/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["patients", "{{mrn}}", "appointments"]
+            },
+            "description": "Returns appointment list of the patient identified by MRN."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Appointments",
+      "item": [
+        {
+          "name": "List appointments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments?date={{date}}&resourceId={{resource_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "{{date}}",
+                  "description": "ISO date-time"
+                },
+                {
+                  "key": "resourceId",
+                  "value": "{{resource_id}}",
+                  "description": "Optional resource ID filter"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientMrn\": \"{{mrn}}\",\n  \"serviceId\": 1,\n  \"resourceIds\": [1],\n  \"startTime\": \"2024-01-15T14:00:00Z\",\n  \"endTime\": \"2024-01-15T14:30:00Z\",\n  \"branchId\": 1,\n  \"statusId\": 1,\n  \"description\": \"Virtual Visit\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["appointments"]
+            }
+          }
+        },
+        {
+          "name": "Get appointment statuses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments/statuses",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "statuses"]
+            },
+            "description": "Returns available appointment status options."
+          }
+        },
+        {
+          "name": "Get appointment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update appointment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startTime\": \"2024-01-15T15:00:00Z\",\n  \"endTime\": \"2024-01-15T15:30:00Z\",\n  \"resourceIds\": [1],\n  \"branchId\": 1,\n  \"statusId\": 2,\n  \"description\": \"Updated appointment\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update appointment status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statusId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resources & Availability",
+      "item": [
+        {
+          "name": "List all resources",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/resources",
+              "host": ["{{base_url}}"],
+              "path": ["resources"]
+            },
+            "description": "Returns all doctors/resources."
+          }
+        },
+        {
+          "name": "Get resource by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/resources/{{resource_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["resources", "{{resource_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get resource availability",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/resources/{{resource_id}}/availability?date={{date}}&serviceDuration=30",
+              "host": ["{{base_url}}"],
+              "path": ["resources", "{{resource_id}}", "availability"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "{{date}}",
+                  "description": "ISO date-time"
+                },
+                {
+                  "key": "serviceDuration",
+                  "value": "30",
+                  "description": "Duration in minutes"
+                }
+              ]
+            },
+            "description": "Returns available time slots for a specific resource."
+          }
+        },
+        {
+          "name": "Get all resources availability",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/resources/availabilities?date={{date}}&serviceDuration=30",
+              "host": ["{{base_url}}"],
+              "path": ["resources", "availabilities"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "{{date}}"
+                },
+                {
+                  "key": "serviceDuration",
+                  "value": "30"
+                }
+              ]
+            },
+            "description": "Returns availability for all resources."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Services",
+      "item": [
+        {
+          "name": "List appointment services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointment-services?activeOnly=true",
+              "host": ["{{base_url}}"],
+              "path": ["appointment-services"],
+              "query": [
+                {
+                  "key": "activeOnly",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List API services",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-services?activeOnly=true",
+              "host": ["{{base_url}}"],
+              "path": ["api-services"],
+              "query": [
+                {
+                  "key": "activeOnly",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Branches",
+      "item": [
+        {
+          "name": "List all branches",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/branches",
+              "host": ["{{base_url}}"],
+              "path": ["branches"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "OTP",
+      "item": [
+        {
+          "name": "Generate OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"login\",\n  \"ttlMinutes\": 5,\n  \"maxAttempts\": 3,\n  \"channel\": \"sms\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/patients/{{mrn}}/otps",
+              "host": ["{{base_url}}"],
+              "path": ["patients", "{{mrn}}", "otps"]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"1234\",\n  \"purpose\": \"login\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/patients/{{mrn}}/otps:verify",
+              "host": ["{{base_url}}"],
+              "path": ["patients", "{{mrn}}", "otps:verify"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Check SMS enabled",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messages/smses/enabled",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "smses", "enabled"]
+            }
+          }
+        },
+        {
+          "name": "Send SMS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mrn\": \"{{mrn}}\",\n  \"mobile\": [\"+966501234567\"],\n  \"body\": \"Your appointment is confirmed.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/messages/smses",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "smses"]
+            }
+          }
+        },
+        {
+          "name": "Get SMS templates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messages/smses/templates?usedFor=new&lang=en",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "smses", "templates"],
+              "query": [
+                {
+                  "key": "usedFor",
+                  "value": "new",
+                  "description": "new, cancelled, updated"
+                },
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "description": "en, ar"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Keys",
+      "item": [
+        {
+          "name": "Rotate API key",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-keys",
+              "host": ["{{base_url}}"],
+              "path": ["api-keys"]
+            },
+            "description": "Invalidates all existing keys and creates a new one."
+          }
+        },
+        {
+          "name": "Revoke API key",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api-keys",
+              "host": ["{{base_url}}"],
+              "path": ["api-keys"]
+            },
+            "description": "Revokes the API key (no replacement)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Definitions",
+      "item": [
+        {
+          "name": "List countries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/definitions/countries",
+              "host": ["{{base_url}}"],
+              "path": ["definitions", "countries"]
+            }
+          }
+        },
+        {
+          "name": "Get definitions by type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/definitions?typeId=1",
+              "host": ["{{base_url}}"],
+              "path": ["definitions"],
+              "query": [
+                {
+                  "key": "typeId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

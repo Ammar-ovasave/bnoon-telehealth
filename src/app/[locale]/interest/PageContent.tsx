@@ -28,7 +28,7 @@ export const PageContent: FC = () => {
 
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-5xl pb-24">
         {/* Header */}
-        <div className="text-center mb-10 md:mb-12 animate-fade-in-up">
+        <div className="text-center mb-10 md:mb-12">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bnoon-navy dark:text-white mb-4 leading-tight">
             {t("title")}
           </h1>
@@ -64,13 +64,13 @@ export const PageContent: FC = () => {
             const row2Services = filteredServices.slice(3);
 
             return (
-              <div className="flex flex-col gap-5 md:gap-6 animate-fade-in-up animation-delay-200">
+              <div className="flex flex-col gap-5 md:gap-6">
                 {/* Row 1: First 3 services */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
                   {row1Services.map((service, index) => (
                     <div
                       key={service.id}
-                      className={`animate-fade-in-up animation-delay-${index * 100}`}
+                      className=""
                     >
                       <ServiceCard service={service} />
                     </div>
@@ -83,7 +83,7 @@ export const PageContent: FC = () => {
                     {row2Services.map((service, index) => (
                       <div
                         key={service.id}
-                        className={`w-full sm:w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-1.5rem)/3)] animate-fade-in-up animation-delay-${(index + 3) * 100}`}
+                        className={`w-full sm:w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-1.5rem)/3)]${(index + 3) * 100}`}
                       >
                         <ServiceCard service={service} />
                       </div>
@@ -96,8 +96,8 @@ export const PageContent: FC = () => {
         )}
 
         {/* Back Button */}
-        <div className="w-full flex justify-center mt-12 animate-fade-in-up animation-delay-300">
-          <Button variant="outline" className="max-w-md w-full dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800" onClick={() => router.back()}>
+        <div className="w-full flex justify-center mt-12">
+          <Button variant="outline" className="max-w-md w-full dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800" onClick={() => router.push(`/${locale}`)}>
             <ChevronLeft className="rtl:scale-x-[-1]" />
             {t("buttons.backToClinicSelection")}
           </Button>

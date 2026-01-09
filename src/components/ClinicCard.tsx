@@ -8,12 +8,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import useSwitchBranch from "@/hooks/useSwitchBranch";
 import LoadingOverlay from "./LoadingOverlay";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("HomePage");
+  const locale = useLocale();
 
   const { handleSwitchBranch, loading: loadingSwitchBranch } = useSwitchBranch();
 
@@ -26,7 +27,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
   const handleSelectClinic = async () => {
     if (clinic.isCommingSoon) return;
     await handleSwitchBranch({ payload: { branchId: clinic.id } });
-    router.push(`/interest?${newUrlSearchParams.toString()}`);
+    router.push(`/${locale}/interest?${newUrlSearchParams}`);
   };
 
   return (

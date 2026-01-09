@@ -1,5 +1,5 @@
 "use client";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { FC, PropsWithChildren } from "react";
 import { SWRConfig } from "swr";
 
@@ -19,6 +19,13 @@ const SWRProvider: FC<PropsWithChildren & { fallback?: { [key: string]: unknown 
       value={{
         fallback: fallback,
         fetcher: (resource, init) => instance.get(resource, init).then((res) => res.data),
+        revalidateOnFocus: false,
+        shouldRetryOnError: (error: AxiosError) => {
+          const status = error?.response?.status;
+          // Only retry on 5xx server errors, not 4xx client errors
+          if (status && status >= 400 && status < 500) return false;
+          return true;
+        },
       }}
     >
       {children}

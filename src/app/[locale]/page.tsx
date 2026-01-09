@@ -44,7 +44,7 @@ export default function Home() {
               {allClinics.map((clinic, index) => (
                 <div
                   key={clinic.id}
-                  className={`animate-fade-in-up animation-delay-${(index % 4) * 100}`}
+                  className=""
                 >
                   <ClinicCard clinic={clinic} />
                 </div>

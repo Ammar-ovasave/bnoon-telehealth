@@ -140,9 +140,9 @@ export function PaymentCallbackContent() {
     processCallback();
   }, [processCallback]);
 
-  // Handle retry
+  // Handle retry - navigate to home to start a new booking
   const handleRetry = () => {
-    router.back();
+    router.push(`/${locale}`);
   };
 
   // Handle go home
@@ -155,7 +155,7 @@ export function PaymentCallbackContent() {
       <div className="max-w-md w-full">
         {/* Processing State */}
         {(state === "processing" || state === "creating_appointment") && (
-          <div className="text-center animate-fade-in-up">
+          <div className="text-center">
             <div className="mb-8">
               <div className="w-24 h-24 mx-auto bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center">
                 <Loader2 className="w-12 h-12 text-bnoon-teal animate-spin" />
@@ -174,7 +174,7 @@ export function PaymentCallbackContent() {
 
         {/* Success State */}
         {state === "success" && (
-          <div className="text-center animate-fade-in-up">
+          <div className="text-center">
             <div className="mb-8">
               <div className="w-24 h-24 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
                 <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
@@ -194,7 +194,7 @@ export function PaymentCallbackContent() {
 
         {/* Failed State */}
         {state === "failed" && (
-          <div className="text-center animate-fade-in-up">
+          <div className="text-center">
             <div className="mb-8">
               <div className="w-24 h-24 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
                 <XCircle className="w-12 h-12 text-red-600 dark:text-red-400" />

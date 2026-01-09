@@ -1,11 +1,11 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { ArrowLeft, ArrowRight, CalendarDays, Clock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { add, format } from "date-fns";
+import { add, format, parseISO } from "date-fns";
 import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
@@ -30,16 +30,90 @@ const formatArabicWeekDayName: { [name: string]: string } = {
 };
 
 export default function SelectDateAndTimePage() {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations("SelectDateAndTimePage");
   const tDoctors = useTranslations("DoctorsPage");
   const locale = useLocale();
 
+  // Read URL params for pre-filling when navigating back
+  const selectedDoctorId = searchParams.get("selectedDoctor");
+  const selectedVisitType = searchParams.get("selectedVisitType") as "clinic" | "virtual" | null;
+  const urlSelectedDate = searchParams.get("selectedDate");
+  const urlSelectedTimeSlot = searchParams.get("selectedTimeSlot");
+
+  // Helper to extract date from time slot string (e.g., "2026-01-27T10:00:00Z" -> Date)
+  const parseDateFromTimeSlot = (timeSlot: string): Date | undefined => {
+    const dateMatch = timeSlot.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (dateMatch) {
+      const parsed = parseISO(dateMatch[1]);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return undefined;
+  };
+
+  // Initialize state from URL params (for when user navigates back)
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => {
+    if (urlSelectedDate) {
+      const parsed = parseISO(urlSelectedDate);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    if (urlSelectedTimeSlot) {
+      return parseDateFromTimeSlot(urlSelectedTimeSlot);
+    }
+    return undefined;
+  });
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | undefined>(
+    () => urlSelectedTimeSlot ?? undefined
+  );
+
+  // Sync state with URL params only on initial mount (handles hydration edge cases)
+  const [hasInitialized, setHasInitialized] = useState(false);
+  useEffect(() => {
+    if (hasInitialized) return; // Only run once on mount
+
+    // Set date from URL params
+    if (urlSelectedDate) {
+      const parsed = parseISO(urlSelectedDate);
+      if (!isNaN(parsed.getTime())) {
+        setSelectedDate(parsed);
+      }
+    } else if (urlSelectedTimeSlot) {
+      const dateFromSlot = parseDateFromTimeSlot(urlSelectedTimeSlot);
+      if (dateFromSlot) {
+        setSelectedDate(dateFromSlot);
+      }
+    }
+    // Set time slot from URL params
+    if (urlSelectedTimeSlot) {
+      setSelectedTimeSlot(urlSelectedTimeSlot);
+    }
+
+    setHasInitialized(true);
+  }, [hasInitialized, urlSelectedDate, urlSelectedTimeSlot]);
+
   const dateFnsLocale = useMemo(() => {
     return locale === "ar" ? ar : enUS;
   }, [locale]);
+
+  // Helper to compare time slots (handles format differences like milliseconds, timezone offsets)
+  const isTimeSlotSelected = (slotStart: string | undefined) => {
+    if (!selectedTimeSlot || !slotStart) return false;
+    // First try exact match
+    if (selectedTimeSlot === slotStart) return true;
+    // Compare parsed timestamps
+    try {
+      const selectedTime = new Date(selectedTimeSlot).getTime();
+      const slotTime = new Date(slotStart).getTime();
+      if (selectedTime === slotTime) return true;
+      // Also compare by formatted time (in case of timezone differences in string representation)
+      const selectedFormatted = format(selectedTimeSlot, "yyyy-MM-dd HH:mm");
+      const slotFormatted = format(slotStart, "yyyy-MM-dd HH:mm");
+      return selectedFormatted === slotFormatted;
+    } catch {
+      return false;
+    }
+  };
 
   const weekdayFormatter = useMemo(() => {
     return (date: Date) => {
@@ -47,10 +121,6 @@ export default function SelectDateAndTimePage() {
       return formatArabicWeekDayName[value] ?? value;
     };
   }, [dateFnsLocale]);
-
-  const searchParams = useSearchParams();
-  const selectedDoctorId = searchParams.get("selectedDoctor");
-  const selectedVisitType = searchParams.get("selectedVisitType") as "clinic" | "virtual" | null;
 
   const selectedDoctor = useMemo(() => {
     return doctors.find((doc) => {
@@ -66,14 +136,38 @@ export default function SelectDateAndTimePage() {
     );
   }, [resourcesData, selectedDoctor?.name]);
 
+  // Format date for API - ensure it's a valid Date object
+  const formattedDateForApi = useMemo(() => {
+    if (!selectedDate) return undefined;
+    try {
+      // Ensure selectedDate is a valid Date
+      if (selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+        return format(selectedDate, "yyyy-MM-dd");
+      }
+      return undefined;
+    } catch {
+      return undefined;
+    }
+  }, [selectedDate]);
+
   const { data: availabilityData, isLoading: loadingTimeslots } = useFertiSmartResourceAvailability({
     resourceId: selectedResource?.id?.toString(),
-    date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined,
+    date: formattedDateForApi,
     serviceDuration: VISIT_DURATION_IN_MINUTES,
   });
 
   const handleBack = () => {
-    router.back();
+    // Explicitly navigate to doctors page with current locale and preserved params
+    const backParams = new URLSearchParams();
+    const selectedClinicLocation = searchParams.get("selectedClinicLocation");
+    const selectedService = searchParams.get("selectedService");
+    const selectedVisitType = searchParams.get("selectedVisitType");
+
+    if (selectedClinicLocation) backParams.set("selectedClinicLocation", selectedClinicLocation);
+    if (selectedService) backParams.set("selectedService", selectedService);
+    if (selectedVisitType) backParams.set("selectedVisitType", selectedVisitType);
+
+    router.push(`/${locale}/doctors?${backParams.toString()}`);
   };
 
   const handleTimeSlotSelect = (timeSlotId: string) => {
@@ -108,14 +202,16 @@ export default function SelectDateAndTimePage() {
 
   const getNextPageUrl = () => {
     if (!selectedDate || !selectedTimeSlot) return "#";
-    if (currentUserData?.mrn) {
+    // If user is authenticated (Bnoon users have userId), go to appointment info
+    // Otherwise, redirect to phone verification
+    if (currentUserData?.userId) {
       if (selectedVisitType === "clinic") {
-        return `/in-person-appointment-info?${newUrlSearchParams}`;
+        return `/${locale}/in-person-appointment-info?${newUrlSearchParams}`;
       } else {
-        return `/virtual-visit-info?${newUrlSearchParams}`;
+        return `/${locale}/virtual-visit-info?${newUrlSearchParams}`;
       }
     } else {
-      return `/verify-phone?${newUrlSearchParams.toString()}`;
+      return `/${locale}/verify-phone?${newUrlSearchParams.toString()}`;
     }
   };
 
@@ -129,7 +225,7 @@ export default function SelectDateAndTimePage() {
 
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-32">
         {/* Header */}
-        <div className="text-center mb-10 animate-fade-in-up">
+        <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
           <p className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6">{t("description")}</p>
 
@@ -200,7 +296,7 @@ export default function SelectDateAndTimePage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up animation-delay-200">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Date Selection */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-3 mb-6">
@@ -209,32 +305,30 @@ export default function SelectDateAndTimePage() {
               </div>
               <h2 className="text-lg font-bold text-bnoon-navy dark:text-white">{t("selectDate")}</h2>
             </div>
-            <div className="flex justify-center">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(value) => {
-                  setSelectedDate(value);
-                  setSelectedTimeSlot(undefined);
-                }}
-                disabled={isDateDisabled}
-                locale={dateFnsLocale}
-                className="rounded-xl border border-gray-100 dark:border-gray-700"
-                formatters={{
-                  formatWeekdayName: weekdayFormatter,
-                }}
-                classNames={{
-                  weekdays: "gap-3",
-                  weekday: "text-[10px] px-2 text-gray-500",
-                  week: "gap-2 mt-3",
-                  day: "hover:bg-bnoon-teal/10 rounded-lg p-1 transition-colors",
-                  day_selected: "bg-bnoon-teal text-white hover:bg-bnoon-teal/90 rounded-lg",
-                  day_today: "bg-bnoon-teal/10 text-bnoon-teal font-semibold rounded-lg",
-                  button_next: "bg-bnoon-teal cursor-pointer text-white p-1.5 rounded-lg hover:bg-bnoon-teal/90 transition-colors",
-                  button_previous: "bg-bnoon-teal cursor-pointer text-white p-1.5 rounded-lg hover:bg-bnoon-teal/90 transition-colors",
-                }}
-              />
-            </div>
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(value) => {
+                setSelectedDate(value);
+                setSelectedTimeSlot(undefined);
+              }}
+              disabled={isDateDisabled}
+              locale={dateFnsLocale}
+              className="rounded-xl border border-gray-100 dark:border-gray-700"
+              formatters={{
+                formatWeekdayName: weekdayFormatter,
+              }}
+              classNames={{
+                weekdays: "gap-3",
+                weekday: "text-[10px] px-2 text-gray-500",
+                week: "gap-2 mt-3",
+                day: "hover:bg-bnoon-teal/10 rounded-lg p-1 transition-colors",
+                day_selected: "bg-bnoon-teal text-white hover:bg-bnoon-teal/90 rounded-lg",
+                day_today: "bg-bnoon-teal/10 text-bnoon-teal font-semibold rounded-lg",
+                button_next: "bg-bnoon-teal cursor-pointer text-white p-1.5 rounded-lg hover:bg-bnoon-teal/90 transition-colors",
+                button_previous: "bg-bnoon-teal cursor-pointer text-white p-1.5 rounded-lg hover:bg-bnoon-teal/90 transition-colors",
+              }}
+            />
           </div>
 
           {/* Time Selection */}
@@ -269,7 +363,7 @@ export default function SelectDateAndTimePage() {
                       onClick={() => handleTimeSlotSelect(slot.start ?? "")}
                       className={cn(
                         "p-3 rounded-xl border-2 text-sm font-semibold transition-all duration-200 cursor-pointer",
-                        selectedTimeSlot === slot.start
+                        isTimeSlotSelected(slot.start)
                           ? "bg-bnoon-teal text-white border-bnoon-teal shadow-lg shadow-bnoon-teal/20"
                           : "bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-bnoon-navy dark:text-white hover:border-bnoon-teal/50 hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10"
                       )}
@@ -321,7 +415,7 @@ export default function SelectDateAndTimePage() {
 
         {/* Summary */}
         {(selectedDate || selectedTimeSlot) && (
-          <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 animate-fade-in-up animation-delay-300">
+          <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
             <h3 className="text-lg font-bold text-bnoon-navy dark:text-white mb-4">{t("summary.title")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {selectedVisitType && (

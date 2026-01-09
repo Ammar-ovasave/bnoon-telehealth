@@ -5,10 +5,8 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { ArrowLeft, ArrowRight, Shield, ChevronDown, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { countryCodes } from "@/constants";
-import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
 import { toast } from "sonner";
-import { createPatient, getPatientsByPhoneNumber, sendOTP, verifyOTP } from "@/services/client";
-import useCurrentUser from "@/hooks/useCurrentUser";
+import { sendBnoonOTP, verifyBnoonOTP, BnoonAuthResponse } from "@/services/client";
 import { Spinner } from "./ui/spinner";
 import useTimer from "@/hooks/useTimer";
 import { differenceInSeconds } from "date-fns";
@@ -16,7 +14,7 @@ import { useTranslations, useLocale } from "next-intl";
 
 const OTP_LENGTH = 4;
 
-export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPhoneNumberFormProps) {
+export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess, onBack }: VerifyPhoneNumberFormProps) {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [otp, setOtp] = useState<string>("");
   const [showOtpInput, setShowOtpInput] = useState<boolean>(false);
@@ -27,7 +25,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const t = useTranslations("VerifyPhonePage");
-  const locale = useLocale();
+  const locale = useLocale() as "ar" | "en";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -43,86 +41,66 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
   }, []);
 
   const handleBack = () => {
-    router.back();
+    if (onBack) {
+      onBack();
+    } else {
+      router.push(`/${locale}`);
+    }
   };
-
-  const { data: branchesData, isLoading: loadingBranches } = useFertiSmartBranches();
-
-  const selectedBranch = branchesData?.[0];
-
-  const { data: currentUserData, isLoading: loadingCurrentUser, mutate: mutateCurrentUser } = useCurrentUser();
 
   const fullPhoneNumber = useMemo(() => {
     return `${selectedCountryCode}${phoneNumber.startsWith("0") ? phoneNumber.slice(1) : phoneNumber}`;
   }, [phoneNumber, selectedCountryCode]);
 
+  /**
+   * Send OTP using the new Bnoon auth flow
+   * No branch selection or MRN required
+   */
   const handleSendOtp = async () => {
-    if (!selectedBranch) {
-      return toast.error(t("errors.branchNotFound"));
-    }
     if (!phoneNumber || phoneNumber.length < 7) {
       alert(t("errors.invalidPhoneNumber"));
       return;
     }
     setIsLoading(true);
-    const allPatients = await getPatientsByPhoneNumber({ phoneNumber: fullPhoneNumber });
-    // Filter out patients with empty mrn
-    const existingPatients = allPatients?.filter((p) => p.mrn && p.mrn.trim() !== "") ?? [];
-    const createPatientResponse = currentUserData?.mrn
-      ? { mrn: currentUserData.mrn }
-      : existingPatients.length > 0
-      ? existingPatients[0]
-      : await createPatient({
-          branchId: selectedBranch.id ?? 0,
-          patient: { contactNumber: fullPhoneNumber, firstName: "-", lastName: "-", middleName: "-" },
-        });
-    const mrnToUse = currentUserData?.mrn
-      ? currentUserData.mrn
-      : existingPatients.length > 0
-      ? existingPatients[0].mrn
-      : createPatientResponse?.mrn;
-    if (!mrnToUse) {
-      setIsLoading(false);
-      return toast.error(t("errors.failedToCreatePatient"));
-    }
-    const purpose = "verify phone number";
-    const sendOTPResponse = await sendOTP({
-      mrn: mrnToUse,
-      channel: "sms",
-      maxAttempts: 5,
-      purpose: purpose,
-      ttlMinutes: 10 * 60,
-    });
-    if (!sendOTPResponse?.length) {
+
+    const response = await sendBnoonOTP(fullPhoneNumber);
+
+    if (!response?.success) {
       setIsLoading(false);
       return toast.error(t("errors.failedToSendOTP"));
     }
+
     localStorage.setItem("otpSentAt", new Date().toISOString());
-    sessionStorage.setItem("mrn", mrnToUse);
-    sessionStorage.setItem("purpose", purpose);
+    sessionStorage.setItem("bnoon_phone", fullPhoneNumber);
     setIsLoading(false);
     setShowOtpInput(true);
   };
 
+  /**
+   * Verify OTP using the new Bnoon auth flow
+   * Creates or retrieves Bnoon user, issues JWT
+   */
   const handleVerifyOtp = async () => {
     if (!otp || otp.length !== OTP_LENGTH) {
       alert(t("errors.invalidOTPCode", { otpLength: OTP_LENGTH }));
       return;
     }
     setIsLoading(true);
-    const response = await verifyOTP({
-      code: otp,
-      mrn: sessionStorage.getItem("mrn") ?? "",
-      purpose: sessionStorage.getItem("purpose") ?? "",
-    });
-    if (!response?.verified) {
+
+    const storedPhone = sessionStorage.getItem("bnoon_phone") ?? fullPhoneNumber;
+    const response = await verifyBnoonOTP(storedPhone, otp, locale);
+
+    if (!response?.success) {
       setIsLoading(false);
       return toast.error(t("errors.invalidOTP"));
     }
-    mutateCurrentUser(undefined);
+
+    // Clean up session storage
+    sessionStorage.removeItem("bnoon_phone");
+
     setTimeout(() => {
       setIsLoading(false);
-      onVerifyPhoneSuccess();
+      onVerifyPhoneSuccess(response);
     }, 200);
   };
 
@@ -178,21 +156,11 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
         <div className="absolute bottom-1/3 -left-40 w-60 h-60 bg-bnoon-navy/5 dark:bg-bnoon-teal/5 rounded-full blur-3xl" />
       </div>
 
-      {loadingCurrentUser || loadingBranches ? (
-        <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
-          <div className="w-16 h-16 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center">
-            <Spinner className="w-8 h-8 text-bnoon-teal" />
-          </div>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">
-            {locale === "ar" ? "جاري التحميل..." : "Loading..."}
-          </p>
-        </div>
-      ) : (
-        <div className="relative px-4 sm:px-6 lg:px-8 mx-auto py-8 md:py-12 max-w-xl pb-24">
+      <div className="relative px-4 sm:px-6 lg:px-8 mx-auto py-8 md:py-12 max-w-xl pb-24">
           {/* Header */}
-          <div className="text-center mb-8 animate-fade-in-up">
+          <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-bnoon-teal to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg shadow-bnoon-teal/20">
+              <div className="w-20 h-20 bg-[#004e77] rounded-2xl flex items-center justify-center shadow-lg shadow-[#004e77]/20">
                 {showOtpInput ? (
                   <Shield className="h-10 w-10 text-white" />
                 ) : (
@@ -210,7 +178,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
 
           {/* Phone Number Input */}
           {!showOtpInput && (
-            <div className="animate-fade-in-up animation-delay-200">
+            <div>
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 dark:border-gray-700">
                 <label htmlFor="phone" className="block text-sm font-semibold text-bnoon-navy dark:text-white mb-3">
                   {t("labels.phoneNumber")}
@@ -314,7 +282,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
 
           {/* OTP Input */}
           {showOtpInput && (
-            <div className="animate-fade-in-up animation-delay-200">
+            <div>
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 dark:border-gray-700">
                 <div className="flex items-center justify-center mb-6">
                   <div className="w-14 h-14 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
@@ -376,11 +344,19 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
             </div>
           )}
         </div>
-      )}
     </div>
   );
 }
 
 interface VerifyPhoneNumberFormProps {
-  onVerifyPhoneSuccess: () => void;
+  /**
+   * Called after successful OTP verification
+   * @param authResponse - Contains isNew, isProfileComplete, and user data
+   */
+  onVerifyPhoneSuccess: (authResponse: BnoonAuthResponse) => void;
+  /**
+   * Called when user clicks back button
+   * If not provided, navigates to home page
+   */
+  onBack?: () => void;
 }

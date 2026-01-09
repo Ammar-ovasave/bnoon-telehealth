@@ -1,7 +1,19 @@
 {
   "visitStatus": {
-    "Approved/Confirmed": "تم تاكيد الموعد",
-    "Cancelled": "تم إلغاء الموعد"
+    "Waiting For Approval": "بانتظار الموافقة",
+    "Approved/Confirmed": "تم التأكيد",
+    "Arrived Waiting!": "وصل - بالانتظار",
+    "Procedure Started": "قيد التنفيذ",
+    "Completed": "مكتمل",
+    "Patient No-Show": "لم يحضر",
+    "Cancelled": "ملغي",
+    "No Answer": "لا يوجد رد",
+    "Will Callback": "سيتم الاتصال",
+    "On The Way Coming": "في الطريق",
+    "Booked Today": "محجوز اليوم",
+    "Patient Confirmed": "تأكيد المريض",
+    "Locked": "مقفل",
+    "Unlocked": "مفتوح"
   },
   "visitTypes": {
     "clinic": "موعد في العيادة",
@@ -13,6 +25,9 @@
     "Iqama No": "رقم الإقامة",
     "Passport": "جواز السفر",
     "License Number": "رقم رخصة القيادة"
+  },
+  "BranchGuard": {
+    "selectClinicMessage": "يرجى اختيار العيادة للمتابعة في الحجز"
   },
   "HomePage": {
     "title": "اختر أقرب عيادة بنون إليك",
@@ -93,7 +108,8 @@
       "virtual": {
         "title": "استشارة افتراضية",
         "description": "تواصل مع طبيبك بسهولة من راحة منزلك عبر مكالمة فيديو.",
-        "selectButton": "اختر استشارة افتراضية"
+        "selectButton": "اختر استشارة افتراضية",
+        "comingSoon": "قريباً"
       }
     },
     "availability": {
@@ -360,8 +376,7 @@
       "description": "الموعد المطلوب غير موجود أو تم إلغاؤه"
     },
     "buttons": {
-      "bookNewAppointment": "حجز موعد جديد",
-      "bookAnotherAppointment": "حجز موعد آخر"
+      "bookAppointment": "حجز موعد"
     },
     "appointmentCard": {
       "confirmation": "رقم التأكيد",
@@ -524,6 +539,47 @@
     "errors": {
       "paymentFailed": "فشلت عملية الدفع. يرجى المحاولة مرة أخرى.",
       "appointmentCreationFailed": "تمت عملية الدفع بنجاح لكن فشل إنشاء الموعد. يرجى التواصل مع الدعم."
+    }
+  },
+  "ProfileCompletionForm": {
+    "title": "أكمل ملفك الشخصي",
+    "description": "يرجى تقديم بياناتك للمتابعة في حجز موعدك.",
+    "labels": {
+      "firstName": "الاسم الأول",
+      "middleName": "الاسم الأوسط",
+      "lastName": "اسم العائلة",
+      "emailAddress": "البريد الإلكتروني",
+      "gender": "الجنس",
+      "dateOfBirth": "تاريخ الميلاد",
+      "nationality": "الجنسية",
+      "selectNationality": "اختر جنسيتك"
+    },
+    "placeholders": {
+      "firstName": "أدخل اسمك الأول",
+      "middleName": "أدخل اسمك الأوسط (اختياري)",
+      "lastName": "أدخل اسم العائلة",
+      "emailAddress": "أدخل بريدك الإلكتروني"
+    },
+    "genders": {
+      "male": "ذكر",
+      "female": "أنثى"
+    },
+    "buttons": {
+      "completeProfile": "أكمل الملف الشخصي",
+      "saving": "جاري الحفظ..."
+    },
+    "errors": {
+      "firstNameRequired": "الاسم الأول مطلوب",
+      "firstNameMinLength": "يجب أن يكون الاسم الأول حرفين على الأقل",
+      "lastNameRequired": "اسم العائلة مطلوب",
+      "lastNameMinLength": "يجب أن يكون اسم العائلة حرفين على الأقل",
+      "genderRequired": "يرجى اختيار الجنس",
+      "dobRequired": "تاريخ الميلاد مطلوب",
+      "emailInvalid": "يرجى إدخال بريد إلكتروني صحيح",
+      "updateFailed": "فشل تحديث الملف الشخصي. يرجى المحاولة مرة أخرى."
+    },
+    "messages": {
+      "profileUpdated": "تم تحديث الملف الشخصي بنجاح!"
     }
   }
 }

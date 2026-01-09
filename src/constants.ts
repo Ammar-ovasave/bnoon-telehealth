@@ -1,5 +1,33 @@
 export const AUTH_TOKEN_NAME = "auth-token";
 export const VISIT_DURATION_IN_MINUTES = 20;
+
+// Appointment Status Constants (from FertiSmart)
+// Verified identical across all branches: Riyadh Granada, Jeddah, Al-Ahsa
+export const APPOINTMENT_STATUS = {
+  WAITING_FOR_APPROVAL: { id: 0, name: "Waiting For Approval" },
+  APPROVED_CONFIRMED: { id: 1, name: "Approved/Confirmed" },
+  ARRIVED_WAITING: { id: 2, name: "Arrived Waiting!" },
+  PROCEDURE_STARTED: { id: 3, name: "Procedure Started" },
+  COMPLETED: { id: 4, name: "Completed" },
+  PATIENT_NO_SHOW: { id: 5, name: "Patient No-Show" },
+  CANCELLED: { id: 6, name: "Cancelled" },
+  NO_ANSWER: { id: 7, name: "No Answer" },
+  WILL_CALLBACK: { id: 8, name: "Will Callback" },
+  ON_THE_WAY_COMING: { id: 9, name: "On The Way Coming" },
+  BOOKED_TODAY: { id: 10, name: "Booked Today" },
+  PATIENT_CONFIRMED: { id: 20, name: "Patient Confirmed" },
+  LOCKED: { id: 21, name: "Locked" },
+  UNLOCKED: { id: 22, name: "Unlocked" },
+} as const;
+
+// Feature Flags
+export const FEATURE_FLAGS = {
+  /**
+   * Enable/disable virtual appointments across the system
+   * Set NEXT_PUBLIC_ENABLE_VIRTUAL_APPOINTMENTS=true in .env to enable
+   */
+  VIRTUAL_APPOINTMENTS_ENABLED: process.env.NEXT_PUBLIC_ENABLE_VIRTUAL_APPOINTMENTS === "true",
+} as const;
 export const countryCodes = [
   { code: "+966", country: "Saudi Arabia", flag: "🇸🇦" },
   { code: "+971", country: "UAE", flag: "🇦🇪" },

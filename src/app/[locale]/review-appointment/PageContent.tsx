@@ -37,18 +37,18 @@ import { toast } from "sonner";
 
 import useCurrentUser from "@/hooks/useCurrentUser";
 import useCurrentBranch from "@/hooks/useCurrentBranch";
-import useFertiSmartAppointmentStatuses from "@/hooks/useFertiSmartAppointmentStatuses";
 import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
 import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 
-import { createAppointment, getCurrentUser, updatePatient } from "@/services/client";
+import { createAppointment, getCurrentUser, updatePatient, getOrCreateBranchMrn, updateBnoonUser } from "@/services/client";
+import { ClinicBranchID } from "@/models/ClinicModel";
 import { containsArabic } from "@/services/containsArabic";
 import { doctors } from "@/models/DoctorModel";
 import { services } from "@/models/ServiceModel";
-import { VISIT_DURATION_IN_MINUTES } from "@/constants";
+import { VISIT_DURATION_IN_MINUTES, APPOINTMENT_STATUS } from "@/constants";
 import { PaymentSummary } from "@/components/payment/PaymentSummary";
 import { PaymentButton } from "@/components/payment/PaymentButton";
 import { PendingAppointmentData } from "@/models/PaymentModel";
@@ -60,6 +60,7 @@ export function PageContent() {
   const tGenders = useTranslations("VirtualVisitInfoPage.genders");
   const tDoctors = useTranslations("DoctorsPage");
   const tServices = useTranslations("ServicesPage.services");
+  const tClinics = useTranslations("HomePage.clinics");
   const _tPayment = useTranslations("PaymentPage");
   const locale = useLocale();
   const isArabic = locale === "ar";
@@ -121,7 +122,6 @@ export function PageContent() {
   // Hooks
   const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
   const { data: branchData } = useCurrentBranch();
-  const { data: statusesData } = useFertiSmartAppointmentStatuses();
   const { data: branchesData } = useFertiSmartBranches();
   const { data: apiServicesData } = useFertiSmartAPIServices();
   const { data: fertiSmartResources } = useFertiSmartResources();
@@ -151,38 +151,35 @@ export function PageContent() {
   }, [apiServicesData, selectedService?.title]);
 
   // Prepare appointment data for payment (virtual visits only)
+  // Note: For Bnoon users, MRN will be obtained dynamically via getOrCreateBranchMrn
+  // when payment starts, so we use a placeholder here that will be replaced
   const pendingAppointmentData: PendingAppointmentData | null = useMemo(() => {
     if (visitType !== "virtual") return null;
-    if (!currentUserData?.mrn || !statusesData || !branchesData?.length || !selectedFertiSmartService) {
+    if (!currentUserData || !branchesData?.length || !selectedFertiSmartService) {
       return null;
     }
 
-    const status = statusesData.find((item) => item.name === "Approved/Confirmed");
-    if (!status) return null;
-
     const splitName = fullName.split(" ");
     return {
-      patientMrn: currentUserData.mrn,
+      patientMrn: "", // Will be obtained via getOrCreateBranchMrn when payment starts
       serviceId: selectedFertiSmartService.id ?? 0,
       serviceName: selectedFertiSmartService.name ?? "",
       resourceIds: [selectedResource?.id ?? 0],
       startTime: selectedTimeSlot,
       endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
       branchId: branchesData[0].id ?? 0,
-      statusId: status.id ?? 0,
-      statusName: status.name ?? "",
+      statusId: APPOINTMENT_STATUS.APPROVED_CONFIRMED.id,
+      statusName: APPOINTMENT_STATUS.APPROVED_CONFIRMED.name,
       description: "Virtual Visit",
       email,
-      phoneNumber: currentUserData.contactNumber ?? "",
+      phoneNumber: currentUserData.phone ?? "",
       firstName: splitName[0],
-      lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
-      middleName: splitName.length > 2 ? splitName[1] : "",
+      lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
+      middleName: splitName.length > 2 ? splitName.slice(1, -1).join(" ") : "",
     };
   }, [
     visitType,
-    currentUserData?.mrn,
-    currentUserData?.contactNumber,
-    statusesData,
+    currentUserData,
     branchesData,
     selectedFertiSmartService,
     selectedResource?.id,
@@ -227,13 +224,8 @@ export function PageContent() {
   };
 
   const handleConfirm = useCallback(async () => {
-    if (!currentUserData?.mrn) {
-      console.log("--- no current user mrn");
-      return toast.error(t("errors.somethingWentWrong"));
-    }
-    const status = statusesData?.find((item) => item.name === "Approved/Confirmed");
-    if (!status) {
-      console.log("could not find status");
+    if (!currentUserData) {
+      console.log("--- no current user");
       return toast.error(t("errors.somethingWentWrong"));
     }
     if (!apiServicesData?.length) {
@@ -244,25 +236,53 @@ export function PageContent() {
       console.log("could not find branch");
       return toast.error(t("errors.somethingWentWrong"));
     }
+    if (!branchData?.branch?.id) {
+      console.log("could not find current branch");
+      return toast.error(t("errors.somethingWentWrong"));
+    }
 
     setLoading(true);
     try {
+      // Split the full name into first, middle, last
       const splitName = fullName.split(" ");
+      const patientName = {
+        firstName: splitName[0] || "",
+        middleName: splitName.length > 2 ? splitName.slice(1, -1).join(" ") : "",
+        lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
+      };
+
+      // Get or create MRN for this branch (lazy patient creation)
+      const branchMrnResult = await getOrCreateBranchMrn(
+        branchData.branch.id as ClinicBranchID,
+        patientName
+      );
+      if (!branchMrnResult?.mrn) {
+        console.log("--- failed to get/create MRN for branch");
+        return toast.error(t("errors.somethingWentWrong"));
+      }
+      const patientMrn = branchMrnResult.mrn;
       const isVirtualVisit = visitType === "virtual";
+
+      // Update Bnoon user in Firestore with the name from the form
+      await updateBnoonUser({
+        firstName: patientName.firstName,
+        middleName: patientName.middleName,
+        lastName: patientName.lastName,
+      });
 
       const [createAppointmentResponse] = await Promise.all([
         createAppointment({
-          statusName: status.name ?? "",
+          statusName: APPOINTMENT_STATUS.APPROVED_CONFIRMED.name,
           serviceName: selectedFertiSmartService?.name ?? "",
           email: isVirtualVisit ? email : null,
-          phoneNumber: currentUserData.contactNumber ?? "",
+          phoneNumber: currentUserData.phone ?? "",
           firstName: splitName[0],
-          lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
-          middleName: splitName.length > 2 ? splitName[1] : "",
-          statusId: status.id ?? 0,
+          lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
+          middleName: splitName.length > 2 ? splitName.slice(1, -1).join(" ") : "",
+          statusId: APPOINTMENT_STATUS.APPROVED_CONFIRMED.id,
           branchId: branchesData?.[0].id ?? 0,
           description: isVirtualVisit ? "Virtual Visit" : "In Clinic",
-          patientMrn: currentUserData.mrn ?? "",
+          patientMrn,
           serviceId: selectedFertiSmartService?.id ?? 0,
           resourceIds: [selectedResource?.id ?? 0],
           startTime: selectedTimeSlot,
@@ -284,11 +304,11 @@ export function PageContent() {
       if (isVirtualVisit) {
         await updatePatient({
           arabicName: containsArabic(fullName) ? fullName : undefined,
-          mrn: newCurrentUser?.mrn ?? "",
+          mrn: patientMrn,
           emailAddress: email,
           firstName: splitName[0],
-          middleName: splitName.length > 2 ? splitName[1] : "",
-          lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
+          middleName: splitName.length > 2 ? splitName.slice(1, -1).join(" ") : "",
+          lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
           identityId: idNumber,
           gender: gender === "female" ? 0 : 1,
           nationalityId: nationalitiesData?.find((item) => item.name === nationality)?.id,
@@ -297,10 +317,10 @@ export function PageContent() {
       } else {
         await updatePatient({
           arabicName: containsArabic(fullName) ? fullName : undefined,
-          mrn: currentUserData.mrn,
+          mrn: patientMrn,
           firstName: splitName[0],
-          middleName: splitName.length > 2 ? splitName[1] : "",
-          lastName: splitName.length > 2 ? splitName.slice(2).join(" ") : splitName.slice(1).join(" "),
+          middleName: splitName.length > 2 ? splitName.slice(1, -1).join(" ") : "",
+          lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
           gender: 0,
         });
       }
@@ -309,14 +329,14 @@ export function PageContent() {
       mutateCurrentUser(undefined);
 
       // Move ID document from temp to permanent storage
-      if (idDocumentUrl && newCurrentUser?.mrn) {
+      if (idDocumentUrl && patientMrn) {
         try {
           await fetch("/api/upload-id-document", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               tempUrl: idDocumentUrl,
-              patientMrn: newCurrentUser.mrn,
+              patientMrn,
             }),
           });
         } catch (error) {
@@ -342,9 +362,8 @@ export function PageContent() {
       setLoading(false);
     }
   }, [
-    currentUserData?.mrn,
-    currentUserData?.contactNumber,
-    statusesData,
+    currentUserData,
+    branchData?.branch?.id,
     apiServicesData?.length,
     branchesData,
     t,
@@ -377,9 +396,9 @@ export function PageContent() {
 
       <div className="relative mx-auto max-w-2xl lg:max-w-4xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         {/* Header */}
-        <div className="mb-8 text-center animate-fade-in-up">
+        <div className="mb-8 text-center">
           <div className="mb-6 flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-bnoon-teal to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg shadow-bnoon-teal/20">
+            <div className="w-16 h-16 bg-[#004e77] rounded-2xl flex items-center justify-center shadow-lg shadow-[#004e77]/20">
               <CheckCircle2 className="w-8 h-8 text-white" />
             </div>
           </div>
@@ -388,7 +407,7 @@ export function PageContent() {
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden animate-fade-in-up animation-delay-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
           {/* Doctor Section */}
           {selectedDoctor && (
             <div className="flex items-center gap-4 p-6 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 border-b border-bnoon-teal/10 dark:border-bnoon-teal/20">
@@ -483,9 +502,13 @@ export function PageContent() {
                     </div>
                     <div>
                       <span className="text-xs text-gray-500 dark:text-gray-400">{t("location")}</span>
-                      <p className="font-medium text-gray-900 dark:text-white">{branchData.branch.name}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {tClinics(`${branchData.branch.id}.name`)}
+                      </p>
                       {branchData.branch.address && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{branchData.branch.address}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {tClinics(`${branchData.branch.id}.address`)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -518,7 +541,9 @@ export function PageContent() {
                 </div>
                 <div>
                   <span className="text-xs text-gray-500 dark:text-gray-400">{t("phone")}</span>
-                  <p className="font-medium text-gray-900 dark:text-white ltr">{currentUserData?.contactNumber}</p>
+                  <p className="font-medium text-gray-900 dark:text-white ltr">
+                    {currentUserData?.phone}
+                  </p>
                 </div>
               </div>
 
@@ -650,7 +675,7 @@ export function PageContent() {
 
         {/* Payment Summary (Virtual Visits Only) */}
         {visitType === "virtual" && selectedService && (
-          <div className="mt-8 animate-fade-in-up animation-delay-150">
+          <div className="mt-8">
             <PaymentSummary
               serviceName={tServices(`${selectedService.id}.title`)}
               price={selectedService.price}
@@ -660,7 +685,7 @@ export function PageContent() {
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col-reverse sm:flex-row gap-4 mt-8 animate-fade-in-up animation-delay-200">
+        <div className="flex flex-col-reverse sm:flex-row gap-4 mt-8">
           <Button
             variant="outline"
             size="lg"
@@ -680,7 +705,7 @@ export function PageContent() {
                 currency={selectedService.currency}
                 email={email}
                 fullName={fullName}
-                phoneNumber={currentUserData?.contactNumber ?? ""}
+                phoneNumber={currentUserData?.phone ?? ""}
                 appointmentData={pendingAppointmentData}
                 disabled={loading || !pendingAppointmentData}
                 onPaymentStarted={() => setLoading(true)}

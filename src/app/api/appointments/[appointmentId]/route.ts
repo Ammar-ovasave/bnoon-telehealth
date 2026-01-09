@@ -13,13 +13,31 @@ import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
 import { formatInTimeZone, toZonedTime } from "date-fns-tz";
 import { parseISO } from "date-fns";
 import { getCancelAppointmentEmail, getRescheduleAppointmentEmail } from "@/services/templates";
-import { clinicLocations } from "@/models/ClinicModel";
+import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
 import { updateAppointmentDB } from "@/firestore/appointments";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { ICalAttendeeStatus, ICalCalendarMethod, ICalEventStatus } from "ical-generator";
+import { getUserByPhone } from "@/firestore/users";
 
 const KSA_TIMEZONE = "Asia/Riyadh";
+
+/**
+ * Get branchId from the API URL
+ */
+function getBranchIdFromApiUrl(apiUrl: string): ClinicBranchID | null {
+  const clinic = clinicLocations.find((c) => c.apiUrl === apiUrl);
+  return clinic?.id ?? null;
+}
+
+/**
+ * Get user's MRN for the current branch from Firestore
+ */
+async function getUserMrnForBranch(userId: string, branchId: ClinicBranchID): Promise<string | null> {
+  const user = await getUserByPhone(userId);
+  if (!user) return null;
+  return user.branchMappings?.[branchId]?.mrn ?? null;
+}
 
 export async function GET(request: Request, context: { params: Promise<{ appointmentId: string }> }) {
   try {
@@ -30,8 +48,22 @@ export async function GET(request: Request, context: { params: Promise<{ appoint
     }
     const cookiesStore = await cookies();
     const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
+    if (!baseAPIURL) {
+      return Response.error();
+    }
+
+    const branchId = getBranchIdFromApiUrl(baseAPIURL);
+    if (!branchId) {
+      return Response.error();
+    }
+
+    // Get user's MRN for this branch from Firestore
+    const userMrn = await getUserMrnForBranch(currentUser.userId, branchId);
+
     const appointment = await getAppointment({ appointmentId: params.appointmentId, baseAPIURL: baseAPIURL });
-    if (appointment?.patientMrn !== currentUser?.mrn) {
+
+    // Verify the user owns this appointment
+    if (appointment?.patientMrn !== userMrn) {
       return Response.error();
     }
     return Response.json(appointment);
@@ -55,17 +87,35 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
     }
     const payload: UpdateAppointmentPayload = requestJson;
     const baseAPIURL = cookieStore.get("branchAPIURL")?.value;
-    const appointment = await getAppointment({ appointmentId: params.appointmentId, baseAPIURL: baseAPIURL });
-    if (appointment?.patientMrn !== currentUser?.mrn) {
+    if (!baseAPIURL) {
       return Response.error();
     }
+
+    const branchId = getBranchIdFromApiUrl(baseAPIURL);
+    if (!branchId) {
+      return Response.error();
+    }
+
+    // Get user's MRN for this branch from Firestore
+    const userMrn = await getUserMrnForBranch(currentUser.userId, branchId);
+    if (!userMrn) {
+      return Response.error();
+    }
+
+    const appointment = await getAppointment({ appointmentId: params.appointmentId, baseAPIURL: baseAPIURL });
+
+    // Verify the user owns this appointment
+    if (appointment?.patientMrn !== userMrn) {
+      return Response.error();
+    }
+
     const res = await updateAppointmentServer({ ...payload, baseAPIURL: baseAPIURL });
     if (res === null) {
       return Response.error();
     }
     const isVirtualAppointment = payload.description === "Virtual Visit";
     const [currentUserPatient] = await Promise.all([
-      getPatient({ mrn: currentUser.mrn, baseAPIURL: baseAPIURL ?? null }),
+      getPatient({ mrn: userMrn, baseAPIURL: baseAPIURL ?? null }),
       updateAppointmentDB(params.appointmentId, payload),
     ]);
     const url = new URL(request.url);
@@ -104,18 +154,18 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
       await Promise.all([
         sendUpdatedAppointmentSMS({
           fullName: patientFullName,
-          mrn: currentUser.mrn ?? "",
+          mrn: userMrn,
           doctorName: doctorName,
           oldDate: oldDate,
           oldTime: oldTime,
           newDate: newDate,
           newTime: newTime,
-          mobileNumber: currentUser?.contactNumber ?? "",
+          mobileNumber: currentUser.phone ?? "",
         }),
         patientEmail
           ? sendEmail({
               baseAPIURL: baseAPIURL ?? null,
-              mrn: currentUser.mrn ?? "",
+              mrn: userMrn,
               email: patientEmail,
               body:
                 emailTemplate ??
@@ -161,16 +211,16 @@ export async function PATCH(request: Request, context: { params: Promise<{ appoi
       await Promise.all([
         sendCancelledAppointmentSMS({
           fullName: patientFullName,
-          mrn: currentUser.mrn ?? "",
+          mrn: userMrn,
           doctorName: doctorName,
           appointmentDate: oldDate,
           appointmentTime: oldTime,
-          mobileNumber: currentUser?.contactNumber ?? "",
+          mobileNumber: currentUser.phone ?? "",
         }),
         patientEmail
           ? sendEmail({
               baseAPIURL: baseAPIURL ?? null,
-              mrn: currentUser.mrn ?? "",
+              mrn: userMrn,
               email: patientEmail,
               body: emailTemplate ?? `<p>Your appointment on ${oldDate} at ${oldTime} has been cancelled.</p>`,
               subject: `Appointment Cancelled ${params.appointmentId}`,
@@ -212,7 +262,6 @@ async function sendUpdatedAppointmentSMS(params: {
   oldTime: string;
   newDate: string;
   newTime: string;
-  // appointmentLink: string;
   mobileNumber: string;
 }) {
   try {

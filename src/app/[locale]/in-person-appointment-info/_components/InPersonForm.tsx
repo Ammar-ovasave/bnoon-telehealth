@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 interface FormData {
   fullName: string;
@@ -22,6 +22,7 @@ interface InPersonFormProps {
 
 export default function InPersonForm({ defaultValus }: InPersonFormProps) {
   const t = useTranslations("InPersonAppointmentInfoPage");
+  const locale = useLocale();
   const { data: patientData } = useFertiSmartPatient();
 
   // Check if user is registered (has existing profile with name)
@@ -37,7 +38,23 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
   const searchParams = useSearchParams();
 
   const handleBack = () => {
-    router.back();
+    // Explicitly navigate to select-date-and-time page with current locale and preserved params
+    const backParams = new URLSearchParams();
+    const selectedClinicLocation = searchParams.get("selectedClinicLocation");
+    const selectedService = searchParams.get("selectedService");
+    const selectedVisitType = searchParams.get("selectedVisitType");
+    const selectedDoctor = searchParams.get("selectedDoctor");
+    const selectedDate = searchParams.get("selectedDate");
+    const selectedTimeSlot = searchParams.get("selectedTimeSlot");
+
+    if (selectedClinicLocation) backParams.set("selectedClinicLocation", selectedClinicLocation);
+    if (selectedService) backParams.set("selectedService", selectedService);
+    if (selectedVisitType) backParams.set("selectedVisitType", selectedVisitType);
+    if (selectedDoctor) backParams.set("selectedDoctor", selectedDoctor);
+    if (selectedDate) backParams.set("selectedDate", selectedDate);
+    if (selectedTimeSlot) backParams.set("selectedTimeSlot", selectedTimeSlot);
+
+    router.push(`/${locale}/select-date-and-time?${backParams.toString()}`);
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -66,8 +83,8 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
     newSearchParams.set("fullName", formData.fullName);
     newSearchParams.set("visitType", "clinic");
 
-    router.push(`/review-appointment?${newSearchParams.toString()}`);
-  }, [validateForm, searchParams, formData.fullName, router]);
+    router.push(`/${locale}/review-appointment?${newSearchParams.toString()}`);
+  }, [validateForm, searchParams, formData.fullName, router, locale]);
 
   return (
     <form
@@ -125,7 +142,7 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
 
         {/* Action Buttons */}
         <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
-          <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
+          <Button type="button" onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
             <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
           </Button>
           <Button

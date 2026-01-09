@@ -15,8 +15,7 @@ import { cookies } from "next/headers";
 import { getConfirmAppointmentEmail } from "@/services/templates";
 import { formatInTimeZone, toZonedTime } from "date-fns-tz";
 import { parseISO } from "date-fns";
-import { AUTH_TOKEN_NAME, VISIT_DURATION_IN_MINUTES } from "@/constants";
-import { signJwt } from "@/services/signJwt";
+import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { clinicLocations } from "@/models/ClinicModel";
 import { getLocale } from "next-intl/server";
 import { createNewAppointmentDB } from "@/firestore/appointments";
@@ -129,17 +128,6 @@ export async function POST(request: Request) {
       }),
     ]);
 
-    const authToken = signJwt({
-      mrn: patientToUse.mrn ?? "",
-      firstName: patientToUse.firstName ?? "",
-      middleName: patientToUse.middleName ?? "",
-      lastName: patientToUse.lastName ?? "",
-      contactNumber: patientToUse.contactNumber ?? "",
-      emailAddress: patientToUse.emailAddress ?? "",
-      branchId: patientToUse.branch?.id ?? 0,
-    });
-    const cookieStore = await cookies();
-    cookieStore.set({ name: AUTH_TOKEN_NAME, value: authToken, httpOnly: true, secure: true });
     return Response.json(createAppointmentResponse.data);
   } catch (error) {
     console.log("--- create appointment error", error);

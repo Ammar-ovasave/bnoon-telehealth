@@ -46,12 +46,12 @@ export async function createUser(
     middleName: data.middleName || "",
     lastName: data.lastName || "",
     emailAddress: data.emailAddress || "",
-    sex: data.sex,
-    dob: data.dob,
-    nationality: data.nationality,
-    identityIdType: data.identityIdType,
-    identityId: data.identityId,
-    preferredLanguage: data.preferredLanguage,
+    sex: data.sex ?? null,
+    dob: data.dob ?? null,
+    nationality: data.nationality ?? null,
+    identityIdType: data.identityIdType ?? null,
+    identityId: data.identityId ?? null,
+    preferredLanguage: data.preferredLanguage ?? null,
     branchMappings: {},
     createdAt: now,
     updatedAt: now,
@@ -185,10 +185,12 @@ export async function userExists(phone: string): Promise<boolean> {
  * Get or create a user by phone number
  * Used during OTP verification
  * @param phone - Phone number
+ * @param preferredLanguage - User's preferred language from the UI locale
  * @returns User and whether it was newly created
  */
 export async function getOrCreateUser(
-  phone: string
+  phone: string,
+  preferredLanguage?: "ar" | "en"
 ): Promise<{ user: BnoonUser; isNew: boolean }> {
   const existingUser = await getUserByPhone(phone);
 
@@ -197,7 +199,7 @@ export async function getOrCreateUser(
     return { user: existingUser, isNew: false };
   }
 
-  const newUser = await createUser({ phone });
+  const newUser = await createUser({ phone, preferredLanguage });
   return { user: newUser, isNew: true };
 }
 

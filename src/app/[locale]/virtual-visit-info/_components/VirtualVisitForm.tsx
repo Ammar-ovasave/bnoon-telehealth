@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import IDPhotoUpload from "@/components/IDPhotoUpload";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
@@ -41,6 +41,7 @@ interface VirtualVisitFormProps {
 export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProps) {
   const t = useTranslations("VirtualVisitInfoPage");
   const tIdTypes = useTranslations("idTypes");
+  const locale = useLocale();
   const { nationalities } = useFertiSmartCountries();
   const { data: patientData } = useFertiSmartPatient();
   const { data: _currentUserData } = useCurrentUser();
@@ -118,7 +119,23 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
   const searchParams = useSearchParams();
 
   const handleBack = () => {
-    router.back();
+    // Explicitly navigate to select-date-and-time page with current locale and preserved params
+    const backParams = new URLSearchParams();
+    const selectedClinicLocation = searchParams.get("selectedClinicLocation");
+    const selectedService = searchParams.get("selectedService");
+    const selectedVisitType = searchParams.get("selectedVisitType");
+    const selectedDoctor = searchParams.get("selectedDoctor");
+    const selectedDate = searchParams.get("selectedDate");
+    const selectedTimeSlot = searchParams.get("selectedTimeSlot");
+
+    if (selectedClinicLocation) backParams.set("selectedClinicLocation", selectedClinicLocation);
+    if (selectedService) backParams.set("selectedService", selectedService);
+    if (selectedVisitType) backParams.set("selectedVisitType", selectedVisitType);
+    if (selectedDoctor) backParams.set("selectedDoctor", selectedDoctor);
+    if (selectedDate) backParams.set("selectedDate", selectedDate);
+    if (selectedTimeSlot) backParams.set("selectedTimeSlot", selectedTimeSlot);
+
+    router.push(`/${locale}/select-date-and-time?${backParams.toString()}`);
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -209,7 +226,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
     newSearchParams.set("idNumber", formData.idNumber);
     newSearchParams.set("visitType", "virtual");
 
-    router.push(`/review-appointment?${newSearchParams.toString()}`);
+    router.push(`/${locale}/review-appointment?${newSearchParams.toString()}`);
   }, [
     validateForm,
     searchParams,
@@ -223,6 +240,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
     idDocumentUrl,
     idDocumentFileName,
     router,
+    locale,
   ]);
 
   return (
@@ -466,7 +484,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
 
         {/* Action Buttons */}
         <div className="flex flex-col-reverse md:flex-row gap-6 justify-between mt-8">
-          <Button onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
+          <Button type="button" onClick={handleBack} variant="outline" size="lg" className="px-6 py-3 w-full md:w-auto">
             <ArrowLeft className="rtl:scale-x-[-1]" /> {t("buttons.back")}
           </Button>
           <Button

@@ -67,7 +67,7 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
           </CardTitle>
 
           {/* Description */}
-          <CardDescription className="text-xs text-gray-500 leading-relaxed">
+          <CardDescription className="text-base text-gray-500 leading-relaxed">
             {t(`services.${service.id}.description`)}
           </CardDescription>
 

@@ -86,7 +86,7 @@ const Footer: FC = () => {
                 href="https://www.instagram.com/bnoon.sa"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-full flex items-center justify-center hover:bg-white/25 transition-colors"
+                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-base flex items-center justify-center hover:bg-white/25 transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -97,7 +97,7 @@ const Footer: FC = () => {
                 href="https://www.linkedin.com/company/bnoon"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-full flex items-center justify-center hover:bg-white/25 transition-colors"
+                className="w-8 h-8 bg-white/10 dark:bg-gray-800 rounded-base flex items-center justify-center hover:bg-white/25 transition-colors"
                 aria-label="LinkedIn"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

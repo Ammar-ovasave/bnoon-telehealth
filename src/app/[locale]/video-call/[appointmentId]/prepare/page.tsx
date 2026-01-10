@@ -135,7 +135,7 @@ const PrepareForVideoCallPage: FC = () => {
           <button
             onClick={permissions.microphone ? toggleMicrophone : requestPermissions}
             className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full text-white transition-colors",
+              "flex h-12 w-12 items-center justify-center rounded-base text-white transition-colors",
               permissions.microphone ? "bg-primary hover:bg-primary/90" : "bg-destructive hover:bg-destructive/90"
             )}
           >
@@ -144,7 +144,7 @@ const PrepareForVideoCallPage: FC = () => {
           <button
             onClick={permissions.camera ? toggleCamera : requestPermissions}
             className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full text-white transition-colors",
+              "flex h-12 w-12 items-center justify-center rounded-base text-white transition-colors",
               permissions.camera ? "bg-primary hover:bg-primary/90" : "bg-destructive hover:bg-destructive/90"
             )}
           >
@@ -157,7 +157,7 @@ const PrepareForVideoCallPage: FC = () => {
           </div>
         )}
       </div>
-      <h1 className={cn("w-full text-center text-2xl font-semibold")}>{`Teleconsultation`}</h1>
+      <h1 className={cn("w-full text-center text-2xl md:text-4xl font-semibold")}>{`Teleconsultation`}</h1>
       <div className="mx-auto mt-4 mb-4">
         <Link
           href={enableJoinCallButton ? `/video-call/${appointmentData?.id}/join?${videoCallInitialSearchParams.toString()}` : "#"}

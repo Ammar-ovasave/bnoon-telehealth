@@ -161,10 +161,10 @@ export function PaymentCallbackContent() {
                 <Loader2 className="w-12 h-12 text-bnoon-teal animate-spin" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {state === "processing" ? t("processing") : t("creatingAppointment")}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">
               {state === "processing"
                 ? t("processingDescription")
                 : t("creatingAppointmentDescription")}
@@ -176,17 +176,17 @@ export function PaymentCallbackContent() {
         {state === "success" && (
           <div className="text-center animate-fade-in-up">
             <div className="mb-8">
-              <div className="w-24 h-24 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 mx-auto bg-green-100 dark:bg-green-900/30 rounded-base flex items-center justify-center">
                 <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {t("success.title")}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-6">
               {t("success.message")}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-500">
+            <p className="text-sm md:text-base text-gray-500 dark:text-gray-500">
               {t("redirecting")}
             </p>
           </div>
@@ -196,14 +196,14 @@ export function PaymentCallbackContent() {
         {state === "failed" && (
           <div className="text-center animate-fade-in-up">
             <div className="mb-8">
-              <div className="w-24 h-24 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 mx-auto bg-red-100 dark:bg-red-900/30 rounded-base flex items-center justify-center">
                 <XCircle className="w-12 h-12 text-red-600 dark:text-red-400" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {t("failed.title")}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-2">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-2">
               {paymentResult?.responseCode
                 ? getPaymentErrorMessage(paymentResult.responseCode, locale as "en" | "ar")
                 : paymentResult?.error || t("failed.message")}

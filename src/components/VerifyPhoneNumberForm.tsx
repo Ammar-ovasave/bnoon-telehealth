@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { ArrowLeft, ArrowRight, Shield, ChevronDown, Smartphone } from "lucide-react";
+import { ArrowLeft, ArrowRight, Shield, ChevronDown, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { countryCodes } from "@/constants";
 import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
@@ -120,10 +120,8 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
       return toast.error(t("errors.invalidOTP"));
     }
     mutateCurrentUser(undefined);
-    setTimeout(() => {
-      setIsLoading(false);
-      onVerifyPhoneSuccess();
-    }, 200);
+    setIsLoading(false);
+    onVerifyPhoneSuccess();
   };
 
   const handleCountryCodeSelect = (code: string) => {
@@ -196,14 +194,14 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                 {showOtpInput ? (
                   <Shield className="h-10 w-10 text-white" />
                 ) : (
-                  <Smartphone className="h-10 w-10 text-white" />
+                  <Phone className="h-10 w-10 text-white" />
                 )}
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-bnoon-navy dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {showOtpInput ? t("title.verifyPhone") : t("title.enterPhone")}
             </h1>
-            <p className="text-base text-gray-600 dark:text-gray-300 max-w-md mx-auto leading-relaxed">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-md mx-auto leading-relaxed">
               {showOtpInput ? t("description.verifyPhone", { otpLength: OTP_LENGTH }) : t("description.enterPhone")}
             </p>
           </div>
@@ -307,7 +305,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess }: VerifyPh
                       </>
                     )}
                   </Button>
-                </div>
+            </div>
               </div>
             </div>
           )}

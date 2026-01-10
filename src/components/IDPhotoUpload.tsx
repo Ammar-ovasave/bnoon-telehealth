@@ -263,7 +263,7 @@ export default function IDPhotoUpload({
           <>
             <div
               className={cn(
-                "w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-colors",
+                "w-16 h-16 rounded-base flex items-center justify-center mb-4 transition-colors",
                 dragActive ? "bg-bnoon-teal/20" : "bg-gray-100 dark:bg-gray-800"
               )}
             >

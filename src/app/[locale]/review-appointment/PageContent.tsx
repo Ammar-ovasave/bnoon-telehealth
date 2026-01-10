@@ -383,8 +383,8 @@ export function PageContent() {
               <CheckCircle2 className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="mb-3 text-2xl sm:text-3xl font-bold text-bnoon-navy dark:text-white">{t("title")}</h1>
-          <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed max-w-md mx-auto">{t("description")}</p>
+          <h1 className="mb-3 text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white">{t("title")}</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed max-w-md mx-auto">{t("description")}</p>
         </div>
 
         {/* Main Content Card */}
@@ -402,7 +402,7 @@ export function PageContent() {
                 />
               )}
               <div className="flex-1">
-                <h3 className="font-semibold text-bnoon-navy dark:text-white text-lg">{doctorDisplayName}</h3>
+                <h3 className="font-semibold text-bnoon-gray dark:text-white text-lg">{doctorDisplayName}</h3>
                 {selectedDoctor.specialty && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                     {tDoctors(`doctors.${selectedDoctor.id}.specialty`) || selectedDoctor.specialty}
@@ -416,14 +416,14 @@ export function PageContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-100 dark:divide-gray-700 border-b border-gray-100 dark:border-gray-700">
             {/* Appointment Details */}
             <div className="p-6">
-              <h4 className="text-sm font-semibold text-bnoon-navy dark:text-white uppercase tracking-wide mb-4">
+              <h4 className="text-sm font-semibold text-bnoon-gray dark:text-white uppercase tracking-wide mb-4">
                 {t("appointmentDetails")}
               </h4>
 
               <div className="space-y-4">
                 {/* Service */}
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-base bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                     <Stethoscope className="h-5 w-5 text-bnoon-teal" />
                   </div>
                   <div>
@@ -436,7 +436,7 @@ export function PageContent() {
 
                 {/* Date */}
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-base bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                     <Calendar className="h-5 w-5 text-bnoon-teal" />
                   </div>
                   <div>
@@ -447,7 +447,7 @@ export function PageContent() {
 
                 {/* Time */}
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-base bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                     <Clock className="h-5 w-5 text-bnoon-teal" />
                   </div>
                   <div>
@@ -460,7 +460,7 @@ export function PageContent() {
 
                 {/* Visit Type */}
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-base bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                     {visitType === "virtual" ? (
                       <Video className="h-5 w-5 text-bnoon-teal" />
                     ) : (
@@ -478,7 +478,7 @@ export function PageContent() {
                 {/* Location (for clinic visits) */}
                 {visitType === "clinic" && branchData?.branch && (
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-base bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                       <MapPin className="h-5 w-5 text-bnoon-teal" />
                     </div>
                     <div>
@@ -495,14 +495,14 @@ export function PageContent() {
 
             {/* Patient Information */}
             <div className="p-6">
-            <h4 className="text-sm font-semibold text-bnoon-navy dark:text-white uppercase tracking-wide mb-4">
+            <h4 className="text-sm font-semibold text-bnoon-gray dark:text-white uppercase tracking-wide mb-4">
               {t("patientInformation")}
             </h4>
 
             <div className="space-y-4">
               {/* Full Name */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                <div className="flex items-center justify-center w-10 h-10 rounded-base bg-gray-100 dark:bg-gray-700">
                   <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 </div>
                 <div>
@@ -513,7 +513,7 @@ export function PageContent() {
 
               {/* Phone */}
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                <div className="flex items-center justify-center w-10 h-10 rounded-base bg-gray-100 dark:bg-gray-700">
                   <Phone className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 </div>
                 <div>
@@ -525,7 +525,7 @@ export function PageContent() {
               {/* Email (for virtual visits) */}
               {visitType === "virtual" && email && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-base bg-gray-100 dark:bg-gray-700">
                     <Mail className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
@@ -538,7 +538,7 @@ export function PageContent() {
               {/* Nationality (for virtual visits) */}
               {visitType === "virtual" && nationality && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-base bg-gray-100 dark:bg-gray-700">
                     <Globe className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
@@ -551,7 +551,7 @@ export function PageContent() {
               {/* Gender (for virtual visits) */}
               {visitType === "virtual" && gender && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-base bg-gray-100 dark:bg-gray-700">
                     <User className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
@@ -564,7 +564,7 @@ export function PageContent() {
               {/* ID Type & Number (for virtual visits) */}
               {visitType === "virtual" && idTypeName && idNumber && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-base bg-gray-100 dark:bg-gray-700">
                     <CreditCard className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   </div>
                   <div>
@@ -577,7 +577,7 @@ export function PageContent() {
               {/* ID Document (for virtual visits) */}
               {visitType === "virtual" && idDocumentUrl && idDocumentFileName && (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-base bg-green-100 dark:bg-green-900/30">
                     {idDocumentFileName.toLowerCase().endsWith(".pdf") ? (
                       <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
                     ) : (

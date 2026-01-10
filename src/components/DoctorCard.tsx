@@ -28,7 +28,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
       icons.push(
         <div
           key="clinic"
-          className="flex items-center gap-1.5 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-2.5 py-1 rounded-full text-xs font-medium"
+          className="flex items-center gap-1.5 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-2.5 py-1 rounded-base text-xs font-medium"
         >
           <Building2 className="w-3.5 h-3.5" />
           <span>{locale === "ar" ? "عيادة" : "Clinic"}</span>
@@ -39,7 +39,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
       icons.push(
         <div
           key="virtual"
-          className="flex items-center gap-1.5 bg-bnoon-navy/10 dark:bg-cyan-500/20 text-bnoon-navy dark:text-cyan-400 px-2.5 py-1 rounded-full text-xs font-medium"
+          className="flex items-center gap-1.5 bg-bnoon-navy/10 dark:bg-cyan-500/20 text-bnoon-navy dark:text-cyan-400 px-2.5 py-1 rounded-base text-xs font-medium"
         >
           <Video className="w-3.5 h-3.5" />
           <span>{locale === "ar" ? "عن بُعد" : "Virtual"}</span>

@@ -26,12 +26,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           {/* Header Section */}
           <div className="text-center mb-8 md:mb-10">
-            <h1 className="text-xl md:text-2xl font-bold text-bnoon-navy dark:text-white mb-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-3">
               {locale === "ar"
                 ? "اختر أقرب مركز بنون إليك"
                 : "Select Your Nearest Bnoon Clinic"}
             </h1>
-            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
               {locale === "ar"
                 ? "بنون تقرّب الرعاية المتقدمة إليك — بأطباء موثوقين، وتقنيات مبتكرة، والتزام بالرعاية الشخصية والمتعاطفة؛ مكرسين لوضع معايير جديدة في رعاية الخصوبة وصحة المرأة."
                 : "Bnoon brings advanced care closer to you — with trusted doctors, innovative technologies, and a commitment to compassionate, personalized care; dedicated to setting new benchmarks in fertility and women's health care."}
@@ -57,7 +57,7 @@ export default function Home() {
             {Object.entries(clinicsByCity).map(([city, clinics]) => (
               <div
                 key={city}
-                className="flex items-center gap-1.5 bg-white dark:bg-gray-800 px-2.5 py-1 rounded-full shadow-sm border border-gray-200 dark:border-gray-700"
+                className="flex items-center gap-1.5 bg-white dark:bg-gray-800 px-2.5 py-1 rounded-base shadow-sm border border-gray-200 dark:border-gray-700"
               >
                 <div className="w-1.5 h-1.5 bg-bnoon-navy rounded-full" />
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{getTranslatedCity(city)}</span>

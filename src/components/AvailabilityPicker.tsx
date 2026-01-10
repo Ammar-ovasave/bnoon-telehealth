@@ -29,7 +29,7 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
         {eyebrow && (
           <p className="text-sm font-semibold text-bnoon-teal uppercase tracking-wider mb-2">{eyebrow}</p>
         )}
-        <h2 className="text-2xl md:text-3xl font-bold text-bnoon-navy">
+        <h2 className="text-2xl md:text-3xl font-bold text-bnoon-gray">
           {title ?? "Pick a visit type"}
         </h2>
         <p className="text-gray-600 mt-3 text-sm md:text-base leading-relaxed">
@@ -58,7 +58,7 @@ export default function AvailabilityPicker({ options, onSelect, eyebrow, title, 
                 </div>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-bnoon-navy group-hover:text-bnoon-teal transition-colors">
+                <h3 className="text-xl font-bold text-bnoon-gray group-hover:text-bnoon-teal transition-colors">
                   {option.title}
                 </h3>
               </div>

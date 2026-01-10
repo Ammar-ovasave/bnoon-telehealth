@@ -141,11 +141,11 @@ export const PageContent: FC = () => {
           {/* Success Header */}
           <div className="text-center mb-10 animate-fade-in-up">
             <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-bnoon-teal/10 rounded-full flex items-center justify-center border-2 border-bnoon-teal">
+              <div className="w-16 h-16 bg-bnoon-teal/10 rounded-base flex items-center justify-center border-2 border-bnoon-teal">
                 <Check className="h-8 w-8 text-bnoon-teal" strokeWidth={3} />
               </div>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-gray dark:text-white mb-4">{t("title")}</h1>
             <p className="text-base text-gray-600 dark:text-gray-300 max-w-xl mx-auto leading-relaxed">{t("description")}</p>
             
             {/* Confirmation Badge */}
@@ -172,7 +172,7 @@ export const PageContent: FC = () => {
           <div className="grid lg:grid-cols-2 gap-6 animate-fade-in-up animation-delay-200">
             {/* Appointment Details */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-bold text-bnoon-navy dark:text-white mb-6 flex items-center gap-3">
+              <h2 className="text-lg font-bold text-bnoon-gray dark:text-white mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
                   <Image
                     src={"/icons/Calender.png"}
@@ -217,7 +217,7 @@ export const PageContent: FC = () => {
 
             {/* Patient Information */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
-              <h2 className="text-lg font-bold text-bnoon-navy dark:text-white mb-6 flex items-center gap-3">
+              <h2 className="text-lg font-bold text-bnoon-gray dark:text-white mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
                   <User className="h-5 w-5 text-bnoon-teal" />
                 </div>
@@ -264,7 +264,7 @@ export const PageContent: FC = () => {
 
           {/* Next Steps */}
           <div className="mt-8 animate-fade-in-up animation-delay-300">
-            <h3 className="text-lg font-bold text-bnoon-navy dark:text-white mb-4">{t("nextSteps.title")}</h3>
+            <h3 className="text-lg font-bold text-bnoon-gray dark:text-white mb-4">{t("nextSteps.title")}</h3>
 
             {/* General confirmation message - varies by visit type */}
             <div className="p-4 bg-gradient-to-r from-bnoon-teal/10 to-cyan-500/10 dark:from-bnoon-teal/20 dark:to-cyan-500/20 rounded-xl border border-bnoon-teal/20 dark:border-bnoon-teal/30 mb-4">
@@ -280,7 +280,7 @@ export const PageContent: FC = () => {
             {selectedVisitType === "virtual" ? (
               <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-blue-100 dark:bg-blue-800 rounded-base flex items-center justify-center">
                     <Video className="h-4 w-4 text-blue-600 dark:text-blue-300" />
                   </div>
                   <h4 className="font-semibold text-blue-900 dark:text-blue-100 text-sm">{t("nextSteps.virtualTitle")}</h4>
@@ -299,7 +299,7 @@ export const PageContent: FC = () => {
             ) : (
               <div className="p-5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-800 rounded-full flex items-center justify-center">
+                  <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-800 rounded-base flex items-center justify-center">
                     <Building className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
                   </div>
                   <h4 className="font-semibold text-emerald-900 dark:text-emerald-100 text-sm">{t("nextSteps.clinicTitle")}</h4>

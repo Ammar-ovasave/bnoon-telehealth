@@ -11,6 +11,7 @@ import useFertiSmartIDTypes from "@/hooks/useFertiSmartIDTypes";
 import { useTranslations, useLocale } from "next-intl";
 import IDPhotoUpload from "@/components/IDPhotoUpload";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { completeGuestRegistration } from "@/services/client";
 
 interface FormData {
   fullName: string;
@@ -42,9 +43,16 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
   const t = useTranslations("VirtualVisitInfoPage");
   const tIdTypes = useTranslations("idTypes");
   const locale = useLocale();
-  const { nationalities } = useFertiSmartCountries();
+  const { nationalities, data: countriesData } = useFertiSmartCountries();
   const { data: patientData } = useFertiSmartPatient();
-  const { data: _currentUserData } = useCurrentUser();
+  const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
+
+  // Submitting state for registration
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Check if this is a guest flow (new user needs registration)
+  const searchParams = useSearchParams();
+  const isGuestFlow = searchParams.get("guestFlow") === "true";
 
   // ID Document upload state
   const [idDocumentUrl, setIdDocumentUrl] = useState<string>("");
@@ -62,15 +70,20 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
     return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   });
 
-  // Check if user is registered (has existing profile with identity data)
+  // Check if user is registered (has existing profile with identity data OR is authenticated)
   // Registered users should not be able to edit their identity fields
+  // After completeGuestRegistration(), currentUserData will be populated via mutateCurrentUser()
   const isRegisteredUser = useMemo(() => {
-    return !!(
+    // User is authenticated (JWT token exists) - they just registered
+    const isAuthenticated = !!currentUserData;
+    // User has existing FertiSmart patient data with identity info
+    const hasFertiSmartIdentity = !!(
       patientData?.identityId &&
       patientData?.nationality?.name &&
       patientData?.sex !== undefined
     );
-  }, [patientData?.identityId, patientData?.nationality?.name, patientData?.sex]);
+    return isAuthenticated || hasFertiSmartIdentity;
+  }, [currentUserData, patientData?.identityId, patientData?.nationality?.name, patientData?.sex]);
 
   const genders = [
     { id: "male", label: t("genders.male") },
@@ -79,6 +92,13 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
   const [formData, setFormData] = useState<FormData>(defaultValues);
 
   const isSaudiNational = formData.nationality === "Saudi Arabia";
+
+  // Find the numeric nationality ID for the selected nationality name
+  const selectedNationalityId = useMemo(() => {
+    if (!formData.nationality || !countriesData) return undefined;
+    const country = countriesData.find(c => c.name === formData.nationality);
+    return country?.id;
+  }, [formData.nationality, countriesData]);
 
   const { data: idTypeDataList } = useFertiSmartIDTypes();
 
@@ -116,13 +136,13 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
 
   const [errors, setErrors] = useState<FormErrors>({});
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const handleBack = () => {
     // Explicitly navigate to select-date-and-time page with current locale and preserved params
     const backParams = new URLSearchParams();
     const selectedClinicLocation = searchParams.get("selectedClinicLocation");
     const selectedService = searchParams.get("selectedService");
+    const selectedServiceCode = searchParams.get("selectedServiceCode");
     const selectedVisitType = searchParams.get("selectedVisitType");
     const selectedDoctor = searchParams.get("selectedDoctor");
     const selectedDate = searchParams.get("selectedDate");
@@ -130,6 +150,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
 
     if (selectedClinicLocation) backParams.set("selectedClinicLocation", selectedClinicLocation);
     if (selectedService) backParams.set("selectedService", selectedService);
+    if (selectedServiceCode) backParams.set("selectedServiceCode", selectedServiceCode);
     if (selectedVisitType) backParams.set("selectedVisitType", selectedVisitType);
     if (selectedDoctor) backParams.set("selectedDoctor", selectedDoctor);
     if (selectedDate) backParams.set("selectedDate", selectedDate);
@@ -204,7 +225,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
   ]);
 
   // Navigate to review page with all necessary params
-  const handleContinueToReview = useCallback(() => {
+  const handleContinueToReview = useCallback(async () => {
     if (validateForm) {
       return toast.error(validateForm);
     }
@@ -215,18 +236,62 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
       sessionStorage.setItem("idDocumentFileName", idDocumentFileName);
     }
 
-    // Build URL with all existing params plus the new form data
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set("fullName", formData.fullName);
-    newSearchParams.set("email", formData.email);
-    newSearchParams.set("nationality", formData.nationality);
-    newSearchParams.set("gender", formData.gender);
-    newSearchParams.set("idType", formData.idType ?? "");
-    newSearchParams.set("idTypeName", selectedIdType?.name ?? "");
-    newSearchParams.set("idNumber", formData.idNumber);
-    newSearchParams.set("visitType", "virtual");
+    setIsSubmitting(true);
 
-    router.push(`/${locale}/review-appointment?${newSearchParams.toString()}`);
+    try {
+      // For guest flow: complete registration first (skip if already registered)
+      const needsRegistration = isGuestFlow && !currentUserData;
+
+      if (needsRegistration) {
+        const registrationResult = await completeGuestRegistration({
+          fullName: formData.fullName,
+          email: formData.email,
+          preferredLanguage: locale as "ar" | "en",
+        });
+
+        if (!registrationResult?.success) {
+          toast.error(t("errors.registrationFailed"));
+          setIsSubmitting(false);
+          return;
+        }
+
+        // Update current user data directly with registration response
+        // Transform BnoonUserResponse to CurrentUserType
+        const user = registrationResult.user;
+        await mutateCurrentUser({
+          userId: user.id,
+          phone: user.phone,
+          firstName: user.firstName,
+          middleName: user.middleName,
+          lastName: user.lastName,
+          emailAddress: user.emailAddress,
+          sex: user.sex,
+        });
+      }
+
+      // Build URL with all existing params plus the new form data
+      const newSearchParams = new URLSearchParams(searchParams.toString());
+      newSearchParams.set("fullName", formData.fullName);
+      newSearchParams.set("email", formData.email);
+      newSearchParams.set("nationality", formData.nationality);
+      // Pass the numeric nationality ID for the API call
+      if (selectedNationalityId) newSearchParams.set("nationalityId", selectedNationalityId.toString());
+      newSearchParams.set("gender", formData.gender);
+      newSearchParams.set("idType", formData.idType ?? "");
+      newSearchParams.set("idTypeName", selectedIdType?.name ?? "");
+      newSearchParams.set("idNumber", formData.idNumber);
+      newSearchParams.set("visitType", "virtual");
+
+      // Remove guestFlow params (user is now registered)
+      newSearchParams.delete("guestFlow");
+      newSearchParams.delete("guestPhone");
+
+      router.push(`/${locale}/review-appointment?${newSearchParams.toString()}`);
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error(t("errors.registrationFailed"));
+      setIsSubmitting(false);
+    }
   }, [
     validateForm,
     searchParams,
@@ -237,10 +302,15 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
     formData.idType,
     formData.idNumber,
     selectedIdType?.name,
+    selectedNationalityId,
     idDocumentUrl,
     idDocumentFileName,
     router,
     locale,
+    isGuestFlow,
+    currentUserData,
+    mutateCurrentUser,
+    t,
   ]);
 
   return (
@@ -490,6 +560,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
           <Button
             type="submit"
             disabled={
+              isSubmitting ||
               !formData.fullName ||
               !formData.email ||
               !formData.nationality ||
@@ -501,7 +572,7 @@ export default function VirtualVisitForm({ defaultValues }: VirtualVisitFormProp
             size="lg"
             className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
           >
-            {t("buttons.confirm")} <ArrowRight className="rtl:scale-x-[-1]" />
+            {isSubmitting ? t("buttons.processing") : t("buttons.confirm")} {!isSubmitting && <ArrowRight className="rtl:scale-x-[-1]" />}
           </Button>
         </div>
       </div>

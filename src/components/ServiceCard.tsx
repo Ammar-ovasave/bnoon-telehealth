@@ -62,12 +62,12 @@ const ServiceCard: FC<ServiceCardProps> = ({ service }) => {
           </div>
 
           {/* Title - aligned and bigger */}
-          <CardTitle className="text-lg font-bold text-bnoon-navy mb-2 group-hover:text-bnoon-teal transition-colors duration-300 min-h-[3.5rem] flex items-center justify-center">
+          <CardTitle className="text-lg font-bold text-bnoon-gray mb-2 group-hover:text-bnoon-teal transition-colors duration-300 min-h-[3.5rem] flex items-center justify-center">
             {t(`services.${service.id}.title`)}
           </CardTitle>
 
           {/* Description */}
-          <CardDescription className="text-base text-gray-500 leading-relaxed">
+          <CardDescription className="text-xs text-gray-500 leading-relaxed">
             {t(`services.${service.id}.description`)}
           </CardDescription>
 

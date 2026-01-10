@@ -1,14 +1,6 @@
-import { getCurrentUser } from "../../current-user/_services";
-import { getNearestUpcomingAppointmentByPhone } from "@/firestore/appointments";
-import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
-
-/**
- * Map baseAPIURL to ClinicBranchID
- */
-function getBranchIdFromApiUrl(apiUrl: string): ClinicBranchID | null {
-  const clinic = clinicLocations.find((c) => c.apiUrl === apiUrl);
-  return clinic?.id ?? null;
-}
+import { getNearestAppointment } from "@/services/bnoon-api";
+import { getAuthToken } from "@/lib/getAuthToken";
+import type { ClinicBranchID } from "@/models/ClinicModel";
 
 export interface NearestAppointmentResponse {
   appointment: {
@@ -21,38 +13,29 @@ export interface NearestAppointmentResponse {
 /**
  * GET /api/user-appointments/nearest
  *
- * Returns the user's nearest upcoming appointment from Firestore
+ * Returns the user's nearest upcoming appointment via bnoon-api
  * Used for auto-selecting branch on manage-appointments page
  */
 export async function GET(): Promise<Response> {
   try {
-    const currentUser = await getCurrentUser();
+    const token = await getAuthToken();
 
-    if (!currentUser?.userId) {
+    if (!token) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Query Firestore for nearest upcoming appointment
-    const appointment = await getNearestUpcomingAppointmentByPhone(currentUser.userId);
+    // Get nearest appointment from bnoon-api
+    const result = await getNearestAppointment(token);
 
-    if (!appointment) {
-      return Response.json({ appointment: null } satisfies NearestAppointmentResponse);
-    }
-
-    // Map baseAPIURL to ClinicBranchID
-    const branchId = getBranchIdFromApiUrl(appointment.baseAPIURL);
-
-    if (!branchId) {
-      // Branch not found (shouldn't happen, but handle gracefully)
-      console.log("--- Branch not found for API URL:", appointment.baseAPIURL);
+    if (!result.hasUpcomingAppointment || !result.nearestAppointment) {
       return Response.json({ appointment: null } satisfies NearestAppointmentResponse);
     }
 
     return Response.json({
       appointment: {
-        appointmentId: appointment.id,
-        branchId,
-        startTime: appointment.startTime,
+        appointmentId: result.nearestAppointment.appointmentId.toString(),
+        branchId: result.nearestAppointment.branchId as ClinicBranchID,
+        startTime: result.nearestAppointment.startTime,
       },
     } satisfies NearestAppointmentResponse);
   } catch (error) {

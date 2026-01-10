@@ -7,7 +7,8 @@ import { FC, useCallback, useState } from "react";
 import { logout } from "@/services/client";
 import { Spinner } from "./ui/spinner";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { mutate } from "swr";
+import { useSWRConfig } from "swr";
+import { clearAllUserData } from "@/lib/clearUserData";
 import { useTranslations, useLocale } from "next-intl";
 import { Calendar, LogOut, Menu, X, User } from "lucide-react";
 import Image from "next/image";
@@ -65,8 +66,8 @@ function NavHeader() {
             {!isLoading && currentUserData?.userId ? (
               <div className="flex items-center gap-3">
                 {/* User Info */}
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700">
-                  <div className="w-7 h-7 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-base border border-gray-200 dark:border-gray-700">
+                  <div className="w-7 h-7 bg-bnoon-teal/10 rounded-base flex items-center justify-center">
                     <User className="w-4 h-4 text-bnoon-teal" />
                   </div>
                   <span className="text-sm font-medium text-bnoon-navy dark:text-white max-w-[120px] truncate">
@@ -79,7 +80,7 @@ function NavHeader() {
               <Link href={"/login"}>
                 <Button
                   variant="outline"
-                  className="rounded-full px-6 border-gray-200 text-bnoon-navy hover:bg-bnoon-teal hover:text-white hover:border-bnoon-teal transition-all duration-300"
+                  className="rounded-base px-6 border-gray-200 text-bnoon-navy hover:bg-bnoon-teal hover:text-white hover:border-bnoon-teal transition-all duration-300"
                 >
                   {t("login")}
                 </Button>
@@ -109,7 +110,7 @@ function NavHeader() {
               {/* User Info Card - Mobile */}
               {!isLoading && currentUserData?.userId && (
                 <div className="flex items-center gap-3 px-3 py-3 bg-gradient-to-r from-gray-50 to-bnoon-teal/5 dark:from-gray-800 dark:to-bnoon-teal/10 rounded-xl border border-gray-100 dark:border-gray-700">
-                  <div className="w-12 h-12 bg-bnoon-teal/10 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-bnoon-teal/10 rounded-base flex items-center justify-center">
                     <User className="w-6 h-6 text-bnoon-teal" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -142,7 +143,7 @@ function NavHeader() {
                 <Link href={"/login"} onClick={() => setMobileMenuOpen(false)}>
                   <Button
                     variant="default"
-                    className="w-full rounded-full bg-bnoon-teal hover:bg-bnoon-teal/90 h-12 text-base"
+                    className="w-full rounded-base bg-bnoon-teal hover:bg-bnoon-teal/90 h-12 text-base"
                   >
                     {t("login")}
                   </Button>
@@ -172,7 +173,7 @@ const LanguageSwitcher: FC = () => {
   return (
     <Link
       href={newUrl}
-      className="px-4 py-2 text-base font-medium text-bnoon-navy border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
+      className="px-4 py-2 text-base font-medium text-bnoon-navy border border-gray-200 rounded-base hover:bg-gray-50 transition-colors"
     >
       {label}
     </Link>
@@ -183,22 +184,21 @@ const LogoutButton: FC<{ isMobile?: boolean }> = ({ isMobile }) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const t = useTranslations("NavHeader");
+  const { mutate } = useSWRConfig();
 
   const handleClick = useCallback(async () => {
     setLoading(true);
     // Clear cookies on server first
     await logout();
-    // Clear specific SWR caches to undefined (user will appear logged out)
-    await Promise.all([
-      mutate("/api/current-user", undefined, { revalidate: false }),
-      mutate("/api/current-branch", undefined, { revalidate: false }),
-      mutate("/api/get-patient", undefined, { revalidate: false }),
-      mutate("/api/user-appointments/nearest", undefined, { revalidate: false }),
-    ]);
+    // Clear all user data from sessionStorage and localStorage
+    clearAllUserData();
+    // Clear ENTIRE SWR cache to prevent previous user's data from appearing
+    // This is critical for security - prevents data leakage between users
+    await mutate(() => true, undefined, { revalidate: false });
     // Navigate to home page
     router.replace("/");
     setLoading(false);
-  }, [router]);
+  }, [router, mutate]);
 
   if (isMobile) {
     return (
@@ -206,7 +206,7 @@ const LogoutButton: FC<{ isMobile?: boolean }> = ({ isMobile }) => {
         onClick={handleClick}
         variant="outline"
         disabled={loading}
-        className="w-full justify-center gap-2 rounded-full text-red-600 dark:text-red-400 border-red-200 dark:border-red-900 hover:bg-red-50 dark:hover:bg-red-900/30"
+        className="w-full justify-center gap-2 rounded-base text-red-600 dark:text-red-400 border-red-200 dark:border-red-900 hover:bg-red-50 dark:hover:bg-red-900/30"
       >
         {loading ? <Spinner className="w-4 h-4" /> : <LogOut className="w-4 h-4" />}
         {t("logout")}
@@ -219,7 +219,7 @@ const LogoutButton: FC<{ isMobile?: boolean }> = ({ isMobile }) => {
       onClick={handleClick}
       variant="ghost"
       disabled={loading}
-      className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 gap-2 rounded-full"
+      className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 gap-2 rounded-base"
     >
       {loading ? <Spinner className="w-4 h-4" /> : <LogOut className="w-4 h-4" />}
       {t("logout")}

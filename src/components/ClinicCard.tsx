@@ -10,7 +10,7 @@ import useSwitchBranch from "@/hooks/useSwitchBranch";
 import LoadingOverlay from "./LoadingOverlay";
 import { useTranslations, useLocale } from "next-intl";
 
-const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
+const ClinicCard: FC<ClinicCardProps> = ({ clinic, priority = false }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("HomePage");
@@ -43,6 +43,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          priority={priority}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80" />
         <div className="p-4 relative z-10 h-full flex flex-col justify-end gap-4">
@@ -76,6 +77,7 @@ const ClinicCard: FC<ClinicCardProps> = ({ clinic }) => {
 
 interface ClinicCardProps {
   clinic: ClinicLocation;
+  priority?: boolean;
 }
 
 export default ClinicCard;

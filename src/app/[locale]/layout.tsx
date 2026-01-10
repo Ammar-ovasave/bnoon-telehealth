@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { Toaster } from "sonner";
-import { getCurrentUser } from "../api/current-user/_services";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import localFont from "next/font/local";
 import SWRProvider from "@/providers/SWRProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 import NavHeader from "@/components/NavHeader";
 import Footer from "@/components/Footer";
 import { setRequestLocale } from "next-intl/server";
@@ -78,7 +78,7 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }>) {
-  const [currentUser, paramsResult] = await Promise.all([getCurrentUser(), params]);
+  const paramsResult = await params;
   const isAr = paramsResult.locale === "ar";
   const locale = paramsResult.locale;
 
@@ -89,15 +89,17 @@ export default async function RootLayout({
   setRequestLocale(locale);
 
   return (
-    <SWRProvider fallback={{ "/api/current-user": currentUser }}>
+    <SWRProvider locale={locale}>
       <NextIntlClientProvider>
         <html lang={paramsResult.locale} dir={isAr ? "rtl" : "ltr"} suppressHydrationWarning>
           <body className={`antialiased bg-white dark:bg-gray-900 transition-colors duration-300 ${isAr ? alexandria.className : helvetica.className}`}>
             <ThemeProvider>
-              <NavHeader />
-              <main className="min-h-screen bg-white dark:bg-gray-900">{children}</main>
-              <Footer />
-              <Toaster />
+              <AuthProvider>
+                <NavHeader />
+                <main className="min-h-screen bg-white dark:bg-gray-900">{children}</main>
+                <Footer />
+                <Toaster />
+              </AuthProvider>
             </ThemeProvider>
           </body>
         </html>

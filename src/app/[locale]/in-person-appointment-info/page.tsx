@@ -1,7 +1,5 @@
 "use client";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
-import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
 import InPersonForm from "./_components/InPersonForm";
 import { MapPin } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
@@ -12,9 +10,14 @@ import BranchGuard from "@/components/BranchGuard";
 export default function InPersonAppointmentInfoPage() {
   const t = useTranslations("InPersonAppointmentInfoPage");
   const searchParams = useSearchParams();
-  const { isLoading } = useCurrentUser();
-  const { isLoading: loadingPatientData, fullName } = useFertiSmartPatient();
-  const { isLoading: loadingCountries } = useFertiSmartCountries();
+  const { data: userData, isLoading, fullName } = useCurrentUser();
+
+  // Debug logging
+  console.log("--- InPersonAppointmentInfoPage ---");
+  console.log("All searchParams:", searchParams.toString());
+  console.log("guestFlow:", searchParams.get("guestFlow"));
+  console.log("guestPhone:", searchParams.get("guestPhone"));
+  console.log("userData:", userData);
 
   // Check if we have form data from URL params (coming back from review page)
   const urlFullName = searchParams.get("fullName");
@@ -41,14 +44,14 @@ export default function InPersonAppointmentInfoPage() {
         </div>
 
         {/* Form */}
-        {isLoading || loadingPatientData || loadingCountries ? (
+        {isLoading ? (
           <div className="flex flex-col justify-center items-center py-16">
             <div className="w-16 h-16 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center mb-4">
               <Spinner className="w-8 h-8 text-bnoon-teal" />
             </div>
           </div>
         ) : (
-          <InPersonForm defaultValus={{ fullName: urlFullName || fullName }} />
+          <InPersonForm defaultValus={{ fullName: urlFullName || fullName }} userData={userData} />
         )}
 
         {/* Visit Information */}

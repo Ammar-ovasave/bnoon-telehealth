@@ -282,7 +282,8 @@
       "iqamaDigitsOnly": "يجب أن يحتوي رقم الإقامة على أرقام فقط",
       "iqamaLength": "يجب أن يكون رقم الإقامة 10 أرقام",
       "somethingWentWrong": "حدث خطأ ما",
-      "idDocumentRequired": "يرجى رفع صورة من وثيقة الهوية"
+      "idDocumentRequired": "يرجى رفع صورة من وثيقة الهوية",
+      "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى."
     },
     "idUpload": {
       "title": "صورة وثيقة الهوية",
@@ -309,7 +310,8 @@
     "buttons": {
       "back": "رجوع",
       "confirm": "تأكيد",
-      "loading": "جاري التحميل..."
+      "loading": "جاري التحميل...",
+      "processing": "جاري المعالجة..."
     },
     "registeredUserNotice": {
       "message": "معلوماتك الشخصية مقفلة لأن لديك ملف تعريف موجود بالفعل. يمكنك تحديث بريدك الإلكتروني فقط لهذا الموعد.",
@@ -356,7 +358,8 @@
       "clinicTip2": "أحضر معك الهوية أو نسخة من جواز السفر وأي تقارير طبية."
     },
     "buttons": {
-      "manageAppointments": "إدارة المواعيد"
+      "manageAppointments": "إدارة المواعيد",
+      "prepareForCall": "اختبر جهازك"
     }
   },
   "ManageAppointmentsPage": {
@@ -413,6 +416,12 @@
       "reschedule": {
         "title": "إعادة جدولة الموعد",
         "description": "اختر التاريخ والوقت المفضلين لك لهذا الموعد.",
+        "currentAppointment": {
+          "title": "الموعد الحالي",
+          "dateTime": "التاريخ والوقت",
+          "doctor": "الطبيب",
+          "service": "الخدمة"
+        },
         "selectDate": "اختر التاريخ",
         "selectTime": "اختر الوقت",
         "selected": "المحدد",
@@ -453,12 +462,14 @@
     "errors": {
       "fullNameRequired": "الاسم الكامل مطلوب",
       "fullNameMinLength": "يجب أن يكون الاسم الكامل على الأقل حرفين",
-      "somethingWentWrong": "حدث خطأ ما"
+      "somethingWentWrong": "حدث خطأ ما",
+      "registrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى."
     },
     "buttons": {
       "back": "رجوع",
       "confirm": "تأكيد",
-      "loading": "جاري التحميل..."
+      "loading": "جاري التحميل...",
+      "processing": "جاري المعالجة..."
     },
     "registeredUserNotice": {
       "message": "شكراً لكونك مريضاً مخلصاً في بنون. اسمك مقفل لأن لديك ملفاً طبياً في عيادتنا.",

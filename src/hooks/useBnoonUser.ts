@@ -20,7 +20,7 @@ export default function useBnoonUser() {
     "/api/users/me",
     fetcher,
     {
-      revalidateOnFocus: false,
+      // No local caching - use global SWRProvider config
       shouldRetryOnError: false,
     }
   );

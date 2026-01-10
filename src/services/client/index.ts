@@ -1,12 +1,7 @@
 import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
 import { CurrentUserType } from "@/models/CurrentUserType";
-import { FertiSmartPatientModel } from "@/models/FertiSmartPatientModel";
-import { SendOTPPayload } from "@/models/SendOTPPayload";
-import { SwitchBranchPayload } from "@/models/SwitchBranchPayload";
 import { UpdateAppointmentPayload } from "@/models/UpdateAppointmentPayload";
-import { UpdatePatientPayload } from "@/models/UpdatePatientPayload";
 import { BnoonUser, UpdateBnoonUserPayload } from "@/models/BnoonUser";
-import { ClinicBranchID } from "@/models/ClinicModel";
 import axios from "axios";
 
 const instance = axios.create({
@@ -25,16 +20,6 @@ export async function getCurrentUser() {
     return res.data;
   } catch (e) {
     console.log("--- get current user error ", e);
-    return null;
-  }
-}
-
-export async function updatePatient(params: UpdatePatientPayload) {
-  try {
-    const res = await instance.patch<{ id?: number }>(`/api/patients/${params.mrn}`, params);
-    return res.data;
-  } catch (error) {
-    console.log("--- updatePatient error", error);
     return null;
   }
 }
@@ -61,10 +46,42 @@ export async function cancelAppointment({
   return await updateAppointment({ appointmentId, statusId: cancelledStatusId, type: "cancel", statusName: cancelStatusName });
 }
 
-export async function createAppointment(params: CreateAppointmentPayload) {
+// Response type for createAppointment
+export interface CreateAppointmentResponse {
+  success: boolean;
+  appointment: {
+    id: string; // MySQL UUID
+    appointmentId: number; // FertiSmart appointment ID
+    branchId: string;
+    branchName: string;
+    startTime: string;
+    endTime: string;
+    doctorName: string;
+    serviceName: string;
+    status: string;
+    visitType: "virtual" | "in-person";
+  };
+}
+
+export async function createAppointment(params: CreateAppointmentPayload): Promise<CreateAppointmentResponse | null> {
   try {
     console.log("--- create appointment", params);
-    const res = await instance.post<{ id?: number }>(`/api/appointments`, params);
+    // Call the new bnoon-api format (no MRN required, patient created internally)
+    const res = await instance.post<CreateAppointmentResponse>(`/api/appointments`, {
+      branchId: params.branchId,
+      serviceId: params.serviceId,
+      resourceId: params.resourceId,
+      startTime: params.startTime,
+      endTime: params.endTime,
+      visitType: params.visitType,
+      fullName: params.fullName,
+      email: params.email ?? undefined,
+      sex: params.sex,
+      dob: params.dob,
+      nationalityId: params.nationalityId,
+      identityIdType: params.identityIdType,
+      identityId: params.identityId,
+    });
     console.log("--- appointment response", res.data);
     return res.data;
   } catch (e) {
@@ -73,32 +90,6 @@ export async function createAppointment(params: CreateAppointmentPayload) {
   }
 }
 
-export async function createPatient(params: {
-  patient: { firstName: string; lastName: string; sex?: 0 | 1; contactNumber: string; middleName: string; dob?: string };
-  branchId: number;
-}) {
-  try {
-    const res = await instance.post<FertiSmartPatientModel>(`/api/patients`, params);
-    return res.data;
-  } catch (e) {
-    console.log("--- createPatient error", e);
-    return null;
-  }
-}
-
-export async function sendOTP(params: SendOTPPayload) {
-  try {
-    const res = await instance.post<{
-      length?: number;
-    }>(`/api/send-otp`, params);
-    return res.data;
-  } catch (e) {
-    console.log("--- sendOTP error", e);
-    return null;
-  }
-}
-
-
 export async function logout() {
   try {
     const res = await instance.post(`/api/logout`);
@@ -106,26 +97,6 @@ export async function logout() {
   } catch (e) {
     console.log("--- logout error", e);
     return null;
-  }
-}
-
-export async function getPatientsByPhoneNumber({ phoneNumber }: { phoneNumber: string }) {
-  try {
-    const res = await instance.get<{ mrn?: string }[]>(`/api/get-patients-by-phone-number?phoneNumber=${phoneNumber}`);
-    return res.data;
-  } catch (e) {
-    console.log("--- getPatientsByPhoneNumber error", e);
-    return null;
-  }
-}
-
-export async function switchBranch(payload: SwitchBranchPayload) {
-  try {
-    const res = await instance.post(`/api/switch-branch`, payload);
-    return res.data;
-  } catch (e) {
-    console.log("--- switchBranch error", e);
-    return false;
   }
 }
 
@@ -143,26 +114,24 @@ export interface BnoonAuthResponse {
   success: boolean;
   isNew: boolean;
   isProfileComplete: boolean;
-  user: BnoonUserResponse;
-}
-
-export interface BranchMrnResponse {
-  branchId: string;
-  mrn: string;
-  isNew: boolean;
-  fertiSmartBranchId: number;
+  sessionId?: string; // For new guests - use in complete-registration
+  user: BnoonUserResponse | null; // null for new guests
 }
 
 /**
  * Send OTP to phone number (new Bnoon auth flow)
  * No branch or MRN required
+ *
+ * Returns alreadyVerified: true if phone was already verified in current session
  */
 export async function sendBnoonOTP(phone: string) {
   try {
-    const res = await instance.post<{ success: boolean; length: number; phone: string }>(
-      `/api/auth/send-otp`,
-      { phone }
-    );
+    const res = await instance.post<{
+      success: boolean;
+      length: number;
+      phone: string;
+      alreadyVerified?: boolean;
+    }>(`/api/auth/send-otp`, { phone });
     return res.data;
   } catch (e) {
     console.log("--- sendBnoonOTP error", e);
@@ -183,6 +152,28 @@ export async function verifyBnoonOTP(phone: string, code: string, preferredLangu
     return res.data;
   } catch (e) {
     console.log("--- verifyBnoonOTP error", e);
+    return null;
+  }
+}
+
+/**
+ * Complete registration for new guests.
+ * Creates user record with profile data and issues JWT token.
+ * Called after OTP verification when a new guest submits the patient info form.
+ */
+export async function completeGuestRegistration(data: {
+  fullName: string;
+  email?: string;
+  preferredLanguage?: "ar" | "en";
+}) {
+  try {
+    const res = await instance.post<{
+      success: boolean;
+      user: BnoonUserResponse;
+    }>(`/api/auth/complete-registration`, data);
+    return res.data;
+  } catch (e) {
+    console.log("--- completeGuestRegistration error", e);
     return null;
   }
 }
@@ -217,24 +208,43 @@ export async function updateBnoonUser(data: UpdateBnoonUserPayload) {
   }
 }
 
+// ============================================
+// Session Status
+// ============================================
+
+export interface SessionStatusAuthData {
+  isNew: boolean;
+  isProfileComplete: boolean;
+  token: string | null;
+  sessionId: string;
+  user: BnoonUserResponse | null;
+}
+
+export interface SessionStatusResponse {
+  hasSession: boolean;
+  phone: string | null;
+  isPhoneVerified: boolean;
+  preferredLanguage: "ar" | "en" | null;
+  expiresAt: string | null;
+  auth?: SessionStatusAuthData;
+}
+
 /**
- * Get or create FertiSmart MRN for a specific branch
- * Implements lazy patient creation
- * @param branchId - The clinic branch ID
- * @param patientName - Optional name to use when creating a new patient (split from fullName)
+ * Get current session status including verified phone and auth data.
+ * Used to check if phone is already verified to skip OTP form.
+ *
+ * Returns:
+ * - hasSession: false if session doesn't exist or expired
+ * - hasSession: true + phone/auth data if session is valid
+ * - auth data includes token for returning users, sessionId for new guests
  */
-export async function getOrCreateBranchMrn(
-  branchId: ClinicBranchID,
-  patientName?: { firstName: string; middleName: string; lastName: string }
-) {
+export async function getSessionStatus() {
   try {
-    const res = await instance.post<BranchMrnResponse>(
-      `/api/users/me/branch-mrn`,
-      { branchId, patientName }
-    );
+    const res = await instance.get<SessionStatusResponse>(`/api/auth/session-status`);
     return res.data;
   } catch (e) {
-    console.log("--- getOrCreateBranchMrn error", e);
+    console.log("--- getSessionStatus error", e);
     return null;
   }
 }
+

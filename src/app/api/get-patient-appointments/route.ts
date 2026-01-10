@@ -1,49 +1,37 @@
 import { cookies } from "next/headers";
-import { getCurrentUser } from "../current-user/_services";
-import { getPatientAppointments } from "@/services/appointment-services";
-import { getUserByPhone } from "@/firestore/users";
-import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
+import { getAuthToken } from "@/lib/getAuthToken";
+import { getAppointments } from "@/services/bnoon-api";
+import { ClinicBranchID } from "@/models/ClinicModel";
+import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Get branchId from the API URL
+ * GET /api/get-patient-appointments
+ * Get appointments for the current user in the selected branch.
+ * Requires branchId query parameter (no cookie fallback).
  */
-function getBranchIdFromApiUrl(apiUrl: string): ClinicBranchID | null {
-  const clinic = clinicLocations.find((c) => c.apiUrl === apiUrl);
-  return clinic?.id ?? null;
-}
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const currentUser = await getCurrentUser();
-    if (!currentUser?.userId) {
-      return Response.error();
-    }
-    const cookiesStore = await cookies();
-    const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
-    if (!baseAPIURL) {
-      return Response.error();
+    const token = await getAuthToken();
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const branchId = getBranchIdFromApiUrl(baseAPIURL);
+    // branchId is required as a query parameter
+    const branchId = request.nextUrl.searchParams.get("branchId") as ClinicBranchID | null;
     if (!branchId) {
-      return Response.error();
+      return NextResponse.json({ error: "branchId query parameter is required" }, { status: 400 });
     }
 
-    // Get user's MRN for this branch from Firestore
-    const user = await getUserByPhone(currentUser.userId);
-    const userMrn = user?.branchMappings?.[branchId]?.mrn;
-    if (!userMrn) {
-      // User doesn't have an MRN for this branch yet - return empty array
-      return Response.json([]);
-    }
+    // Get language from NEXT_LOCALE cookie or Accept-Language header
+    const cookiesStore = await cookies();
+    const localeCookie = cookiesStore.get("NEXT_LOCALE")?.value;
+    const acceptLanguage = request.headers.get("Accept-Language");
+    const language: "ar" | "en" = localeCookie === "en" || acceptLanguage?.startsWith("en") ? "en" : "ar";
 
-    const appointments = await getPatientAppointments({ mrn: userMrn, baseAPIURL: baseAPIURL });
-    if (!appointments) {
-      return Response.error();
-    }
-    return Response.json(appointments);
+    const result = await getAppointments(branchId, token, language);
+    return NextResponse.json(result.appointments);
   } catch (error) {
     console.log("---- error getting patient appointments", error);
-    return Response.error();
+    return NextResponse.json({ error: "Failed to get appointments" }, { status: 500 });
   }
 }

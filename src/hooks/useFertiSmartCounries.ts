@@ -2,10 +2,8 @@ import { useMemo } from "react";
 import useSWR from "swr";
 
 export default function useFertiSmartCountries() {
-  // Countries are global and don't change per branch - use longer cache
   const { data: rawData, error, isLoading } = useSWR<{ id?: number; name?: string }[]>(
-    `/api/ferti-smart/definitions/countries`,
-    { dedupingInterval: 60000 * 10 } // 10 minutes
+    `/api/countries`
   );
 
   // Sort countries with Saudi Arabia first

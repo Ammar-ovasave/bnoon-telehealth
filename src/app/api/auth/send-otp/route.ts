@@ -1,7 +1,7 @@
-import { normalizePhoneNumber } from "@/models/BnoonUser";
-import { sendSMS } from "@/services/appointment-services";
-import { add } from "date-fns";
+import { sendOtp } from "@/services/bnoon-api";
+import { SESSION_ID_NAME } from "@/constants";
 import { cookies } from "next/headers";
+import { add } from "date-fns";
 import { NextResponse } from "next/server";
 
 interface SendOTPRequest {
@@ -11,8 +11,7 @@ interface SendOTPRequest {
 
 /**
  * POST /api/auth/send-otp
- * Send OTP to phone number (no branch or MRN required)
- * This is the new Bnoon-owned auth flow
+ * Send OTP to phone number via bnoon-api
  */
 export async function POST(request: Request) {
   try {
@@ -26,43 +25,30 @@ export async function POST(request: Request) {
       );
     }
 
-    const normalizedPhone = normalizePhoneNumber(body.phone);
+    // Get session ID from cookie if exists
+    const sessionId = cookiesStore.get(SESSION_ID_NAME)?.value;
 
-    // Generate 4-digit OTP
-    const code = generateOTP();
+    // Call bnoon-api to send OTP
+    const result = await sendOtp(
+      { phone: body.phone, purpose: body.purpose },
+      sessionId
+    );
 
-    console.log("\n\n🔐 OTP CODE:", code, "for", normalizedPhone, "\n\n");
-
-    // Send SMS
-    const smsSent = await sendSMS({
-      mobileNumber: normalizedPhone,
-      message: `Your Bnoon verification code is: ${code}`,
-    });
-
-    if (!smsSent) {
-      console.log("⚠️ SMS failed but continuing for testing");
+    // Store session ID if returned (for session tracking)
+    if (result.sessionId) {
+      cookiesStore.set(SESSION_ID_NAME, result.sessionId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        expires: add(new Date(), { hours: 24 }),
+        sameSite: "strict",
+      });
     }
 
-    // Store OTP in httpOnly cookie (5 minute expiry)
-    // Store both the code and the phone number for verification
-    cookiesStore.set("otpCode", code, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      expires: add(new Date(), { minutes: 5 }),
-      sameSite: "strict",
-    });
-
-    cookiesStore.set("otpPhone", normalizedPhone, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      expires: add(new Date(), { minutes: 5 }),
-      sameSite: "strict",
-    });
-
     return NextResponse.json({
-      success: true,
-      length: code.length,
-      phone: normalizedPhone,
+      success: result.success,
+      length: result.length,
+      phone: result.phone,
+      alreadyVerified: result.alreadyVerified,
     });
   } catch (error) {
     console.error("--- send OTP error", error);
@@ -71,11 +57,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}
-
-/**
- * Generate a random 4-digit OTP code
- */
-function generateOTP(): string {
-  return `${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`;
 }

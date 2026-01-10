@@ -1,4 +1,5 @@
 export const AUTH_TOKEN_NAME = "auth-token";
+export const SESSION_ID_NAME = "session-id";
 export const VISIT_DURATION_IN_MINUTES = 20;
 
 // Appointment Status Constants (from FertiSmart)
@@ -28,6 +29,7 @@ export const FEATURE_FLAGS = {
    */
   VIRTUAL_APPOINTMENTS_ENABLED: process.env.NEXT_PUBLIC_ENABLE_VIRTUAL_APPOINTMENTS === "true",
 } as const;
+// Full list of country codes
 export const countryCodes = [
   { code: "+966", country: "Saudi Arabia", flag: "🇸🇦" },
   { code: "+971", country: "UAE", flag: "🇦🇪" },
@@ -83,3 +85,10 @@ export const countryCodes = [
   { code: "+51", country: "Peru", flag: "🇵🇪" },
   { code: "+52", country: "Mexico", flag: "🇲🇽" },
 ];
+
+// Available country codes based on environment
+// Development: All countries | Production: Saudi Arabia only
+export const availableCountryCodes =
+  process.env.NEXT_PUBLIC_ALLOW_ALL_COUNTRIES === "true"
+    ? countryCodes
+    : countryCodes.filter((c) => c.code === "+966");

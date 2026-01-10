@@ -5,8 +5,10 @@ import { ArrowLeft, ArrowRight, User, Lock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
 import { useTranslations, useLocale } from "next-intl";
+import type { CurrentUserType } from "@/models/CurrentUserType";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { completeGuestRegistration } from "@/services/client";
 
 interface FormData {
   fullName: string;
@@ -18,30 +20,42 @@ interface FormErrors {
 
 interface InPersonFormProps {
   defaultValus: FormData;
+  userData: CurrentUserType | null;
 }
 
-export default function InPersonForm({ defaultValus }: InPersonFormProps) {
+export default function InPersonForm({ defaultValus, userData }: InPersonFormProps) {
   const t = useTranslations("InPersonAppointmentInfoPage");
   const locale = useLocale();
-  const { data: patientData } = useFertiSmartPatient();
+  const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
+  console.log({ currentUserData });
+  // Submitting state for registration
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Check if user is registered (has existing profile with name)
+  // Check if user is registered (has existing profile with name OR is authenticated)
   // Registered users should not be able to edit their name
+  // After completeGuestRegistration(), currentUserData will be populated via mutateCurrentUser()
   const isRegisteredUser = useMemo(() => {
-    const hasName = !!(patientData?.firstName && patientData.firstName !== "-");
-    return hasName;
-  }, [patientData?.firstName]);
+    // User is authenticated (JWT token exists) - they just registered
+    const isAuthenticated = !!currentUserData;
+    // User has existing profile with name from prop
+    const hasNameFromProp = !!(userData?.firstName && userData.firstName !== "-");
+    return isAuthenticated || hasNameFromProp;
+  }, [currentUserData, userData?.firstName]);
 
   const [formData, setFormData] = useState<FormData>(defaultValus);
   const [errors, setErrors] = useState<FormErrors>({});
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Check if this is a guest flow (new user needs registration)
+  const isGuestFlow = searchParams.get("guestFlow") === "true";
+
   const handleBack = () => {
     // Explicitly navigate to select-date-and-time page with current locale and preserved params
     const backParams = new URLSearchParams();
     const selectedClinicLocation = searchParams.get("selectedClinicLocation");
     const selectedService = searchParams.get("selectedService");
+    const selectedServiceCode = searchParams.get("selectedServiceCode");
     const selectedVisitType = searchParams.get("selectedVisitType");
     const selectedDoctor = searchParams.get("selectedDoctor");
     const selectedDate = searchParams.get("selectedDate");
@@ -49,6 +63,7 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
 
     if (selectedClinicLocation) backParams.set("selectedClinicLocation", selectedClinicLocation);
     if (selectedService) backParams.set("selectedService", selectedService);
+    if (selectedServiceCode) backParams.set("selectedServiceCode", selectedServiceCode);
     if (selectedVisitType) backParams.set("selectedVisitType", selectedVisitType);
     if (selectedDoctor) backParams.set("selectedDoctor", selectedDoctor);
     if (selectedDate) backParams.set("selectedDate", selectedDate);
@@ -73,18 +88,60 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
   }, [formData.fullName, t]);
 
   // Navigate to review page with all necessary params
-  const handleContinueToReview = useCallback(() => {
+  const handleContinueToReview = useCallback(async () => {
     if (validateForm) {
       return toast.error(validateForm);
     }
 
-    // Build URL with all existing params plus the new form data
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set("fullName", formData.fullName);
-    newSearchParams.set("visitType", "clinic");
+    setIsSubmitting(true);
 
-    router.push(`/${locale}/review-appointment?${newSearchParams.toString()}`);
-  }, [validateForm, searchParams, formData.fullName, router, locale]);
+    try {
+      // For guest flow: complete registration first (skip if already registered)
+      const needsRegistration = isGuestFlow && !currentUserData;
+
+      if (needsRegistration) {
+        const registrationResult = await completeGuestRegistration({
+          fullName: formData.fullName,
+          preferredLanguage: locale as "ar" | "en",
+          // No email for in-person visits
+        });
+
+        if (!registrationResult?.success) {
+          toast.error(t("errors.registrationFailed"));
+          setIsSubmitting(false);
+          return;
+        }
+
+        // Update current user data directly with registration response
+        // Transform BnoonUserResponse to CurrentUserType
+        const user = registrationResult.user;
+        await mutateCurrentUser({
+          userId: user.id,
+          phone: user.phone,
+          firstName: user.firstName,
+          middleName: user.middleName,
+          lastName: user.lastName,
+          emailAddress: user.emailAddress,
+          sex: user.sex,
+        });
+      }
+
+      // Build URL with all existing params plus the new form data
+      const newSearchParams = new URLSearchParams(searchParams.toString());
+      newSearchParams.set("fullName", formData.fullName);
+      newSearchParams.set("visitType", "clinic");
+
+      // Remove guestFlow params (user is now registered)
+      newSearchParams.delete("guestFlow");
+      newSearchParams.delete("guestPhone");
+
+      router.push(`/${locale}/review-appointment?${newSearchParams.toString()}`);
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error(t("errors.registrationFailed"));
+      setIsSubmitting(false);
+    }
+  }, [validateForm, searchParams, formData.fullName, router, locale, isGuestFlow, currentUserData, mutateCurrentUser, t]);
 
   return (
     <form
@@ -149,9 +206,9 @@ export default function InPersonForm({ defaultValus }: InPersonFormProps) {
             type="submit"
             size="lg"
             className="px-8 py-3 text-lg font-semibold w-full md:w-auto"
-            disabled={!formData.fullName}
+            disabled={isSubmitting || !formData.fullName}
           >
-            {t("buttons.confirm")} <ArrowRight className="rtl:scale-x-[-1]" />
+            {isSubmitting ? t("buttons.processing") : t("buttons.confirm")} {!isSubmitting && <ArrowRight className="rtl:scale-x-[-1]" />}
           </Button>
         </div>
       </div>

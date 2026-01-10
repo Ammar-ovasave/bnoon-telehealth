@@ -1,72 +1,65 @@
 import { cookies } from "next/headers";
-import { getCurrentUser } from "../current-user/_services";
-import { getPatient } from "@/services/appointment-services";
-import { getUserByPhone } from "@/firestore/users";
-import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
+import { getAuthToken } from "@/lib/getAuthToken";
+import { getUser } from "@/services/bnoon-api";
+import { ClinicBranchID } from "@/models/ClinicModel";
 
 /**
- * Get branchId from the API URL
+ * GET /api/get-patient
+ * Get patient data for the current user.
+ * Now returns user data from bnoon-api instead of FertiSmart.
  */
-function getBranchIdFromApiUrl(apiUrl: string): ClinicBranchID | null {
-  const clinic = clinicLocations.find((c) => c.apiUrl === apiUrl);
-  return clinic?.id ?? null;
-}
-
 export async function GET() {
   try {
     const cookiesStore = await cookies();
-    const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
+    const branchId = cookiesStore.get("branchId")?.value as ClinicBranchID | undefined;
 
-    if (!baseAPIURL) {
+    if (!branchId) {
       console.log("---- get-patient error: no branch selected");
       return Response.json({ error: "No branch selected" }, { status: 400 });
     }
 
-    const currentUser = await getCurrentUser();
-
-    // ============================================
-    // Case 1: Guest user (not authenticated)
-    // Return null - no patient data available
-    // ============================================
-    if (!currentUser) {
+    const token = await getAuthToken();
+    if (!token) {
+      // Guest user - no patient data available
       return Response.json(null);
     }
 
-    // ============================================
-    // Case 2: Bnoon user
-    // Get existing MRN from Firestore branchMappings (DO NOT create)
-    // ============================================
-    const userId = currentUser.userId;
-    const branchId = getBranchIdFromApiUrl(baseAPIURL);
-
-    if (!branchId) {
-      console.log("---- get-patient error: invalid branch URL");
-      return Response.json({ error: "Invalid branch" }, { status: 400 });
-    }
-
-    // Get full user from Firestore
-    const bnoonUser = await getUserByPhone(userId);
-    if (!bnoonUser) {
-      // User not in Firestore yet - return null (no patient data)
+    // Get user data from bnoon-api
+    const result = await getUser(token);
+    if (!result?.user) {
       return Response.json(null);
     }
 
-    // Check if user already has an MRN for this branch
-    const existingMapping = bnoonUser.branchMappings?.[branchId];
-    if (!existingMapping?.mrn) {
-      // No patient record for this branch yet - return null
-      // Patient will be created when they submit the appointment form
-      return Response.json(null);
+    // Get MRN for the selected branch
+    const user = result.user;
+    let mrn: string | null = null;
+    switch (branchId) {
+      case "jeddah":
+        mrn = user.jeddahMRN;
+        break;
+      case "al-ahsa":
+        mrn = user.alahsaMRN;
+        break;
+      case "riyadh-granada":
+        mrn = user.riyadhGranadaMRN;
+        break;
+      case "riyadh-king-salman":
+        mrn = user.riyadhKingSalmanMRN;
+        break;
     }
 
-    const mrn = existingMapping.mrn;
-    const patient = await getPatient({ mrn, baseAPIURL });
-    if (!patient) {
-      console.log("---- get-patient error: patient not found in FertiSmart");
-      return Response.json({ error: "Patient not found" }, { status: 404 });
-    }
-
-    return Response.json(patient);
+    // Return patient data in the expected format
+    return Response.json({
+      mrn: mrn,
+      firstName: user.firstName,
+      middleName: user.middleName,
+      lastName: user.lastName,
+      fullName: [user.firstName, user.middleName, user.lastName].filter(Boolean).join(" "),
+      contactNumber: user.phone,
+      email: user.emailAddress,
+      sex: user.sex,
+      dob: user.dob,
+    });
   } catch (error) {
     console.log("---- error getting patient", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });

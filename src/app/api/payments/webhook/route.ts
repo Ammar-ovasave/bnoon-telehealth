@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAPS } from "@/services/amazon-payment-services";
-import { getPaymentByMerchantReference, updatePaymentStatus } from "@/firestore/payments";
-import { APS_RESPONSE_CODES, PaymentStatus } from "@/models/PaymentModel";
+import { getPaymentByMerchantReference, updatePaymentStatus } from "@/services/bnoon-api/payments";
+import { APS_RESPONSE_CODES } from "@/models/PaymentModel";
+import type { PaymentStatus } from "@/services/bnoon-api/types";
 
 /**
  * APS Webhook (IPN - Instant Payment Notification)
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the existing payment record
+    // Get the existing payment record from bnoon-api
     const payment = await getPaymentByMerchantReference(merchantReference);
 
     if (!payment) {
@@ -108,12 +109,12 @@ export async function POST(request: NextRequest) {
     // Determine the new status based on the command and response code
     const newStatus = mapCommandToStatus(command, responseCode);
 
-    // Update payment record
+    // Update payment record in bnoon-api
     await updatePaymentStatus(merchantReference, {
       status: newStatus,
-      fortId: fortId || payment.fortId,
-      responseCode,
-      responseMessage: params.response_message,
+      fortId: fortId || payment.fortId || undefined,
+      responseCode: responseCode || undefined,
+      responseMessage: params.response_message || undefined,
       apsResponse: params,
     });
 

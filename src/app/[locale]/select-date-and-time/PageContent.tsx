@@ -10,14 +10,14 @@ import { ar, enUS } from "date-fns/locale";
 import { formatInTimeZone } from "date-fns-tz";
 import { VISIT_DURATION_IN_MINUTES } from "@/constants";
 import { Spinner } from "@/components/ui/spinner";
-import { doctors } from "@/models/DoctorModel";
 import Link from "next/link";
-import useFertiSmartResources from "@/hooks/useFertiSmartResources";
 import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
+import useDoctorByResourceId from "@/hooks/useDoctorByResourceId";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { getDoctorName } from "@/lib/getDoctorName";
+import { User } from "lucide-react";
+import type { BranchId } from "@/services/bnoon-api/types";
 
 const formatArabicWeekDayName: { [name: string]: string } = {
   سبت: "السبت",
@@ -33,7 +33,6 @@ export default function SelectDateAndTimePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("SelectDateAndTimePage");
-  const tDoctors = useTranslations("DoctorsPage");
   const locale = useLocale();
 
   // Read URL params for pre-filling when navigating back
@@ -122,19 +121,14 @@ export default function SelectDateAndTimePage() {
     };
   }, [dateFnsLocale]);
 
-  const selectedDoctor = useMemo(() => {
-    return doctors.find((doc) => {
-      return doc.id === selectedDoctorId;
-    });
-  }, [selectedDoctorId]);
+  // Get branch from URL params
+  const branchId = searchParams.get("selectedClinicLocation") as BranchId | null;
 
-  const { data: resourcesData, isLoading: loadingResources } = useFertiSmartResources();
-
-  const selectedResource = useMemo(() => {
-    return resourcesData?.find((item) =>
-      item.linkedUserFullName?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? "")
-    );
-  }, [resourcesData, selectedDoctor?.name]);
+  // Fetch single doctor by resourceId from bnoon-api
+  const { doctor: selectedDoctor, isLoading: loadingDoctor } = useDoctorByResourceId({
+    branchId,
+    resourceId: selectedDoctorId,
+  });
 
   // Format date for API - ensure it's a valid Date object
   const formattedDateForApi = useMemo(() => {
@@ -150,8 +144,10 @@ export default function SelectDateAndTimePage() {
     }
   }, [selectedDate]);
 
+  // Use selectedDoctorId directly as resourceId for availability lookup
   const { data: availabilityData, isLoading: loadingTimeslots } = useFertiSmartResourceAvailability({
-    resourceId: selectedResource?.id?.toString(),
+    branchId: branchId ?? undefined,
+    resourceId: selectedDoctorId ? Number(selectedDoctorId) : undefined,
     date: formattedDateForApi,
     serviceDuration: VISIT_DURATION_IN_MINUTES,
   });
@@ -160,12 +156,14 @@ export default function SelectDateAndTimePage() {
     // Explicitly navigate to doctors page with current locale and preserved params
     const backParams = new URLSearchParams();
     const selectedClinicLocation = searchParams.get("selectedClinicLocation");
-    const selectedService = searchParams.get("selectedService");
-    const selectedVisitType = searchParams.get("selectedVisitType");
+    const selectedServiceParam = searchParams.get("selectedService");
+    const selectedServiceCodeParam = searchParams.get("selectedServiceCode");
+    const selectedVisitTypeParam = searchParams.get("selectedVisitType");
 
     if (selectedClinicLocation) backParams.set("selectedClinicLocation", selectedClinicLocation);
-    if (selectedService) backParams.set("selectedService", selectedService);
-    if (selectedVisitType) backParams.set("selectedVisitType", selectedVisitType);
+    if (selectedServiceParam) backParams.set("selectedService", selectedServiceParam);
+    if (selectedServiceCodeParam) backParams.set("selectedServiceCode", selectedServiceCodeParam);
+    if (selectedVisitTypeParam) backParams.set("selectedVisitType", selectedVisitTypeParam);
 
     router.push(`/${locale}/doctors?${backParams.toString()}`);
   };
@@ -239,12 +237,18 @@ export default function SelectDateAndTimePage() {
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
                     <div className="absolute inset-0 rounded-full bg-gradient-to-br from-bnoon-teal to-bnoon-navy p-[2px]">
                       <div className="w-full h-full rounded-full overflow-hidden bg-white">
-                        <Image
-                          src={selectedDoctor.photo}
-                          alt={getDoctorName(selectedDoctor, locale)}
-                          fill
-                          className={cn("object-cover rounded-full", selectedDoctor.imageClassName)}
-                        />
+                        {selectedDoctor.photoUrl ? (
+                          <Image
+                            src={selectedDoctor.photoUrl}
+                            alt={selectedDoctor.name}
+                            fill
+                            className="object-cover rounded-full"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                            <User className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -252,10 +256,10 @@ export default function SelectDateAndTimePage() {
                   {/* Doctor Info */}
                   <div className="text-start rtl:text-right">
                     <h3 className="font-bold text-bnoon-navy dark:text-white text-base sm:text-lg">
-                      {getDoctorName(selectedDoctor, locale)}
+                      {selectedDoctor.name}
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 max-w-[200px] sm:max-w-[280px] line-clamp-2">
-                      {tDoctors(`doctors.${selectedDoctor.id}.specialty`) || selectedDoctor.specialty}
+                      {selectedDoctor.specialty}
                     </p>
                   </div>
                 </div>
@@ -349,7 +353,7 @@ export default function SelectDateAndTimePage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-80 flex-1 overflow-y-auto p-1">
-                {loadingTimeslots || loadingResources || loadingCurrentUser ? (
+                {loadingTimeslots || loadingDoctor || loadingCurrentUser ? (
                   <div className="col-span-full flex flex-col justify-center items-center py-12">
                     <Spinner className="w-8 h-8 text-bnoon-teal" />
                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-3">

@@ -1,47 +1,53 @@
-import { DoctorModel } from "@/models/DoctorModel";
 import { FC } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Video, Building2, Loader2 } from "lucide-react";
+import { ChevronRight, Video, Building2, Loader2, User } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { useTranslations, useLocale } from "next-intl";
-import { getDoctorName } from "@/lib/getDoctorName";
-import clsx from "clsx";
 import { FEATURE_FLAGS } from "@/constants";
+import type { DoctorDto } from "@/services/bnoon-api/types";
 
 interface DoctorCardProps {
-  doctor: DoctorModel;
+  doctor: DoctorDto;
   selectedDoctor: string;
-  setSelectedDoctor: (doctor: string) => void;
+  setSelectedDoctor: (doctorId: string) => void;
   disabled?: boolean;
   isLoading?: boolean;
 }
 
-const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDoctor, disabled = false, isLoading = false }) => {
+const DoctorCard: FC<DoctorCardProps> = ({
+  doctor,
+  selectedDoctor,
+  setSelectedDoctor,
+  disabled = false,
+  isLoading = false,
+}) => {
   const t = useTranslations("DoctorsPage");
   const locale = useLocale();
-  const doctorName = getDoctorName(doctor, locale);
+
+  // Convert numeric ID to string for comparison
+  const doctorId = doctor.id.toString();
 
   const getAvailabilityIcons = () => {
     const icons = [];
-    if (doctor.availability.clinic) {
-      icons.push(
-        <div
-          key="clinic"
-          className="flex items-center gap-1.5 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-2.5 py-1 rounded-full text-xs font-medium"
-        >
-          <Building2 className="w-3.5 h-3.5" />
-          <span>{locale === "ar" ? "عيادة" : "Clinic"}</span>
-        </div>
-      );
-    }
-    // Only show virtual badge if feature is enabled
-    if (doctor.availability.virtual && FEATURE_FLAGS.VIRTUAL_APPOINTMENTS_ENABLED) {
+    // All doctors support clinic visits by default
+    icons.push(
+      <div
+        key="clinic"
+        className="flex items-center gap-1.5 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal px-2.5 py-1 rounded-base text-xs font-medium"
+      >
+        <Building2 className="w-3.5 h-3.5" />
+        <span>{locale === "ar" ? "عيادة" : "Clinic"}</span>
+      </div>
+    );
+
+    // Only show virtual badge if feature is enabled and doctor supports it
+    if (doctor.supportsVirtual && FEATURE_FLAGS.VIRTUAL_APPOINTMENTS_ENABLED) {
       icons.push(
         <div
           key="virtual"
-          className="flex items-center gap-1.5 bg-bnoon-navy/10 dark:bg-cyan-500/20 text-bnoon-navy dark:text-cyan-400 px-2.5 py-1 rounded-full text-xs font-medium"
+          className="flex items-center gap-1.5 bg-bnoon-navy/10 dark:bg-cyan-500/20 text-bnoon-navy dark:text-cyan-400 px-2.5 py-1 rounded-base text-xs font-medium"
         >
           <Video className="w-3.5 h-3.5" />
           <span>{locale === "ar" ? "عن بُعد" : "Virtual"}</span>
@@ -51,7 +57,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
     return icons;
   };
 
-  const isSelected = selectedDoctor === doctor.id;
+  const isSelected = selectedDoctor === doctorId;
 
   return (
     <Card
@@ -65,7 +71,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
           ? "ring-2 ring-bnoon-teal bg-bnoon-teal/5 dark:bg-bnoon-teal/10 shadow-lg shadow-bnoon-teal/10"
           : !disabled && "hover:-translate-y-1"
       )}
-      onClick={() => !disabled && setSelectedDoctor(doctor.id)}
+      onClick={() => !disabled && setSelectedDoctor(doctorId)}
     >
       {/* Selected Indicator */}
       {isSelected && (
@@ -83,40 +89,34 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
                 : "bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 p-0.5 group-hover:from-bnoon-teal/50 group-hover:to-cyan-400/50 group-hover:p-1"
             )}
           >
-            <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-gray-700">
-              <Image
-                src={doctor.photo}
-                alt={`${doctorName} photo`}
-                fill
-                className={clsx(
-                  "object-cover rounded-full",
-                  doctor.imageClassName
-                )}
-                sizes="112px"
-              />
+            <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-gray-700 flex items-center justify-center">
+              {doctor.photoUrl ? (
+                <Image
+                  src={doctor.photoUrl}
+                  alt={`${doctor.name} photo`}
+                  fill
+                  className="object-cover rounded-full"
+                  sizes="112px"
+                />
+              ) : (
+                <User className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+              )}
             </div>
           </div>
         </div>
 
         <CardTitle className="text-lg font-bold text-gray-900 dark:text-white mb-1 leading-tight">
-          {doctorName}
+          {doctor.name}
         </CardTitle>
-        <CardDescription className="text-bnoon-teal text-sm font-semibold">
-          {t(`doctors.${doctor.id}.specialty`)}
-        </CardDescription>
+        {doctor.specialty && (
+          <CardDescription className="text-bnoon-teal text-sm font-semibold">
+            {doctor.specialty}
+          </CardDescription>
+        )}
       </CardHeader>
 
       <CardContent className="pt-4 pb-5 flex-1 px-5">
         <div className="space-y-4 flex flex-col h-full">
-          {/* Languages */}
-          <div className="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-            <span>{doctor.languages.map((lang) => t(lang)).join(" • ")}</span>
-          </div>
-
           {/* Availability Tags */}
           <div className="flex items-center justify-center gap-2 flex-wrap">
             {getAvailabilityIcons()}
@@ -135,7 +135,7 @@ const DoctorCard: FC<DoctorCardProps> = ({ doctor, selectedDoctor, setSelectedDo
             )}
             variant="default"
             disabled={disabled || isLoading}
-            onClick={() => !disabled && !isLoading && setSelectedDoctor(doctor.id)}
+            onClick={() => !disabled && !isLoading && setSelectedDoctor(doctorId)}
           >
             {isLoading ? (
               <>

@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { ArrowLeft, ArrowRight, Shield, ChevronDown, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { countryCodes } from "@/constants";
+import { availableCountryCodes } from "@/constants";
 import { toast } from "sonner";
-import { sendBnoonOTP, verifyBnoonOTP, BnoonAuthResponse } from "@/services/client";
+import { sendBnoonOTP, verifyBnoonOTP, getSessionStatus, BnoonAuthResponse } from "@/services/client";
 import { Spinner } from "./ui/spinner";
 import useTimer from "@/hooks/useTimer";
 import { differenceInSeconds } from "date-fns";
 import { useTranslations, useLocale } from "next-intl";
+import { useAuth } from "@/providers/AuthProvider";
 
 const OTP_LENGTH = 4;
 
@@ -19,6 +20,7 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess, onBack }: 
   const [otp, setOtp] = useState<string>("");
   const [showOtpInput, setShowOtpInput] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isCheckingSession, setIsCheckingSession] = useState<boolean>(true);
   const [selectedCountryCode, setSelectedCountryCode] = useState<string>("+966");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -26,6 +28,61 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess, onBack }: 
   const router = useRouter();
   const t = useTranslations("VerifyPhonePage");
   const locale = useLocale() as "ar" | "en";
+
+  // Get global auth state (validated once at app level)
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+
+  // Check session status on mount to skip forms if phone is already verified
+  // Only runs after global auth check is complete and user is NOT authenticated
+  useEffect(() => {
+    // Wait for global auth check to complete
+    if (isAuthLoading) {
+      return;
+    }
+
+    // User already authenticated - skip session check, just show form
+    if (isAuthenticated) {
+      setIsCheckingSession(false);
+      return;
+    }
+
+    // Not authenticated - check guest session status
+    const checkSession = async () => {
+      try {
+        const status = await getSessionStatus();
+
+        if (status?.isPhoneVerified && status.phone && status.auth) {
+          // Phone already verified in session - proceed directly with auth data
+          const authResponse: BnoonAuthResponse = {
+            success: true,
+            isNew: status.auth.isNew,
+            isProfileComplete: status.auth.isProfileComplete,
+            sessionId: status.auth.sessionId,
+            user: status.auth.user,
+          };
+          onVerifyPhoneSuccess(authResponse, status.phone);
+          return;
+        }
+
+        if (status?.hasSession && status.phone && !status.isPhoneVerified) {
+          // Session exists with phone but not verified - show OTP form
+          // Extract country code and phone number
+          const phoneMatch = status.phone.match(/^(\+\d+)(.+)$/);
+          if (phoneMatch) {
+            setSelectedCountryCode(phoneMatch[1]);
+            setPhoneNumber(phoneMatch[2]);
+          }
+          setShowOtpInput(true);
+        }
+      } catch (error) {
+        console.error("Error checking session status:", error);
+      } finally {
+        setIsCheckingSession(false);
+      }
+    };
+
+    checkSession();
+  }, [isAuthLoading, isAuthenticated, onVerifyPhoneSuccess]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -55,6 +112,9 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess, onBack }: 
   /**
    * Send OTP using the new Bnoon auth flow
    * No branch selection or MRN required
+   *
+   * Handles alreadyVerified case: if phone was already verified in session,
+   * auto-call verify-otp to proceed (OTP code not required for verified phones).
    */
   const handleSendOtp = async () => {
     if (!phoneNumber || phoneNumber.length < 7) {
@@ -68,6 +128,17 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess, onBack }: 
     if (!response?.success) {
       setIsLoading(false);
       return toast.error(t("errors.failedToSendOTP"));
+    }
+
+    // Handle alreadyVerified case - phone was verified in this session
+    // Call verify-otp without code to proceed directly
+    if (response.alreadyVerified) {
+      const verifyResponse = await verifyBnoonOTP(fullPhoneNumber, "", locale);
+      if (verifyResponse?.success) {
+        setIsLoading(false);
+        onVerifyPhoneSuccess(verifyResponse, fullPhoneNumber);
+        return;
+      }
     }
 
     localStorage.setItem("otpSentAt", new Date().toISOString());
@@ -95,12 +166,14 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess, onBack }: 
       return toast.error(t("errors.invalidOTP"));
     }
 
-    // Clean up session storage
-    sessionStorage.removeItem("bnoon_phone");
+    // Keep the phone in sessionStorage for guest flow (cleared after complete-registration)
+    // Pass the phone to the callback for URL param propagation
+    const verifiedPhone = storedPhone;
 
     setTimeout(() => {
       setIsLoading(false);
-      onVerifyPhoneSuccess(response);
+      // Pass the phone to the callback so it can be used in guest flow
+      onVerifyPhoneSuccess(response, verifiedPhone);
     }, 200);
   };
 
@@ -111,16 +184,16 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess, onBack }: 
   };
 
   const getSelectedCountry = () => {
-    return countryCodes.find((country) => country.code === selectedCountryCode) || countryCodes[0];
+    return availableCountryCodes.find((country) => country.code === selectedCountryCode) || availableCountryCodes[0];
   };
 
   const getFilteredCountries = () => {
     if (!searchTerm.trim()) {
-      return countryCodes;
+      return availableCountryCodes;
     }
 
     const term = searchTerm.toLowerCase();
-    return countryCodes.filter(
+    return availableCountryCodes.filter(
       (country) =>
         country.country.toLowerCase().includes(term) ||
         country.code.includes(term) ||
@@ -147,6 +220,15 @@ export default function VerifyPhoneNumberForm({ onVerifyPhoneSuccess, onBack }: 
   };
 
   const isTimerActive = remainingTime > 0 && lastSentOTPAt !== null;
+
+  // Show loading while checking auth or session status
+  if (isAuthLoading || isCheckingSession) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 flex justify-center items-center">
+        <Spinner className="w-8 h-8" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
@@ -352,8 +434,9 @@ interface VerifyPhoneNumberFormProps {
   /**
    * Called after successful OTP verification
    * @param authResponse - Contains isNew, isProfileComplete, and user data
+   * @param phone - The phone number that was verified (for guest flow)
    */
-  onVerifyPhoneSuccess: (authResponse: BnoonAuthResponse) => void;
+  onVerifyPhoneSuccess: (authResponse: BnoonAuthResponse, phone?: string) => void;
   /**
    * Called when user clicks back button
    * If not provided, navigates to home page

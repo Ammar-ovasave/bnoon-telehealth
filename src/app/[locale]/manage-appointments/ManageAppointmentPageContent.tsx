@@ -4,10 +4,9 @@ import { AlertCircle, Calendar, Plus } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { useMemo, useEffect, useRef, useCallback, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import useCurrentUser from "@/hooks/useCurrentUser";
 import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
-import useCurrentBranch from "@/hooks/useCurrentBranch";
-import useSwitchBranch from "@/hooks/useSwitchBranch";
 import useNearestUpcomingAppointment from "@/hooks/useNearestUpcomingAppointment";
 import AppointmentCard from "./_components/AppointmentCard";
 import ClinicBranchSelect from "@/components/ClinicBranchSelect";
@@ -15,15 +14,13 @@ import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
 import AppointmentCardSkeleton from "./_components/AppointmentCardSkeleton";
 
 export default function ManageAppointmentPageContent() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser();
   const t = useTranslations("ManageAppointmentsPage");
   const locale = useLocale();
   const searchParams = useSearchParams();
-  const { data, isLoading } = useCurrentUserAppointments();
-  const { data: currentBranchData, isLoading: isLoadingBranch } = useCurrentBranch();
-  const { handleSwitchBranch, loading: isSwitchingBranch } = useSwitchBranch();
   const { appointment: nearestAppointment, isLoading: isLoadingNearestAppointment } = useNearestUpcomingAppointment();
-  const [hasAutoSwitched, setHasAutoSwitched] = useState(false);
-  const isAutoSwitching = useRef(false);
   const highlightedAppointmentRef = useRef<HTMLDivElement>(null);
   const [appointmentNotFound, setAppointmentNotFound] = useState(false);
 
@@ -47,9 +44,9 @@ export default function ManageAppointmentPageContent() {
 
   // Determine target branch with priority:
   // 1. Branch from URL (deep linking)
-  // 2. Nearest upcoming appointment's branch from Firestore
+  // 2. Nearest upcoming appointment's branch
   // 3. First available branch in dropdown
-  const targetBranchId = useMemo((): ClinicBranchID | null => {
+  const selectedBranchId = useMemo((): ClinicBranchID => {
     // Priority 1: Branch from URL (for deep linking)
     if (validBranchFromUrl) return validBranchFromUrl;
 
@@ -61,52 +58,20 @@ export default function ManageAppointmentPageContent() {
       }
     }
 
-    // Priority 3: First available branch (if no branch currently selected)
-    if (!currentBranchData?.branch?.id) {
-      return firstAvailableBranch;
-    }
+    // Priority 3: First available branch
+    return firstAvailableBranch;
+  }, [validBranchFromUrl, nearestAppointment, firstAvailableBranch]);
 
-    return null;
-  }, [validBranchFromUrl, nearestAppointment, currentBranchData?.branch?.id, firstAvailableBranch]);
+  // Fetch appointments based on selected branch (from URL, not cookie)
+  const { data, isLoading } = useCurrentUserAppointments({ branchId: selectedBranchId });
 
-  // Determine if we need to auto-switch
-  const needsAutoSwitch = useMemo(() => {
-    // Still loading initial data
-    if (isLoadingBranch || isLoadingNearestAppointment) return false;
-    // No target branch determined
-    if (!targetBranchId) return false;
-    // Already on the target branch
-    if (currentBranchData?.branch?.id === targetBranchId) return false;
-    // Haven't switched yet this session
-    return !hasAutoSwitched;
-  }, [isLoadingBranch, isLoadingNearestAppointment, targetBranchId, currentBranchData?.branch?.id, hasAutoSwitched]);
-
-  // Perform auto-switch to target branch
-  const performAutoSwitch = useCallback(async () => {
-    if (!targetBranchId || hasAutoSwitched || isAutoSwitching.current) return;
-
-    setHasAutoSwitched(true);
-    isAutoSwitching.current = true;
-
-    await handleSwitchBranch({ payload: { branchId: targetBranchId } });
-
-    isAutoSwitching.current = false;
-  }, [targetBranchId, handleSwitchBranch, hasAutoSwitched]);
-
-  // Auto-switch to target branch on first load
-  useEffect(() => {
-    if (needsAutoSwitch) {
-      performAutoSwitch();
-    }
-  }, [needsAutoSwitch, performAutoSwitch]);
-
-  // Show loading while auto-switching or switching branches
-  const isInitializing = isLoadingBranch || isLoadingNearestAppointment || needsAutoSwitch || isSwitchingBranch;
+  // Show loading while initializing
+  const isInitializing = isLoadingUser || isLoadingNearestAppointment;
 
   // Check if highlighted appointment exists and scroll to it
   useEffect(() => {
     if (!isLoading && !isInitializing && appointmentIdFromUrl && data) {
-      const found = data.some((apt) => String(apt.id) === appointmentIdFromUrl);
+      const found = data.some((apt) => String(apt.appointmentId) === appointmentIdFromUrl);
       setAppointmentNotFound(!found);
 
       // Scroll to highlighted appointment after a short delay
@@ -121,22 +86,47 @@ export default function ManageAppointmentPageContent() {
     }
   }, [isLoading, isInitializing, appointmentIdFromUrl, data]);
 
-  const currentUserAppointmentsData = useMemo(
-    () =>
-      data?.filter((appointment) => {
-        return appointment.status?.name?.toLocaleLowerCase() !== "cancelled";
-      }),
-    [data]
-  );
+  // Show all appointments - action buttons are handled by card components based on status
+  const currentUserAppointmentsData = data;
 
-  // Build book appointment URL with current branch
+  // Build book appointment URL with selected branch and locale
   const bookAppointmentUrl = useMemo(() => {
-    const currentBranchId = currentBranchData?.branch?.id;
-    if (currentBranchId) {
-      return `/interest?selectedClinicLocation=${currentBranchId}`;
+    return `/${locale}/interest?selectedClinicLocation=${selectedBranchId}`;
+  }, [selectedBranchId, locale]);
+
+  // Update URL query param when branch changes
+  const handleBranchChange = useCallback((branchId: ClinicBranchID) => {
+    // Preserve appointmentId if present, update branch
+    const newParams = new URLSearchParams();
+    newParams.set("branch", branchId);
+    if (appointmentIdFromUrl) {
+      newParams.set("appointmentId", appointmentIdFromUrl);
     }
-    return "/";
-  }, [currentBranchData?.branch?.id]);
+    router.push(`${pathname}?${newParams.toString()}`);
+  }, [router, pathname, appointmentIdFromUrl]);
+
+  // Redirect to home if not authenticated (after loading completes)
+  useEffect(() => {
+    if (!isLoadingUser && !currentUser) {
+      router.replace("/");
+    }
+  }, [isLoadingUser, currentUser, router]);
+
+  // Show full-page loading while checking authentication
+  if (isLoadingUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="animate-pulse text-gray-500 dark:text-gray-400">
+          {locale === "ar" ? "جاري التحميل..." : "Loading..."}
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render content if not authenticated
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
@@ -155,7 +145,11 @@ export default function ManageAppointmentPageContent() {
 
         {/* Branch Selector */}
         <div>
-          <ClinicBranchSelect className="mb-6" isSwitching={isSwitchingBranch} />
+          <ClinicBranchSelect
+            className="mb-6"
+            value={selectedBranchId}
+            onValueChange={handleBranchChange}
+          />
         </div>
 
         {/* Book Appointment Button - Always visible */}
@@ -208,10 +202,10 @@ export default function ManageAppointmentPageContent() {
             </div>
           ) : (
             currentUserAppointmentsData?.map((appointment) => {
-              const isHighlighted = appointmentIdFromUrl === String(appointment.id);
+              const isHighlighted = appointmentIdFromUrl === String(appointment.appointmentId);
               return (
                 <div
-                  key={appointment.id}
+                  key={appointment.appointmentId}
                   ref={isHighlighted ? highlightedAppointmentRef : undefined}
                 >
                   <AppointmentCard appointment={appointment} isHighlighted={isHighlighted} />

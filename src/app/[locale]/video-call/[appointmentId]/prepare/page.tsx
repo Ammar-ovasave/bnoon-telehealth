@@ -31,10 +31,10 @@ const PrepareForVideoCallPage: FC = () => {
     if (isLoadingAppointment) return false;
     if (loadingPermissions) return false;
     if (joinAppointmentLoading) return false;
-    if (!appointmentData?.time?.start) return false;
+    if (!appointmentData?.startTime) return false;
     // return isCallTime;
     return true;
-  }, [appointmentData?.time?.start, isLoadingAppointment, joinAppointmentLoading, loadingPermissions]);
+  }, [appointmentData?.startTime, isLoadingAppointment, joinAppointmentLoading, loadingPermissions]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -50,10 +50,10 @@ const PrepareForVideoCallPage: FC = () => {
   }, [enableMic, enableCamera]);
 
   const callAvailableTime = useMemo(() => {
-    if (!appointmentData?.time?.start) return null;
-    const callTime = new Date(appointmentData?.time?.start);
+    if (!appointmentData?.startTime) return null;
+    const callTime = new Date(appointmentData?.startTime);
     return format(subMinutes(callTime, 5), "dd/MM HH:mm");
-  }, [appointmentData?.time?.start]);
+  }, [appointmentData?.startTime]);
 
   const requestPermissions = useCallback(async () => {
     try {
@@ -168,7 +168,7 @@ const PrepareForVideoCallPage: FC = () => {
               setJoinAppointmentLoading(true);
             }
           }}
-          title={appointmentData?.time?.start ? `You will be able to join the call on ${callAvailableTime}` : undefined}
+          title={appointmentData?.startTime ? `You will be able to join the call on ${callAvailableTime}` : undefined}
         >
           <Button
             disabled={!enableJoinCallButton || isLoadingAppointment || loadingPermissions || joinAppointmentLoading}

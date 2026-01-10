@@ -1,23 +1,31 @@
 "use client";
 import { Suspense, useMemo } from "react";
-import { groupClinicsByCity } from "@/models/ClinicModel";
-import ClinicCard from "@/components/ClinicCard";
+import BranchCard from "@/components/BranchCard";
 import LoadingPage from "./loading";
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale } from "next-intl";
+import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
+import { BranchDto } from "@/services/bnoon-api/types";
 
 export default function Home() {
-  const t = useTranslations("HomePage");
   const locale = useLocale();
-  const clinicsByCity = useMemo(() => groupClinicsByCity(), []);
+  const { branches, isLoading, error } = useFertiSmartBranches();
 
-  const getTranslatedCity = (city: string) => {
-    return t(`cities.${city}`) || city;
-  };
-
-  // Flatten all clinics into a single array
-  const allClinics = useMemo(() => {
-    return Object.values(clinicsByCity).flat();
-  }, [clinicsByCity]);
+  // Group branches by location (city) for the city labels
+  const branchesByCity = useMemo(() => {
+    if (!branches) return {};
+    return branches.reduce(
+      (acc, branch) => {
+        // Extract city from location (e.g., "Granada District, Riyadh" -> "Riyadh")
+        const city = branch.location.split(",").pop()?.trim() || branch.location;
+        if (!acc[city]) {
+          acc[city] = [];
+        }
+        acc[city].push(branch);
+        return acc;
+      },
+      {} as Record<string, BranchDto[]>
+    );
+  }, [branches]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -38,35 +46,63 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Clinics Grid - Primary Content */}
+          {/* Branches Grid - Primary Content */}
           <Suspense fallback={<LoadingPage />}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
-              {allClinics.map((clinic, index) => (
-                <div
-                  key={clinic.id}
-                  className=""
-                >
-                  <ClinicCard clinic={clinic} />
-                </div>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-full aspect-[4/5] rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse"
+                  />
+                ))}
+              </div>
+            ) : error ? (
+              <div className="text-center py-10">
+                <p className="text-red-500">
+                  {locale === "ar"
+                    ? "حدث خطأ في تحميل الفروع. يرجى المحاولة مرة أخرى."
+                    : "Failed to load branches. Please try again."}
+                </p>
+              </div>
+            ) : branches && branches.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+                {branches.map((branch, index) => (
+                  <div key={branch.branchId}>
+                    <BranchCard branch={branch} priority={index === 0} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10">
+                <p className="text-gray-500">
+                  {locale === "ar"
+                    ? "لا توجد فروع متاحة حالياً."
+                    : "No branches available at the moment."}
+                </p>
+              </div>
+            )}
           </Suspense>
 
           {/* City Labels */}
-          <div className="mt-6 flex flex-wrap justify-center gap-2">
-            {Object.entries(clinicsByCity).map(([city, clinics]) => (
-              <div
-                key={city}
-                className="flex items-center gap-1.5 bg-white dark:bg-gray-800 px-2.5 py-1 rounded-full shadow-sm border border-gray-200 dark:border-gray-700"
-              >
-                <div className="w-1.5 h-1.5 bg-bnoon-navy rounded-full" />
-                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{getTranslatedCity(city)}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  ({clinics.length})
-                </span>
-              </div>
-            ))}
-          </div>
+          {branches && branches.length > 0 && (
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {Object.entries(branchesByCity).map(([city, cityBranches]) => (
+                <div
+                  key={city}
+                  className="flex items-center gap-1.5 bg-white dark:bg-gray-800 px-2.5 py-1 rounded-full shadow-sm border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="w-1.5 h-1.5 bg-bnoon-navy rounded-full" />
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    {city}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    ({cityBranches.length})
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

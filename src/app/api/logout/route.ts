@@ -7,7 +7,7 @@ export async function POST() {
     // Clear auth token
     cookieStore.delete(AUTH_TOKEN_NAME);
     // Clear selected branch
-    cookieStore.delete("branchAPIURL");
+    cookieStore.delete("branchId");
     return Response.json({});
   } catch (error) {
     console.log("--- logout error", error);

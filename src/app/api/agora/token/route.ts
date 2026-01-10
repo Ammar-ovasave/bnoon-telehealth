@@ -2,11 +2,14 @@ import { RtcRole, RtcTokenBuilder } from "agora-token";
 import { addHours, differenceInSeconds } from "date-fns";
 import { getAppointment } from "@/services/appointment-services";
 import { cookies } from "next/headers";
+import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
 
 export async function GET(request: Request) {
   try {
     const cookiesStore = await cookies();
-    const apiUrl = cookiesStore.get("branchAPIURL")?.value;
+    const branchId = cookiesStore.get("branchId")?.value as ClinicBranchID | undefined;
+    const clinic = branchId ? clinicLocations.find((c) => c.id === branchId) : undefined;
+    const apiUrl = clinic?.apiUrl ?? undefined;
     const url = new URL(request.url);
     const appointmentId = url.searchParams.get("appointmentId");
     const userId = url.searchParams.get("userId");

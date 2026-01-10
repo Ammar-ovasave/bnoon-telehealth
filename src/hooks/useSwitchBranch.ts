@@ -1,31 +1,26 @@
 import { SwitchBranchPayload } from "@/models/SwitchBranchPayload";
-import { switchBranch } from "@/services/client";
 import { useCallback, useState } from "react";
-import { toast } from "sonner";
-import useCurrentUser from "./useCurrentUser";
-import useCurrentBranch from "./useCurrentBranch";
 import { mutate } from "swr";
 
+/**
+ * Hook for branch switching - NO LONGER uses cookies.
+ * Branch selection is now handled via URL parameters only.
+ * This hook is kept for revalidating SWR caches when branch changes.
+ */
 export default function useSwitchBranch() {
   const [loading, setLoading] = useState(false);
-  const { mutate: mutateCurrentUser } = useCurrentUser();
-  const { mutate: mutateCurrentBranch } = useCurrentBranch();
 
   const handleSwitchBranch = useCallback(
-    async ({ payload }: { payload: SwitchBranchPayload }) => {
+    async ({ payload: _payload }: { payload: SwitchBranchPayload }) => {
       setLoading(true);
-      const success = await switchBranch(payload);
-      if (success) {
-        mutateCurrentBranch(undefined);
-        mutateCurrentUser(undefined);
-        // Use global mutate to invalidate cache without triggering a fetch
-        mutate("/api/get-patient-appointments", undefined);
-      } else {
-        toast.error("Something went wrong");
-      }
+
+      // Revalidate appointments cache to refetch with new branch
+      // Branch is now passed via URL params, not cookies
+      mutate("/api/get-patient-appointments");
+
       setLoading(false);
     },
-    [mutateCurrentBranch, mutateCurrentUser]
+    []
   );
 
   return { loading, handleSwitchBranch };

@@ -4,10 +4,8 @@ import useSWR from "swr";
 
 export default function useFertiSmartPatient() {
   const { data, error, isLoading, mutate } = useSWR<FertiSmartPatientModel>(`/api/get-patient`, {
+    // No local caching - use global SWRProvider config
     errorRetryCount: 0,
-    revalidateOnFocus: false,
-    revalidateIfStale: false,
-    revalidateOnMount: true,
   });
 
   const fullName = useMemo(() => {

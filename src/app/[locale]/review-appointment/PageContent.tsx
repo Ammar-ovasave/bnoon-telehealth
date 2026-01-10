@@ -36,19 +36,13 @@ import Image from "next/image";
 import { toast } from "sonner";
 
 import useCurrentUser from "@/hooks/useCurrentUser";
-import useCurrentBranch from "@/hooks/useCurrentBranch";
-import useFertiSmartBranches from "@/hooks/useFertiSmartBranches";
-import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
-import useFertiSmartResources from "@/hooks/useFertiSmartResources";
-import useFertiSmartCountries from "@/hooks/useFertiSmartCounries";
-import useFertiSmartPatient from "@/hooks/useFertiSmartPatient";
+import useDoctorByResourceId from "@/hooks/useDoctorByResourceId";
 
-import { createAppointment, getCurrentUser, updatePatient, getOrCreateBranchMrn, updateBnoonUser } from "@/services/client";
+import { createAppointment, updateBnoonUser } from "@/services/client";
 import { ClinicBranchID } from "@/models/ClinicModel";
-import { containsArabic } from "@/services/containsArabic";
-import { doctors } from "@/models/DoctorModel";
 import { services } from "@/models/ServiceModel";
-import { VISIT_DURATION_IN_MINUTES, APPOINTMENT_STATUS } from "@/constants";
+import { VISIT_DURATION_IN_MINUTES } from "@/constants";
+import { getServiceSlug } from "@/lib/serviceMapping";
 import { PaymentSummary } from "@/components/payment/PaymentSummary";
 import { PaymentButton } from "@/components/payment/PaymentButton";
 import { PendingAppointmentData } from "@/models/PaymentModel";
@@ -58,10 +52,8 @@ const KSA_TIMEZONE = "Asia/Riyadh";
 export function PageContent() {
   const t = useTranslations("ReviewAppointmentPage");
   const tGenders = useTranslations("VirtualVisitInfoPage.genders");
-  const tDoctors = useTranslations("DoctorsPage");
   const tServices = useTranslations("ServicesPage.services");
   const tClinics = useTranslations("HomePage.clinics");
-  const _tPayment = useTranslations("PaymentPage");
   const locale = useLocale();
   const isArabic = locale === "ar";
   const router = useRouter();
@@ -73,10 +65,14 @@ export function PageContent() {
   const [idDocumentExpired, setIdDocumentExpired] = useState(false);
 
   // Get all URL params
-  const selectedDoctorId = decodeURIComponent(searchParams.get("selectedDoctor") ?? "");
-  const selectedServiceId = decodeURIComponent(searchParams.get("selectedService") ?? "");
+  // Note: selectedDoctor param contains the resourceId (numeric) from the doctors page
+  const resourceId = searchParams.get("selectedDoctor") ?? "";
+  // selectedService contains the numeric FertiSmart service ID from APIServiceCard
+  const fertiSmartServiceId = searchParams.get("selectedService") ?? "";
+  const selectedServiceSlug = searchParams.get("selectedServiceCode") ?? "";
   const selectedTimeSlot = decodeURIComponent(searchParams.get("selectedTimeSlot") ?? "");
   const visitType = searchParams.get("visitType") as "clinic" | "virtual";
+  const branchId = searchParams.get("selectedClinicLocation") ?? "";
 
   // Retrieve ID document from sessionStorage and verify it exists (for virtual visits)
   useEffect(() => {
@@ -114,6 +110,7 @@ export function PageContent() {
   const fullName = decodeURIComponent(searchParams.get("fullName") ?? "");
   const email = decodeURIComponent(searchParams.get("email") ?? "");
   const nationality = decodeURIComponent(searchParams.get("nationality") ?? "");
+  const nationalityId = searchParams.get("nationalityId") ?? "";
   const gender = searchParams.get("gender") as "male" | "female" | null;
   const idType = searchParams.get("idType") ?? "";
   const idTypeName = decodeURIComponent(searchParams.get("idTypeName") ?? "");
@@ -121,71 +118,59 @@ export function PageContent() {
 
   // Hooks
   const { data: currentUserData, mutate: mutateCurrentUser } = useCurrentUser();
-  const { data: branchData } = useCurrentBranch();
-  const { data: branchesData } = useFertiSmartBranches();
-  const { data: apiServicesData } = useFertiSmartAPIServices();
-  const { data: fertiSmartResources } = useFertiSmartResources();
-  const { data: nationalitiesData } = useFertiSmartCountries();
-  const { mutate: mutatePatient } = useFertiSmartPatient();
 
-  // Get selected data
-  const selectedDoctor = useMemo(() => {
-    return doctors.find((doc) => doc.id === selectedDoctorId);
-  }, [selectedDoctorId]);
+  // Fetch doctor details using resourceId from bnoon-api
+  const { doctor } = useDoctorByResourceId({
+    branchId: branchId || null,
+    resourceId: resourceId || null,
+  });
 
+  // Parse IDs as numbers for API calls
+  const resourceIdNumber = resourceId ? parseInt(resourceId, 10) : 0;
+  const serviceIdNumber = fertiSmartServiceId ? parseInt(fertiSmartServiceId, 10) : 0;
+  const nationalityIdNumber = nationalityId ? parseInt(nationalityId, 10) : undefined;
+
+  // Get service from static data for display (convert code to slug for lookup)
   const selectedService = useMemo(() => {
-    return services.find((item) => item.id === selectedServiceId);
-  }, [selectedServiceId]);
-
-  const selectedResource = useMemo(() => {
-    return fertiSmartResources?.find((resource) => {
-      return resource.linkedUserFullName?.toLocaleLowerCase().includes(selectedDoctor?.name.toLocaleLowerCase() ?? "");
-    });
-  }, [fertiSmartResources, selectedDoctor?.name]);
-
-  const selectedFertiSmartService = useMemo(() => {
-    const serviceName = selectedService?.title.toLocaleLowerCase() ?? "";
-    const fertiSmartService = apiServicesData?.find((item) => item.name?.toLocaleLowerCase().includes(serviceName));
-    if (fertiSmartService) return fertiSmartService;
-    return apiServicesData?.[0];
-  }, [apiServicesData, selectedService?.title]);
+    const serviceSlug = getServiceSlug(selectedServiceSlug);
+    return services.find((item) => item.id === serviceSlug);
+  }, [selectedServiceSlug]);
 
   // Prepare appointment data for payment (virtual visits only)
-  // Note: For Bnoon users, MRN will be obtained dynamically via getOrCreateBranchMrn
-  // when payment starts, so we use a placeholder here that will be replaced
+  // Uses the new bnoon-api format (no MRN required, patient created internally)
   const pendingAppointmentData: PendingAppointmentData | null = useMemo(() => {
     if (visitType !== "virtual") return null;
-    if (!currentUserData || !branchesData?.length || !selectedFertiSmartService) {
+    if (!currentUserData || !branchId || !serviceIdNumber) {
       return null;
     }
 
-    const splitName = fullName.split(" ");
     return {
-      patientMrn: "", // Will be obtained via getOrCreateBranchMrn when payment starts
-      serviceId: selectedFertiSmartService.id ?? 0,
-      serviceName: selectedFertiSmartService.name ?? "",
-      resourceIds: [selectedResource?.id ?? 0],
+      branchId: branchId as ClinicBranchID,
+      serviceId: serviceIdNumber,
+      resourceId: resourceIdNumber,
       startTime: selectedTimeSlot,
       endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
-      branchId: branchesData[0].id ?? 0,
-      statusId: APPOINTMENT_STATUS.APPROVED_CONFIRMED.id,
-      statusName: APPOINTMENT_STATUS.APPROVED_CONFIRMED.name,
-      description: "Virtual Visit",
+      visitType: "virtual",
+      fullName,
       email,
-      phoneNumber: currentUserData.phone ?? "",
-      firstName: splitName[0],
-      lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
-      middleName: splitName.length > 2 ? splitName.slice(1, -1).join(" ") : "",
+      sex: gender === "female" ? 0 : 1,
+      nationalityId: nationalityIdNumber,
+      identityIdType: Number(idType) || undefined,
+      identityId: idNumber || undefined,
     };
   }, [
     visitType,
     currentUserData,
-    branchesData,
-    selectedFertiSmartService,
-    selectedResource?.id,
+    branchId,
+    serviceIdNumber,
+    resourceIdNumber,
     selectedTimeSlot,
     fullName,
     email,
+    gender,
+    nationalityIdNumber,
+    idType,
+    idNumber,
   ]);
 
   // Format date and time
@@ -197,8 +182,8 @@ export function PageContent() {
     locale: isArabic ? ar : enUS,
   });
 
-  // Display names
-  const doctorDisplayName = isArabic && selectedDoctor?.arName ? selectedDoctor.arName : selectedDoctor?.name ?? "";
+  // Display name from fetched doctor data
+  const doctorDisplayName = doctor?.name ?? "";
 
   const handleBack = () => {
     // Navigate back to the form page with all current data preserved
@@ -206,15 +191,27 @@ export function PageContent() {
     const editParams = new URLSearchParams();
 
     // Preserve appointment selection params
-    editParams.set("selectedDoctor", selectedDoctorId);
-    editParams.set("selectedService", selectedServiceId);
+    editParams.set("selectedDoctor", resourceId);
+    if (branchId) editParams.set("selectedClinicLocation", branchId);
+    // selectedService = numeric FertiSmart ID, selectedServiceCode = code like API001
+    if (fertiSmartServiceId) editParams.set("selectedService", fertiSmartServiceId);
+    if (selectedServiceSlug) editParams.set("selectedServiceCode", selectedServiceSlug);
     editParams.set("selectedTimeSlot", selectedTimeSlot);
+    // Derive selectedDate from selectedTimeSlot for back navigation
+    if (selectedTimeSlot) {
+      const dateMatch = selectedTimeSlot.match(/^(\d{4}-\d{2}-\d{2})/);
+      if (dateMatch) {
+        editParams.set("selectedDate", dateMatch[1]);
+      }
+    }
     editParams.set("visitType", visitType);
+    editParams.set("selectedVisitType", visitType); // Also set selectedVisitType for back navigation
 
     // Preserve form data so user can edit
     if (fullName) editParams.set("fullName", fullName);
     if (email) editParams.set("email", email);
     if (nationality) editParams.set("nationality", nationality);
+    if (nationalityId) editParams.set("nationalityId", nationalityId);
     if (gender) editParams.set("gender", gender);
     if (idType) editParams.set("idType", idType);
     if (idTypeName) editParams.set("idTypeName", idTypeName);
@@ -223,27 +220,26 @@ export function PageContent() {
     router.push(`/${locale}/${formPath}?${editParams.toString()}`);
   };
 
+  // Display phone from current user (user should be registered by now)
+  const displayPhone = currentUserData?.phone ?? "";
+
   const handleConfirm = useCallback(async () => {
+    // User should always be authenticated at this point (registered in patient info form)
     if (!currentUserData) {
-      console.log("--- no current user");
       return toast.error(t("errors.somethingWentWrong"));
     }
-    if (!apiServicesData?.length) {
-      console.log("could not find api service");
+    if (!serviceIdNumber) {
       return toast.error(t("errors.somethingWentWrong"));
     }
-    if (!branchesData?.length) {
-      console.log("could not find branch");
-      return toast.error(t("errors.somethingWentWrong"));
-    }
-    if (!branchData?.branch?.id) {
-      console.log("could not find current branch");
+    if (!branchId) {
       return toast.error(t("errors.somethingWentWrong"));
     }
 
     setLoading(true);
     try {
-      // Split the full name into first, middle, last
+      const isVirtualVisit = visitType === "virtual";
+
+      // Update user profile with name from form
       const splitName = fullName.split(" ");
       const patientName = {
         firstName: splitName[0] || "",
@@ -251,99 +247,35 @@ export function PageContent() {
         lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
       };
 
-      // Get or create MRN for this branch (lazy patient creation)
-      const branchMrnResult = await getOrCreateBranchMrn(
-        branchData.branch.id as ClinicBranchID,
-        patientName
-      );
-      if (!branchMrnResult?.mrn) {
-        console.log("--- failed to get/create MRN for branch");
-        return toast.error(t("errors.somethingWentWrong"));
-      }
-      const patientMrn = branchMrnResult.mrn;
-      const isVirtualVisit = visitType === "virtual";
-
-      // Update Bnoon user in Firestore with the name from the form
       await updateBnoonUser({
         firstName: patientName.firstName,
         middleName: patientName.middleName,
         lastName: patientName.lastName,
       });
 
-      const [createAppointmentResponse] = await Promise.all([
-        createAppointment({
-          statusName: APPOINTMENT_STATUS.APPROVED_CONFIRMED.name,
-          serviceName: selectedFertiSmartService?.name ?? "",
-          email: isVirtualVisit ? email : null,
-          phoneNumber: currentUserData.phone ?? "",
-          firstName: splitName[0],
-          lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
-          middleName: splitName.length > 2 ? splitName.slice(1, -1).join(" ") : "",
-          statusId: APPOINTMENT_STATUS.APPROVED_CONFIRMED.id,
-          branchId: branchesData?.[0].id ?? 0,
-          description: isVirtualVisit ? "Virtual Visit" : "In Clinic",
-          patientMrn,
-          serviceId: selectedFertiSmartService?.id ?? 0,
-          resourceIds: [selectedResource?.id ?? 0],
-          startTime: selectedTimeSlot,
-          endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
-        }),
-      ]);
+      // Create appointment via bnoon-api
+      // Note: Patient creation is handled internally by bnoon-api
+      const createAppointmentResponse = await createAppointment({
+        branchId: branchId as ClinicBranchID,
+        serviceId: serviceIdNumber,
+        resourceId: resourceIdNumber,
+        startTime: selectedTimeSlot,
+        endTime: addMinutes(selectedTimeSlot, VISIT_DURATION_IN_MINUTES).toISOString(),
+        visitType: isVirtualVisit ? "virtual" : "in-person",
+        fullName,
+        email: isVirtualVisit ? email : undefined,
+        sex: isVirtualVisit ? (gender === "female" ? 0 : 1) : 0,
+        nationalityId: isVirtualVisit ? nationalityIdNumber : undefined,
+        identityIdType: isVirtualVisit ? Number(idType) : undefined,
+        identityId: isVirtualVisit ? idNumber : undefined,
+      });
 
-      const newCurrentUser = await getCurrentUser();
-      if (!newCurrentUser) {
-        console.log("no new current user");
-        return toast.error(t("errors.somethingWentWrong"));
-      }
-      if (!createAppointmentResponse?.id) {
+      if (!createAppointmentResponse?.success || !createAppointmentResponse?.appointment?.appointmentId) {
         console.log("could not create appointment", createAppointmentResponse);
         return toast.error(t("errors.somethingWentWrong"));
       }
 
-      // Update patient with form data
-      if (isVirtualVisit) {
-        await updatePatient({
-          arabicName: containsArabic(fullName) ? fullName : undefined,
-          mrn: patientMrn,
-          emailAddress: email,
-          firstName: splitName[0],
-          middleName: splitName.length > 2 ? splitName.slice(1, -1).join(" ") : "",
-          lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
-          identityId: idNumber,
-          gender: gender === "female" ? 0 : 1,
-          nationalityId: nationalitiesData?.find((item) => item.name === nationality)?.id,
-          identityIdTypeId: Number(idType),
-        });
-      } else {
-        await updatePatient({
-          arabicName: containsArabic(fullName) ? fullName : undefined,
-          mrn: patientMrn,
-          firstName: splitName[0],
-          middleName: splitName.length > 2 ? splitName.slice(1, -1).join(" ") : "",
-          lastName: splitName.length > 1 ? splitName[splitName.length - 1] : "",
-          gender: 0,
-        });
-      }
-
-      mutatePatient(undefined);
-      mutateCurrentUser(undefined);
-
-      // Move ID document from temp to permanent storage
-      if (idDocumentUrl && patientMrn) {
-        try {
-          await fetch("/api/upload-id-document", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              tempUrl: idDocumentUrl,
-              patientMrn,
-            }),
-          });
-        } catch (error) {
-          console.error("Failed to move ID document to permanent storage:", error);
-          // Don't fail the appointment creation if this fails
-        }
-      }
+      mutateCurrentUser();
 
       // Clear ID document from sessionStorage after successful submission
       if (typeof window !== "undefined") {
@@ -353,7 +285,8 @@ export function PageContent() {
       }
 
       const newSearchParams = new URLSearchParams(searchParams.toString());
-      newSearchParams.append("appointmentId", createAppointmentResponse.id.toString());
+      // Pass UUID (id) not FertiSmart appointmentId - the confirmation page uses UUID to fetch details
+      newSearchParams.append("appointmentId", createAppointmentResponse.appointment.id);
       router.replace(`/appointment-confirmation?${newSearchParams.toString()}`);
     } catch (e) {
       console.log("--- create appointment error", e);
@@ -363,27 +296,21 @@ export function PageContent() {
     }
   }, [
     currentUserData,
-    branchData?.branch?.id,
-    apiServicesData?.length,
-    branchesData,
+    branchId,
+    serviceIdNumber,
     t,
     fullName,
     visitType,
     email,
-    selectedFertiSmartService?.name,
-    selectedFertiSmartService?.id,
-    selectedResource?.id,
+    resourceIdNumber,
     selectedTimeSlot,
     idNumber,
     gender,
-    nationality,
-    nationalitiesData,
+    nationalityIdNumber,
     idType,
-    mutatePatient,
     mutateCurrentUser,
     searchParams,
     router,
-    idDocumentUrl,
   ]);
 
   return (
@@ -409,11 +336,11 @@ export function PageContent() {
         {/* Main Content Card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
           {/* Doctor Section */}
-          {selectedDoctor && (
+          {doctor && (
             <div className="flex items-center gap-4 p-6 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 border-b border-bnoon-teal/10 dark:border-bnoon-teal/20">
-              {selectedDoctor.photo && (
+              {doctor.photoUrl && (
                 <Image
-                  src={selectedDoctor.photo}
+                  src={doctor.photoUrl}
                   alt={doctorDisplayName}
                   width={72}
                   height={72}
@@ -422,9 +349,9 @@ export function PageContent() {
               )}
               <div className="flex-1">
                 <h3 className="font-semibold text-bnoon-navy dark:text-white text-lg">{doctorDisplayName}</h3>
-                {selectedDoctor.specialty && (
+                {doctor.specialty && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-                    {tDoctors(`doctors.${selectedDoctor.id}.specialty`) || selectedDoctor.specialty}
+                    {doctor.specialty}
                   </p>
                 )}
               </div>
@@ -495,7 +422,7 @@ export function PageContent() {
                 </div>
 
                 {/* Location (for clinic visits) */}
-                {visitType === "clinic" && branchData?.branch && (
+                {visitType === "clinic" && branchId && (
                   <div className="flex items-center gap-3">
                     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-bnoon-teal/10 dark:bg-bnoon-teal/20">
                       <MapPin className="h-5 w-5 text-bnoon-teal" />
@@ -503,13 +430,11 @@ export function PageContent() {
                     <div>
                       <span className="text-xs text-gray-500 dark:text-gray-400">{t("location")}</span>
                       <p className="font-medium text-gray-900 dark:text-white">
-                        {tClinics(`${branchData.branch.id}.name`)}
+                        {tClinics(`${branchId}.name`)}
                       </p>
-                      {branchData.branch.address && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {tClinics(`${branchData.branch.id}.address`)}
-                        </p>
-                      )}
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {tClinics(`${branchId}.address`)}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -542,7 +467,7 @@ export function PageContent() {
                 <div>
                   <span className="text-xs text-gray-500 dark:text-gray-400">{t("phone")}</span>
                   <p className="font-medium text-gray-900 dark:text-white ltr">
-                    {currentUserData?.phone}
+                    {displayPhone}
                   </p>
                 </div>
               </div>
@@ -705,7 +630,7 @@ export function PageContent() {
                 currency={selectedService.currency}
                 email={email}
                 fullName={fullName}
-                phoneNumber={currentUserData?.phone ?? ""}
+                phoneNumber={displayPhone}
                 appointmentData={pendingAppointmentData}
                 disabled={loading || !pendingAppointmentData}
                 onPaymentStarted={() => setLoading(true)}

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAPS } from "@/services/amazon-payment-services";
-import { getPaymentByMerchantReference, updatePaymentStatus } from "@/firestore/payments";
+import { getPaymentByMerchantReference, updatePaymentStatus } from "@/services/bnoon-api/payments";
 import { isPaymentSuccess } from "@/models/PaymentModel";
 
 /**
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     const responseMessage = params.response_message;
     const fortId = params.fort_id;
 
-    // Get payment record from Firestore
+    // Get payment record from bnoon-api
     const paymentRecord = await getPaymentByMerchantReference(merchantReference);
 
     if (!paymentRecord) {
@@ -61,12 +61,12 @@ export async function POST(request: Request) {
     // Check if payment was successful
     const success = isPaymentSuccess(responseCode);
 
-    // Update payment status in Firestore
+    // Update payment status in bnoon-api
     await updatePaymentStatus(merchantReference, {
       status: success ? "authorized" : "failed",
-      fortId,
-      responseCode,
-      responseMessage,
+      fortId: fortId || undefined,
+      responseCode: responseCode || undefined,
+      responseMessage: responseMessage || undefined,
     });
 
     if (success) {
@@ -148,7 +148,7 @@ export async function GET(request: Request) {
     const responseMessage = params.response_message;
     const fortId = params.fort_id;
 
-    // Get payment record from Firestore
+    // Get payment record from bnoon-api
     const paymentRecord = await getPaymentByMerchantReference(merchantReference);
 
     if (!paymentRecord) {
@@ -166,9 +166,9 @@ export async function GET(request: Request) {
 
     await updatePaymentStatus(merchantReference, {
       status: success ? "authorized" : "failed",
-      fortId,
-      responseCode,
-      responseMessage,
+      fortId: fortId || undefined,
+      responseCode: responseCode || undefined,
+      responseMessage: responseMessage || undefined,
     });
 
     return NextResponse.json({

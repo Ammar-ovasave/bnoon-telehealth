@@ -7,23 +7,26 @@ export type PaymentStatus = "pending" | "authorized" | "captured" | "failed" | "
 
 /**
  * Pending appointment data stored with payment before appointment is created
+ * Uses the new bnoon-api format (no MRN required, patient created internally)
  */
 export interface PendingAppointmentData {
-  patientMrn: string;
+  branchId: string; // e.g., "jeddah", "riyadh-granada"
+  branchName?: string;
   serviceId: number;
-  serviceName: string;
-  resourceIds: number[];
+  serviceName?: string;
+  resourceId: number; // Single doctor ID
+  doctorName?: string;
   startTime: string;
   endTime: string;
-  branchId: number;
-  statusId: number;
-  statusName: string;
-  description: string;
-  email: string | null;
-  phoneNumber: string;
-  firstName: string;
-  lastName: string;
-  middleName: string;
+  visitType: "virtual" | "in-person";
+  fullName?: string;
+  email?: string | null;
+  phoneNumber?: string;
+  sex?: 0 | 1;
+  dob?: string;
+  nationalityId?: number;
+  identityIdType?: number;
+  identityId?: string;
 }
 
 /**

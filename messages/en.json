@@ -283,7 +283,8 @@
       "iqamaDigitsOnly": "Iqama number must only contain digits",
       "iqamaLength": "Iqama number must be 10 digits",
       "somethingWentWrong": "Something went wrong",
-      "idDocumentRequired": "Please upload a photo of your ID document"
+      "idDocumentRequired": "Please upload a photo of your ID document",
+      "registrationFailed": "Registration failed. Please try again."
     },
     "idUpload": {
       "title": "ID Document Photo",
@@ -310,7 +311,8 @@
     "buttons": {
       "back": "Back",
       "confirm": "Confirm",
-      "loading": "Loading..."
+      "loading": "Loading...",
+      "processing": "Processing..."
     },
     "registeredUserNotice": {
       "message": "Your personal information is locked because you already have a profile on file. Only your email can be updated for this appointment.",
@@ -357,7 +359,8 @@
       "clinicTip2": "Bring your ID, passport copy and any medical reports."
     },
     "buttons": {
-      "manageAppointments": "Manage Appointments"
+      "manageAppointments": "Manage Appointments",
+      "prepareForCall": "Test Your Device"
     }
   },
   "ManageAppointmentsPage": {
@@ -414,6 +417,12 @@
       "reschedule": {
         "title": "Reschedule Appointment",
         "description": "Choose your preferred date and time for this appointment.",
+        "currentAppointment": {
+          "title": "Current Appointment",
+          "dateTime": "Date & Time",
+          "doctor": "Doctor",
+          "service": "Service"
+        },
         "selectDate": "Select Date",
         "selectTime": "Select Time",
         "selected": "Selected",
@@ -454,12 +463,14 @@
     "errors": {
       "fullNameRequired": "Full name is required",
       "fullNameMinLength": "Full name must be at least 2 characters",
-      "somethingWentWrong": "Something went wrong"
+      "somethingWentWrong": "Something went wrong",
+      "registrationFailed": "Registration failed. Please try again."
     },
     "buttons": {
       "back": "Back",
       "confirm": "Confirm",
-      "loading": "Loading..."
+      "loading": "Loading...",
+      "processing": "Processing..."
     },
     "registeredUserNotice": {
       "message": "Thank you for being a loyal patient at Bnoon. Your name is locked because you have a medical file at our clinic.",

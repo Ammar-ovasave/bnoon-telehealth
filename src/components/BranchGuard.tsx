@@ -1,34 +1,36 @@
 "use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import useCurrentBranch from "@/hooks/useCurrentBranch";
 import { toast } from "sonner";
-import { Spinner } from "./ui/spinner";
+import { clinicLocations } from "@/models/ClinicModel";
 
 interface BranchGuardProps {
   children: React.ReactNode;
 }
 
+/**
+ * Guard component that ensures a valid branch is selected via URL params.
+ * No longer uses cookies - relies on `selectedClinicLocation` URL parameter.
+ */
 export default function BranchGuard({ children }: BranchGuardProps) {
-  const { data, isLoading } = useCurrentBranch();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations("BranchGuard");
 
+  const branchId = searchParams.get("selectedClinicLocation");
+  const isValidBranch = branchId && clinicLocations.some((c) => c.id === branchId && !c.isCommingSoon);
+
   useEffect(() => {
-    if (!isLoading && !data?.branch?.id) {
+    if (!isValidBranch) {
       toast.error(t("selectClinicMessage"));
       router.replace(`/${locale}`);
     }
-  }, [isLoading, data?.branch?.id, router, locale, t]);
+  }, [isValidBranch, router, locale, t]);
 
-  if (isLoading || !data?.branch?.id) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spinner className="w-8 h-8 text-bnoon-teal" />
-      </div>
-    );
+  if (!isValidBranch) {
+    return null; // Will redirect in useEffect
   }
 
   return <>{children}</>;

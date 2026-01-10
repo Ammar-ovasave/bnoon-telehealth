@@ -3,10 +3,12 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  allowedDevOrigins: ["localhost", "192.168.1.135"],
   images: {
     remotePatterns: [
       { hostname: "images.unsplash.com", protocol: "https" },
       { hostname: "firebasestorage.googleapis.com", protocol: "https" },
+      { hostname: "bnoonstorage.blob.core.windows.net", protocol: "https" },
     ],
   },
   async rewrites() {

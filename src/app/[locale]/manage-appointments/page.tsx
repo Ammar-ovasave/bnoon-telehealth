@@ -1,14 +1,23 @@
-import { redirect } from "next/navigation";
-import { getCurrentUser } from "../../api/current-user/_services";
+import { Suspense } from "react";
 import ManageAppointmentPageContent from "./ManageAppointmentPageContent";
 
-export default async function ManageAppointmentsPage() {
-  const currentUser = await getCurrentUser();
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light/30 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+      <div className="animate-pulse text-gray-500 dark:text-gray-400">
+        Loading...
+      </div>
+    </div>
+  );
+}
 
-  // Redirect to home if user is not authenticated (Bnoon users have userId)
-  if (!currentUser?.userId) {
-    return redirect("/");
-  }
-
-  return <ManageAppointmentPageContent />;
+export default function ManageAppointmentsPage() {
+  // Auth check is now handled client-side in ManageAppointmentPageContent
+  // via useCurrentUser hook which redirects to home if not authenticated
+  // Suspense boundary required for useSearchParams() to work with client-side navigation
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ManageAppointmentPageContent />
+    </Suspense>
+  );
 }

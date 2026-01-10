@@ -1,22 +1,31 @@
 "use client";
-import { services } from "@/models/ServiceModel";
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import ServiceCard from "@/components/ServiceCard";
+import APIServiceCard from "@/components/APIServiceCard";
 import useFertiSmartAPIServices from "@/hooks/useFertiSmartAPIServices";
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
-import { doctors } from "@/models/DoctorModel";
 
 export const PageContent: FC = () => {
-  const { isLoading, data: servicesData } = useFertiSmartAPIServices();
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedClinicLocationId = searchParams.get("selectedClinicLocation");
+  const { isLoading, services, error } = useFertiSmartAPIServices(selectedClinicLocationId ?? undefined);
   const t = useTranslations("ServicesPage");
   const locale = useLocale();
+
+  // Sort services by displayOrder and filter active ones
+  const sortedServices = useMemo(() => {
+    if (!services) return [];
+    return services
+      .filter((s) => s.active)
+      .sort((a, b) => a.displayOrder - b.displayOrder);
+  }, [services]);
+
+  const row1Services = sortedServices.slice(0, 3);
+  const row2Services = sortedServices.slice(3);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-bnoon-light to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
@@ -47,52 +56,42 @@ export const PageContent: FC = () => {
               {locale === "ar" ? "جاري تحميل الخدمات..." : "Loading services..."}
             </p>
           </div>
+        ) : error ? (
+          <div className="text-center py-10">
+            <p className="text-red-500">
+              {locale === "ar"
+                ? "حدث خطأ في تحميل الخدمات. يرجى المحاولة مرة أخرى."
+                : "Failed to load services. Please try again."}
+            </p>
+          </div>
+        ) : sortedServices.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-gray-500 dark:text-gray-400">
+              {locale === "ar"
+                ? "لا توجد خدمات متاحة حالياً لهذا الفرع."
+                : "No services available for this branch at the moment."}
+            </p>
+          </div>
         ) : (
-          (() => {
-            const filteredServices = services
-              .filter((service) => {
-                return servicesData?.some((s) => s.name?.toLocaleLowerCase().includes(service.title.toLocaleLowerCase()));
-              })
-              .filter((service) => {
-                const hasDoctors = doctors.some((doc) => {
-                  return doc.services.some((s) => s === service.id) && doc.branchId === selectedClinicLocationId;
-                });
-                return hasDoctors;
-              });
+          <div className="flex flex-col gap-5 md:gap-6">
+            {/* Row 1: First 3 services */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
+              {row1Services.map((service) => (
+                <APIServiceCard key={service.id} service={service} />
+              ))}
+            </div>
 
-            const row1Services = filteredServices.slice(0, 3);
-            const row2Services = filteredServices.slice(3);
-
-            return (
-              <div className="flex flex-col gap-5 md:gap-6">
-                {/* Row 1: First 3 services */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
-                  {row1Services.map((service, index) => (
-                    <div
-                      key={service.id}
-                      className=""
-                    >
-                      <ServiceCard service={service} />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Row 2: Remaining services centered */}
-                {row2Services.length > 0 && (
-                  <div className="flex flex-col sm:flex-row justify-center gap-5 md:gap-6">
-                    {row2Services.map((service, index) => (
-                      <div
-                        key={service.id}
-                        className={`w-full sm:w-[calc((100%-1.25rem)/2)] md:w-[calc((100%-1.5rem)/3)]${(index + 3) * 100}`}
-                      >
-                        <ServiceCard service={service} />
-                      </div>
-                    ))}
+            {/* Row 2: Remaining services centered with same width as row 1 */}
+            {row2Services.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-5 md:gap-6">
+                {row2Services.map((service) => (
+                  <div key={service.id} className="w-full sm:w-[calc(50%-0.625rem)] md:w-[calc(33.333%-1rem)]">
+                    <APIServiceCard service={service} />
                   </div>
-                )}
+                ))}
               </div>
-            );
-          })()
+            )}
+          </div>
         )}
 
         {/* Back Button */}

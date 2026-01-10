@@ -1,232 +1,77 @@
-import { CreateAppointmentPayload } from "@/models/CreateAppointmentPayload";
-import {
-  createPatientServer,
-  createVideoConsultationCalendarEvent,
-  getAppointmentServices,
-  getBranches,
-  getPatient,
-  getResource,
-  getSMSTemplates,
-  sendEmail,
-  sendSMS,
-  updateAppointmentServer,
-} from "@/services/appointment-services";
-import { cookies } from "next/headers";
-import { getConfirmAppointmentEmail } from "@/services/templates";
-import { formatInTimeZone, toZonedTime } from "date-fns-tz";
-import { parseISO } from "date-fns";
-import { VISIT_DURATION_IN_MINUTES } from "@/constants";
-import { clinicLocations } from "@/models/ClinicModel";
-import { getLocale } from "next-intl/server";
-import { createNewAppointmentDB } from "@/firestore/appointments";
-import axios, { branchURLs } from "@/services/axios";
+import { createAppointment as createAppointmentBnoonApi } from "@/services/bnoon-api";
+import { getAuthToken } from "@/lib/getAuthToken";
+import { NextResponse } from "next/server";
 
-const KSA_TIMEZONE = "Asia/Riyadh";
+interface CreateAppointmentRequest {
+  branchId: string;
+  serviceId: number;
+  resourceId: number;
+  startTime: string;
+  endTime: string;
+  visitType: "virtual" | "in-person";
+  fullName?: string;
+  email?: string;
+  sex?: 0 | 1;
+  dob?: string;
+  nationalityId?: number;
+  identityIdType?: number;
+  identityId?: string;
+}
 
+/**
+ * POST /api/appointments
+ * Create a new appointment via bnoon-api
+ */
 export async function POST(request: Request) {
   try {
-    const [cookiesStore, locale] = await Promise.all([cookies(), getLocale()]);
-    const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
-    const payload: CreateAppointmentPayload = await request.json();
-    const [patient, doctorResource, services] = await Promise.all([
-      getPatient({ mrn: payload.patientMrn, baseAPIURL: baseAPIURL ?? null }),
-      getResource({ baseAPIURL: baseAPIURL ?? null, resourceId: payload.resourceIds[0].toString() }),
-      getAppointmentServices({ baseAPIURL: baseAPIURL ?? null, activeOnly: false }),
-    ]);
-    let patientToUse = patient;
-    if (!patient) {
-      console.log("--- payload.patientMrn", payload.patientMrn);
-      const fertiSmartBranches = await getBranches({ baseAPIURL: baseAPIURL ?? null });
-      const newPatient = await createPatientServer({
-        baseAPIURL: baseAPIURL ?? null,
-        branchId: fertiSmartBranches?.[0].id ?? 0,
-        patient: {
-          contactNumber: payload.phoneNumber,
-          firstName: payload.firstName || "-",
-          lastName: payload.lastName || "-",
-          middleName: payload.middleName || "-",
-        },
-      });
-      patientToUse = newPatient ?? patient;
-      console.log("--- create appointment get patient error");
-    }
-    if (!patientToUse?.mrn) {
-      console.log("--- create appointment no patient to use", patientToUse);
-      return Response.error();
-    }
-    payload.patientMrn = patientToUse.mrn;
-    const createAppointmentResponse = await axios.post<{ id?: number }>(
-      baseAPIURL ? `${baseAPIURL}/appointments` : "/appointments",
-      payload
-    );
-    if (!createAppointmentResponse.data.id) {
-      console.log("--- create appointment error", createAppointmentResponse.data);
-      return Response.error();
-    }
-    const service = services?.find((item) => item.id === payload.serviceId);
-    const url = new URL(request.url);
-    const isVirtualAppointment = payload.description === "Virtual Visit";
-    const appointmentLink = isVirtualAppointment
-      ? `${url.origin}/video-call/${createAppointmentResponse.data.id}/prepare`
-      : `${url.origin}/manage-appointments`;
-    const manageAppointmentsLink = `${url.origin}/manage-appointments`;
-    const appointmentDate = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "dd-MM-yyyy");
-    const appointmentTime = formatInTimeZone(payload.startTime, KSA_TIMEZONE, "hh:mm a");
-    // Parse the startTime - payload.startTime is always in UTC format (ends with Z)
-    // parseISO correctly parses UTC dates. We convert it to represent the KSA local time
-    // so that when the ical library interprets it with the KSA timezone, it displays correctly
-    const utcDate = parseISO(payload.startTime);
-    const startDateForCalendar = toZonedTime(utcDate, KSA_TIMEZONE);
-    const clinicBranch = clinicLocations.find((clinic) => clinic.apiUrl === baseAPIURL);
-    await Promise.all([
-      createNewAppointmentDB({
-        ...payload,
-        id: createAppointmentResponse.data.id.toString(),
-        createdAt: new Date().toISOString(),
-        baseAPIURL: baseAPIURL ?? branchURLs[0],
-      }),
-      updateAppointmentServer({
-        type: null,
-        baseAPIURL: baseAPIURL,
-        appointmentId: createAppointmentResponse.data.id,
-        description: isVirtualAppointment ? `${payload.description} - ${appointmentLink}` : payload.description,
-      }),
-      // Only send confirmation email for virtual appointments
-      isVirtualAppointment
-        ? sendConfirmAppointmentEmail({
-            appointmentDate,
-            appointmentLink,
-            manageAppointmentsLink,
-            appointmentTime,
-            startDateObj: startDateForCalendar,
-            doctorName: doctorResource?.linkedUserFullName ?? "",
-            location: "Virtual Visit",
-            patientEmail: payload.email ?? patientToUse.emailAddress ?? "",
-            patientGender: patientToUse.sex === 0 ? "female" : "male",
-            patientName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${
-              payload.middleName ?? patientToUse.middleName ?? ""
-            } ${payload.lastName ?? patientToUse.lastName ?? ""}`.trim(),
-            serviceName: service?.name ?? "",
-            clinicName: clinicBranch?.name ?? "",
-            isVirtual: true,
-            locationLink: clinicBranch?.locationLink,
-            baseAPIURL: baseAPIURL ?? null,
-            mrn: payload.patientMrn,
-            appointmentId: createAppointmentResponse.data.id ?? 0,
-            locale: locale,
-          })
-        : Promise.resolve(null),
-      sendNewAppointmentSMS({
-        fullName: `${payload.firstName ?? patientToUse.firstName ?? ""} ${payload.middleName ?? patientToUse.middleName ?? ""} ${
-          payload.lastName ?? patientToUse.lastName ?? ""
-        }`.trim(),
-        mrn: patientToUse.mrn ?? "",
-        doctorName: doctorResource?.linkedUserFullName ?? "",
-        appointmentDate: appointmentDate,
-        appointmentTime: appointmentTime,
-        mobileNumber: patientToUse.contactNumber ?? "",
-      }),
-    ]);
+    const token = await getAuthToken();
 
-    return Response.json(createAppointmentResponse.data);
-  } catch (error) {
-    console.log("--- create appointment error", error);
-    return Response.error();
-  }
-}
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-async function sendConfirmAppointmentEmail(params: {
-  appointmentDate: string;
-  appointmentLink: string;
-  manageAppointmentsLink: string;
-  appointmentTime: string;
-  startDateObj: Date;
-  doctorName: string;
-  location: string;
-  patientEmail: string;
-  patientGender: "female" | "male";
-  patientName: string;
-  serviceName: string;
-  clinicName: string;
-  isVirtual: boolean;
-  locationLink?: string;
-  baseAPIURL: string | null;
-  mrn: string;
-  appointmentId: number;
-  locale?: string;
-}) {
-  if (!params.patientEmail) return null;
-  const emailTemplate = await getConfirmAppointmentEmail({
-    appointmentDate: params.appointmentDate,
-    appointmentLink: params.appointmentLink,
-    manageAppointmentsLink: params.manageAppointmentsLink,
-    appointmentTime: params.appointmentTime,
-    doctorName: params.doctorName,
-    location: params.location,
-    patientEmail: params.patientEmail,
-    patientGender: params.patientGender,
-    patientName: params.patientName,
-    serviceName: params.serviceName,
-    clinicName: params.clinicName,
-    isVirtual: params.isVirtual,
-    locationLink: params.locationLink,
-    locale: params.locale,
-  });
-  return sendEmail({
-    baseAPIURL: params.baseAPIURL,
-    mrn: params.mrn,
-    email: params.patientEmail,
-    body: emailTemplate ?? `<p>Join appointment: <a href="${params.appointmentLink}"></a></p>`,
-    subject: `Appointment Confirmed ${params.appointmentId}`,
-    attachments: [
+    const payload: CreateAppointmentRequest = await request.json();
+
+    // Validate required fields
+    if (!payload.branchId || !payload.serviceId || !payload.resourceId || !payload.startTime || !payload.endTime) {
+      return NextResponse.json(
+        { error: "Missing required fields: branchId, serviceId, resourceId, startTime, endTime" },
+        { status: 400 }
+      );
+    }
+
+    // Call bnoon-api to create appointment
+    const result = await createAppointmentBnoonApi(
       {
-        filename: "invite.ics",
-        content: createVideoConsultationCalendarEvent({
-          callDurationInMinutes: VISIT_DURATION_IN_MINUTES,
-          dateAndTime: params.startDateObj,
-          joinCallUrl: params.appointmentLink,
-          orderId: params.appointmentId.toString(),
-          testName: params.serviceName,
-          userEmail: params.patientEmail,
-          userName: params.patientName,
-          description: `Bnoon - ${params.serviceName}`,
-        }).toString(),
-        contentType: "text/calendar; method=REQUEST",
+        branchId: payload.branchId,
+        serviceId: payload.serviceId,
+        resourceId: payload.resourceId,
+        startTime: payload.startTime,
+        endTime: payload.endTime,
+        visitType: payload.visitType ?? "in-person",
+        fullName: payload.fullName,
+        email: payload.email,
+        sex: payload.sex,
+        dob: payload.dob,
+        nationalityId: payload.nationalityId,
+        identityIdType: payload.identityIdType,
+        identityId: payload.identityId,
       },
-    ],
-  });
-}
+      token
+    );
 
-async function sendNewAppointmentSMS(params: {
-  fullName: string;
-  mrn: string;
-  doctorName: string;
-  appointmentDate: string;
-  appointmentTime: string;
-  // appointmentLink: string;
-  mobileNumber: string;
-}) {
-  try {
-    const [cookiesStore, locale] = await Promise.all([cookies(), getLocale()]);
-    const baseAPIURL = cookiesStore.get("branchAPIURL")?.value;
-    const templates = await getSMSTemplates({ baseAPIURL: baseAPIURL });
-    const templateText = templates?.new[locale as "ar" | "en"] || templates?.new.en || templates?.new.ar;
-    if (!templateText) {
-      return null;
-    }
-    const textContent = templateText
-      .replace(/{{PATIENT_NAME}}/g, params.fullName)
-      .replace(/{{DATE}}/g, params.appointmentDate)
-      .replace(/{{RESOURCE_NAME}}/g, params.doctorName)
-      .replace(/{{TIME}}/g, params.appointmentTime)
-      .replace(/{{PATIENT_MRN}}/g, params.mrn);
-    const success = await sendSMS({
-      mobileNumber: params.mobileNumber,
-      message: textContent,
-    });
-    return success;
+    return NextResponse.json(result);
   } catch (error) {
-    console.log("--- sendNewAppointmentSMS error", error);
-    return null;
+    console.error("--- create appointment error", error);
+
+    // Handle axios error responses
+    if (error && typeof error === "object" && "response" in error) {
+      const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
+      const status = axiosError.response?.status || 500;
+      const message = axiosError.response?.data?.message || "Failed to create appointment";
+      return NextResponse.json({ error: message }, { status });
+    }
+
+    return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });
   }
 }

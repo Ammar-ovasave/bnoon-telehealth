@@ -13,11 +13,7 @@ export default function useNearestUpcomingAppointment() {
   const shouldFetch = !!currentUser?.userId;
 
   const { data, error, isLoading, mutate } = useSWR<NearestAppointmentResponse>(
-    shouldFetch ? "/api/user-appointments/nearest" : null,
-    {
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-    }
+    shouldFetch ? "/api/user-appointments/nearest" : null
   );
 
   return {

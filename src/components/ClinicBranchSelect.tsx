@@ -1,37 +1,46 @@
 "use client";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
-import { clinicLocations } from "@/models/ClinicModel";
+import { clinicLocations, ClinicBranchID } from "@/models/ClinicModel";
 import { cn } from "@/lib/utils";
-import useCurrentBranch from "@/hooks/useCurrentBranch";
-import useSwitchBranch from "@/hooks/useSwitchBranch";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 interface ClinicBranchSelectProps {
   className?: string;
   isSwitching?: boolean;
+  /** Required: The current branch ID (from URL params) */
+  value: ClinicBranchID;
+  /** Required: Handler for branch changes (should update URL params) */
+  onValueChange: (branchId: ClinicBranchID) => void;
 }
 
-export default function ClinicBranchSelect({ className, isSwitching }: ClinicBranchSelectProps) {
+export default function ClinicBranchSelect({ className, isSwitching, value, onValueChange }: ClinicBranchSelectProps) {
   const t = useTranslations("ManageAppointmentsPage.clinicBranchSelect");
   const tHomePage = useTranslations("HomePage");
-  const { data, isLoading } = useCurrentBranch();
 
-  const selectedBranchId = data?.branch?.id ?? "";
+  // Local state for immediate UI feedback (prevents lag when URL updates)
+  const [localValue, setLocalValue] = useState(value);
 
-  const { handleSwitchBranch, loading: switchingBranch } = useSwitchBranch();
+  // Sync local state when external value changes (e.g., URL navigation)
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
 
-  // Use external isSwitching if provided, otherwise use internal state
-  const isCurrentlySwitching = isSwitching ?? switchingBranch;
+  const selectedBranchId = localValue;
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const nextBranchId = event.target.value;
+    const nextBranchId = event.target.value as ClinicBranchID;
     if (!nextBranchId || nextBranchId === selectedBranchId) {
       return;
     }
-    handleSwitchBranch({ payload: { branchId: nextBranchId } });
+
+    // Update local state immediately for instant UI feedback
+    setLocalValue(nextBranchId);
+
+    // Notify parent (URL-based branch switching)
+    onValueChange(nextBranchId);
   };
 
   return (
@@ -62,10 +71,10 @@ export default function ClinicBranchSelect({ className, isSwitching }: ClinicBra
               id="clinic-branch-select"
               value={selectedBranchId}
               onChange={handleChange}
-              disabled={isLoading || isCurrentlySwitching}
+              disabled={isSwitching}
               className={cn(
                 "border-bnoon-teal/30 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 dark:border-bnoon-teal/40 font-semibold text-bnoon-navy dark:text-white focus-visible:border-bnoon-teal focus-visible:ring-bnoon-teal/30",
-                isCurrentlySwitching && "opacity-60 cursor-not-allowed"
+                isSwitching && "opacity-60 cursor-not-allowed"
               )}
             >
               {clinicLocations
@@ -79,7 +88,7 @@ export default function ClinicBranchSelect({ className, isSwitching }: ClinicBra
                   );
                 })}
             </NativeSelect>
-            {(isLoading || isCurrentlySwitching) && (
+            {isSwitching && (
               <Loader2
                 className="absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-bnoon-teal"
                 aria-hidden="true"

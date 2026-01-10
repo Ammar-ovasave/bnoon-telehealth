@@ -1,7 +1,9 @@
 "use client";
 import axios, { AxiosError } from "axios";
-import { FC, PropsWithChildren } from "react";
-import { SWRConfig } from "swr";
+import { FC, PropsWithChildren, useEffect } from "react";
+import { SWRConfig, mutate } from "swr";
+
+const LOCALE_STORAGE_KEY = "swr-locale";
 
 const instance = axios.create({
   headers: {
@@ -9,17 +11,36 @@ const instance = axios.create({
   },
 });
 
-instance.interceptors.request.use((config) => {
-  return config;
-});
+const SWRProvider: FC<PropsWithChildren & { fallback?: { [key: string]: unknown }; locale: string }> = ({ children, fallback, locale }) => {
 
-const SWRProvider: FC<PropsWithChildren & { fallback?: { [key: string]: unknown } }> = ({ children, fallback }) => {
+  // Revalidate all SWR cache when locale changes
+  // Use localStorage to persist previous locale across component remounts
+  useEffect(() => {
+    const previousLocale = localStorage.getItem(LOCALE_STORAGE_KEY);
+
+    if (previousLocale && previousLocale !== locale) {
+      // Locale changed - revalidate all cached data to refetch with new language
+      mutate(() => true);
+    }
+
+    // Always update stored locale
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+  }, [locale]);
+
   return (
     <SWRConfig
       value={{
         fallback: fallback,
-        fetcher: (resource, init) => instance.get(resource, init).then((res) => res.data),
-        revalidateOnFocus: false,
+        fetcher: (resource, init) =>
+          instance
+            .get(resource, {
+              ...init,
+              headers: {
+                ...init?.headers,
+                "Accept-Language": locale,
+              },
+            })
+            .then((res) => res.data),
         shouldRetryOnError: (error: AxiosError) => {
           const status = error?.response?.status;
           // Only retry on 5xx server errors, not 4xx client errors

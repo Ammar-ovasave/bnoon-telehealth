@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAPS, AmazonPaymentServices } from "@/services/amazon-payment-services";
-import { createPaymentRecord } from "@/firestore/payments";
+import { createPayment } from "@/services/bnoon-api/payments";
 import { CreatePaymentSessionRequest, CreatePaymentSessionResponse } from "@/models/PaymentModel";
 
 /**
@@ -12,7 +12,6 @@ export async function POST(request: Request) {
   try {
     const payload: CreatePaymentSessionRequest = await request.json();
     const url = new URL(request.url);
-    const _cookieStore = await cookies();
 
     // Validate required fields
     if (!payload.amount || !payload.email || !payload.fullName || !payload.appointmentData) {
@@ -33,22 +32,52 @@ export async function POST(request: Request) {
     // Generate unique merchant reference
     const merchantReference = AmazonPaymentServices.generateMerchantReference();
 
-    // Store pending payment in Firestore
-    const paymentId = await createPaymentRecord({
-      merchantReference,
-      amount: payload.amount,
-      currency: payload.currency || "SAR",
-      status: "pending",
-      customerEmail: payload.email,
-      customerName: payload.fullName,
-      customerPhone: payload.phoneNumber || "",
-      appointmentData: payload.appointmentData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
+    // Get auth token from cookies for authenticated payment creation
+    const cookieStore = await cookies();
+    const authToken = cookieStore.get("auth-token")?.value;
 
-    if (!paymentId) {
-      console.log("--- Failed to create payment record");
+    if (!authToken) {
+      console.log("--- No auth token found for payment creation");
+      return NextResponse.json(
+        { success: false, error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
+    // Store pending payment in bnoon-api
+    try {
+      await createPayment(
+        {
+          merchantReference,
+          amount: payload.amount,
+          currency: payload.currency || "SAR",
+          customerEmail: payload.email,
+          customerName: payload.fullName,
+          customerPhone: payload.phoneNumber || "",
+          appointmentData: {
+            branchId: payload.appointmentData.branchId,
+            branchName: payload.appointmentData.branchName,
+            serviceId: payload.appointmentData.serviceId,
+            serviceName: payload.appointmentData.serviceName,
+            resourceId: payload.appointmentData.resourceId,
+            doctorName: payload.appointmentData.doctorName,
+            startTime: payload.appointmentData.startTime,
+            endTime: payload.appointmentData.endTime,
+            visitType: payload.appointmentData.visitType,
+            fullName: payload.fullName,
+            email: payload.email,
+            phoneNumber: payload.phoneNumber || "",
+            sex: payload.appointmentData.sex,
+            dob: payload.appointmentData.dob,
+            nationalityId: payload.appointmentData.nationalityId,
+            identityIdType: payload.appointmentData.identityIdType,
+            identityId: payload.appointmentData.identityId,
+          },
+        },
+        authToken
+      );
+    } catch (error) {
+      console.log("--- Failed to create payment record in bnoon-api", error);
       return NextResponse.json(
         { success: false, error: "Failed to create payment session" },
         { status: 500 }
@@ -73,7 +102,7 @@ export async function POST(request: Request) {
       customerPhone: payload.phoneNumber,
       returnUrl,
       language: locale as "en" | "ar",
-      orderDescription: `Appointment: ${payload.appointmentData.serviceName}`,
+      orderDescription: `Virtual Appointment - ${payload.appointmentData.branchId}`,
     });
 
     const response: CreatePaymentSessionResponse = {

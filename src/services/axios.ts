@@ -1,6 +1,10 @@
 import axios from "axios";
-import { getAPIKey as getAPIKeyFromDB } from "../firestore/api_keys";
 
+/**
+ * @deprecated - This axios instance is for legacy FertiSmart direct calls.
+ * New code should use bnoon-api client instead.
+ * TODO: Remove when all FertiSmart calls are migrated to bnoon-api.
+ */
 const instance = axios.create({
   baseURL: process.env.BASE_URL,
   headers: {
@@ -9,6 +13,9 @@ const instance = axios.create({
   },
 });
 
+/**
+ * @deprecated - API keys are now managed by bnoon-api via environment variables
+ */
 const mapAPIKeys: { [url: string]: string } = {
   "https://unvaunted-weedily-jannie.ngrok-free.dev": "AMpEg6pwR1VKgjnJQ4NUgJ2Sy3gVi77yBfjqL74q",
   "https://undeclarable-kolby-overgraciously.ngrok-free.dev": "-2VY--ga7Nm3RqxkKrj6IJUynVv0w1acifsgB9Cw",
@@ -17,20 +24,17 @@ const mapAPIKeys: { [url: string]: string } = {
 
 export const branchURLs = Object.keys(mapAPIKeys);
 
-async function getAPIKey({ url }: { url: string }) {
+function getAPIKey({ url }: { url: string }): string {
   try {
     const urlObj = new URL(url);
-    const apiKeyDoc = await getAPIKeyFromDB({ apiURL: urlObj.origin });
-    return apiKeyDoc?.key ?? mapAPIKeys[urlObj.origin] ?? Object.values(mapAPIKeys)[0];
-  } catch (e) {
-    console.log("--- getAPIKey error", e);
+    return mapAPIKeys[urlObj.origin] ?? Object.values(mapAPIKeys)[0];
+  } catch {
     return Object.values(mapAPIKeys)[0];
   }
 }
 
 instance.interceptors.request.use(async (config) => {
-  const apiKey = await getAPIKey({ url: config.url ?? "" });
-  // console.log("--- server request", apiKey, config.url, config.baseURL);
+  const apiKey = getAPIKey({ url: config.url ?? "" });
   config.headers["x-api-key"] = apiKey;
   return config;
 });

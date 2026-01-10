@@ -1,0 +1,524 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import useCurrentUser from "@/hooks/useCurrentUser";
+import { cn } from "@/lib/utils";
+import { AppointmentDto } from "@/services/bnoon-api/types";
+import { ClinicBranchID } from "@/models/ClinicModel";
+import { format, add } from "date-fns";
+import { ar, enUS } from "date-fns/locale";
+import { formatInTimeZone } from "date-fns-tz";
+import { Clock, Mail, RefreshCw, X } from "lucide-react";
+import { FC, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { cancelAppointment, updateAppointment } from "@/services/client";
+import useCurrentUserAppointments from "@/hooks/useCurrentUserAppointments";
+import useFertiSmartResourceAvailability from "@/hooks/useFertiSmartResourceAvailability";
+import { VISIT_DURATION_IN_MINUTES } from "@/constants";
+import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
+import Image from "next/image";
+import { useLocale } from "next-intl";
+import { getAppointmentStatusColor, getAppointmentStatusIcon } from "./appointmentCardUtils";
+
+// FertiSmart status ID for "Cancelled" - fixed value from FertiSmart system
+const CANCELLED_STATUS_ID = 6;
+const CANCELLED_STATUS_NAME = "Cancelled";
+
+export interface AppointmentCardProps {
+  appointment: AppointmentDto;
+  isHighlighted?: boolean;
+}
+
+const InPersonAppointmentCard: FC<AppointmentCardProps> = ({ appointment, isHighlighted = false }) => {
+  const t = useTranslations("ManageAppointmentsPage.appointmentCard");
+  const tVisitStatus = useTranslations("visitStatus");
+  const locale = useLocale();
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showRescheduleDialog, setShowRescheduleDialog] = useState(false);
+  const [selectedRescheduleDate, setSelectedRescheduleDate] = useState<Date | undefined>(undefined);
+  const [selectedRescheduleTimeSlot, setSelectedRescheduleTimeSlot] = useState<string>();
+  const [isRescheduling, setIsRescheduling] = useState(false);
+  const { mutate: mutateCurrentUserAppointments } = useCurrentUserAppointments({
+    branchId: appointment.branchId as ClinicBranchID,
+  });
+
+  // Service and doctor names are already localized from bnoon-api
+  const serviceTitle = appointment.serviceName ?? "-";
+  const displayDoctorName = appointment.doctorName ?? "-";
+
+  const userTimezone = useMemo(() => {
+    if (typeof window !== "undefined") {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+    return "UTC";
+  }, []);
+
+  const isKSA = userTimezone === "Asia/Riyadh";
+  const KSA_TIMEZONE = "Asia/Riyadh";
+
+  const dateAndTime = useMemo(() => {
+    if (!appointment.startTime) return "-";
+    try {
+      return format(appointment.startTime, "yyyy-MM-dd hh:mm a");
+    } catch (error) {
+      console.log("format appointmnt date and time error", error);
+      return "-";
+    }
+  }, [appointment.startTime]);
+
+  const dateAndTimeKSA = useMemo(() => {
+    if (!appointment.startTime || isKSA) return null;
+    try {
+      return formatInTimeZone(appointment.startTime, KSA_TIMEZONE, "yyyy-MM-dd hh:mm a");
+    } catch (error) {
+      console.log("format appointmnt date and time KSA error", error);
+      return null;
+    }
+  }, [appointment.startTime, isKSA]);
+
+  // Check if appointment can be modified based on status
+  const FINAL_STATUSES = ["completed", "cancelled", "patient no-show", "locked"];
+  const IN_PROGRESS_STATUSES = ["procedure started", "arrived waiting!"];
+
+  const statusLower = appointment.status?.toLowerCase() ?? "";
+
+  const isAppointmentFinal = FINAL_STATUSES.some((s) => statusLower.includes(s));
+  const isAppointmentInProgress = IN_PROGRESS_STATUSES.some((s) => statusLower === s);
+  const canModifyAppointment = !isAppointmentFinal && !isAppointmentInProgress;
+
+  // Use current user from JWT context - no API call needed
+  const { data: currentUser, fullName } = useCurrentUser();
+
+  // Fetch availability for reschedule using appointment's branchId
+  const { data: availabilityData, isLoading: loadingTimeslots } = useFertiSmartResourceAvailability({
+    branchId: appointment.branchId,
+    resourceId: appointment.resourceId,
+    date: selectedRescheduleDate ? format(selectedRescheduleDate, "yyyy-MM-dd") : undefined,
+    serviceDuration: VISIT_DURATION_IN_MINUTES,
+  });
+
+  const isDateDisabled = (date: Date) => {
+    const today = add(new Date(), { days: 1 });
+    today.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
+  const handleReschedule = () => {
+    setShowRescheduleDialog(true);
+  };
+
+  const handleRescheduleConfirm = async () => {
+    if (!selectedRescheduleDate || !selectedRescheduleTimeSlot || !appointment.appointmentId) return;
+
+    try {
+      setIsRescheduling(true);
+      const selectedSlot = availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot);
+      if (!selectedSlot?.start || !selectedSlot?.end) return;
+
+      await updateAppointment({
+        appointmentId: appointment.appointmentId,
+        startTime: selectedSlot.start,
+        endTime: selectedSlot.end,
+        type: "reschedule",
+      });
+
+      mutateCurrentUserAppointments(undefined);
+      setShowRescheduleDialog(false);
+      setSelectedRescheduleDate(undefined);
+      setSelectedRescheduleTimeSlot(undefined);
+    } catch (error) {
+      console.error("Error rescheduling appointment:", error);
+      toast.error(t("errors.somethingWentWrong"));
+    } finally {
+      setIsRescheduling(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setShowCancelConfirm(true);
+  };
+
+  const dateFnsLocale = useMemo(() => {
+    return locale === "ar" ? ar : enUS;
+  }, [locale]);
+
+  return (
+    <div
+      key={appointment.appointmentId}
+      className={cn(
+        "bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 shadow-sm border transition-all duration-300",
+        isHighlighted
+          ? "border-bnoon-teal ring-2 ring-bnoon-teal/30 bg-bnoon-teal/5 dark:bg-bnoon-teal/10"
+          : "border-gray-200 dark:border-gray-700"
+      )}
+    >
+      {/* Highlighted Badge */}
+      {isHighlighted && (
+        <div className="flex items-center gap-2 mb-4 pb-3 border-b border-bnoon-teal/20">
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 text-bnoon-teal rounded-full text-xs font-medium">
+            <Mail className="w-3 h-3" />
+            {t("fromNotification")}
+          </div>
+        </div>
+      )}
+
+      {/* Appointment Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <div className="flex flex-col md:flex-row items-center gap-3 mb-2 md:mb-0">
+          <div
+            className={cn(
+              "px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2",
+              getAppointmentStatusColor(appointment.status ?? "")
+            )}
+          >
+            {getAppointmentStatusIcon(appointment.status ?? "")}
+            {appointment.statusName || tVisitStatus(appointment.status ?? "") || appointment.status}
+          </div>
+          {appointment.status?.toLocaleLowerCase() !== "cancelled" && (
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {t("confirmation")}: {appointment.appointmentId}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
+          {/* Reschedule and Cancel buttons - only for appointments that can be modified */}
+          {canModifyAppointment && (
+            <>
+              <Button onClick={() => handleReschedule()} variant="outline" size="sm" className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" />
+                {t("buttons.reschedule")}
+              </Button>
+              <Button
+                onClick={() => handleCancel()}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+              >
+                <X className="h-4 w-4" />
+                {t("buttons.cancel")}
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Appointment Details */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Left Column - Appointment Info */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("appointmentDetails.title")}</h3>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <Image
+                src={`/icons/Calender.png`}
+                alt={t("appointmentDetails.title")}
+                width={100}
+                height={100}
+                className="h-[30px] w-[22px] object-cover"
+              />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("appointmentDetails.dateTime")}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{dateAndTime}</p>
+                {dateAndTimeKSA && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {t("appointmentDetails.ksaTime")}: {dateAndTimeKSA}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Image
+                src={`/icons/Doctor.svg`}
+                alt={t("appointmentDetails.doctor")}
+                width={100}
+                height={100}
+                className="h-[30px] w-[22px] object-cover"
+              />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("appointmentDetails.doctor")}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{displayDoctorName}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Image
+                src={`/icons/Icons-16.png`}
+                alt={t("appointmentDetails.service")}
+                width={50}
+                height={50}
+                className="h-[30px] w-[22px] object-cover"
+              />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("appointmentDetails.service")}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{serviceTitle}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Image
+                src={`/icons/Location1.png`}
+                alt={t("appointmentDetails.location")}
+                width={100}
+                height={100}
+                className="h-[30px] w-[22px] object-cover"
+              />
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("appointmentDetails.location")}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{t("appointmentDetails.inClinic")}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Patient Info */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t("patientInformation.title")}</h3>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.fullName")}</p>
+              <p className="font-medium text-gray-900 dark:text-white">{fullName}</p>
+            </div>
+            {currentUser?.emailAddress && (
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.email")}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{currentUser.emailAddress}</p>
+              </div>
+            )}
+            {currentUser?.phone && (
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t("patientInformation.phoneNumber")}</p>
+                <p dir="ltr" className="font-medium ltr:text-left rtl:text-right text-gray-900 dark:text-white">
+                  {currentUser.phone}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Reschedule Dialog */}
+      <AlertDialog open={showRescheduleDialog} onOpenChange={setShowRescheduleDialog}>
+        <AlertDialogContent className="!max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("reschedule.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("reschedule.description")}</AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {/* Current Appointment Info */}
+          <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg mb-4">
+            <h4 className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-2">
+              {t("reschedule.currentAppointment.title")}
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              <div>
+                <span className="text-amber-700 dark:text-amber-300">{t("reschedule.currentAppointment.dateTime")}:</span>
+                <p className="font-medium text-amber-900 dark:text-amber-100">{dateAndTime}</p>
+                {dateAndTimeKSA && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400">({t("reschedule.ksaTime")}: {dateAndTimeKSA})</p>
+                )}
+              </div>
+              <div>
+                <span className="text-amber-700 dark:text-amber-300">{t("reschedule.currentAppointment.doctor")}:</span>
+                <p className="font-medium text-amber-900 dark:text-amber-100">{displayDoctorName}</p>
+              </div>
+              <div>
+                <span className="text-amber-700 dark:text-amber-300">{t("reschedule.currentAppointment.service")}:</span>
+                <p className="font-medium text-amber-900 dark:text-amber-100">{serviceTitle}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-4">
+            {/* Date Selection */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t("reschedule.selectDate")}</h3>
+              <div className="flex justify-center">
+                <CalendarComponent
+                  mode="single"
+                  selected={selectedRescheduleDate}
+                  onSelect={(value) => {
+                    setSelectedRescheduleDate(value);
+                    setSelectedRescheduleTimeSlot(undefined);
+                  }}
+                  disabled={isDateDisabled}
+                  locale={dateFnsLocale}
+                  className="rounded-md border"
+                  classNames={{
+                    day: "hover:bg-green-50 dark:hover:bg-green-900/20",
+                    day_selected: "bg-green-600 text-white hover:bg-green-700",
+                    day_today: "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
+                    button_next: "bg-primary cursor-pointer text-white p-1 rounded-sm",
+                    button_previous: "bg-primary cursor-pointer text-white p-1 rounded-sm",
+                  }}
+                />
+              </div>
+              {selectedRescheduleDate && (
+                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
+                  <p className="text-sm text-green-800 dark:text-green-200">
+                    {t("reschedule.selected")}:{" "}
+                    <span className="font-medium">
+                      {format(selectedRescheduleDate, "EEEE, MMMM d, yyyy", { locale: dateFnsLocale })}
+                    </span>
+                  </p>
+                  {!isKSA && (
+                    <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                      {t("reschedule.ksaTime")}:{" "}
+                      {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0
+                        ? formatInTimeZone(
+                            availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
+                              new Date().toISOString(),
+                            KSA_TIMEZONE,
+                            "EEEE, MMMM d, yyyy",
+                            { locale: dateFnsLocale }
+                          )
+                        : formatInTimeZone(selectedRescheduleDate, KSA_TIMEZONE, "EEEE, MMMM d, yyyy", {
+                            locale: dateFnsLocale,
+                          })}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Time Selection */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t("reschedule.selectTime")}</h3>
+              {!selectedRescheduleDate ? (
+                <div className="text-center py-8">
+                  <Clock className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-500 dark:text-gray-400">{t("reschedule.selectDateFirst")}</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+                  {loadingTimeslots ? (
+                    <div className="col-span-2 flex justify-center">
+                      <Spinner className="size-8" />
+                    </div>
+                  ) : (availabilityData?.length ?? 0) > 0 ? (
+                    availabilityData?.map((slot) => (
+                      <button
+                        key={slot.start}
+                        onClick={() => setSelectedRescheduleTimeSlot(slot.start ?? "")}
+                        className={cn(
+                          "p-3 rounded-md border text-sm font-medium transition-all duration-200 cursor-pointer",
+                          selectedRescheduleTimeSlot === slot.start
+                            ? "bg-primary text-white border-primary shadow-md"
+                            : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-primary/10 hover:border-primary"
+                        )}
+                      >
+                        <div>
+                          {format(slot.start ?? "", "hh:mm aa", { locale: dateFnsLocale })}
+                          {!isKSA && (
+                            <span className="text-xs block opacity-75 mt-0.5">
+                              {formatInTimeZone(slot.start ?? new Date().toISOString(), KSA_TIMEZONE, "hh:mm aa", {
+                                locale: dateFnsLocale,
+                              })}{" "}
+                              {t("reschedule.ksaTime")}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-400 text-center col-span-2">
+                      {t("reschedule.noAvailability", {
+                        date: selectedRescheduleDate ? format(selectedRescheduleDate, "dd-MM-yyyy") : "the selected date",
+                      })}
+                    </p>
+                  )}
+                </div>
+              )}
+              {selectedRescheduleTimeSlot && (availabilityData?.length ?? 0) > 0 && (
+                <div className="mt-4 p-3 bg-primary/10 dark:bg-primary/20 rounded-md">
+                  <p className="text-sm text-primary dark:text-primary-200">
+                    {t("reschedule.selected")}:{" "}
+                    <span className="font-medium">
+                      {format(
+                        availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
+                          new Date().toISOString(),
+                        "hh:mm aa",
+                        { locale: dateFnsLocale }
+                      )}
+                    </span>
+                    {!isKSA && (
+                      <span className="text-xs ml-2 opacity-75">
+                        {`${formatInTimeZone(
+                          availabilityData?.find((slot) => slot.start === selectedRescheduleTimeSlot)?.start ??
+                            new Date().toISOString(),
+                          KSA_TIMEZONE,
+                          "hh:mm aa",
+                          { locale: dateFnsLocale }
+                        )} ${t("reschedule.ksaTime")}`}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRescheduling}>{t("reschedule.buttons.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isRescheduling || !selectedRescheduleDate || !selectedRescheduleTimeSlot}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleRescheduleConfirm();
+              }}
+            >
+              {isRescheduling ? <Spinner /> : t("reschedule.buttons.confirmReschedule")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("cancel.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("cancel.description")}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isCancelling}>{t("cancel.buttons.keepAppointment")}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isCancelling}
+              className="bg-red-600 hover:bg-red-700"
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                try {
+                  setIsCancelling(true);
+                  if (!appointment.appointmentId) return;
+                  await cancelAppointment({
+                    cancelStatusName: CANCELLED_STATUS_NAME,
+                    appointmentId: appointment.appointmentId,
+                    cancelledStatusId: CANCELLED_STATUS_ID,
+                  });
+                  mutateCurrentUserAppointments(undefined);
+                } finally {
+                  setIsCancelling(false);
+                  setShowCancelConfirm(false);
+                }
+              }}
+            >
+              {isCancelling ? <Spinner /> : t("cancel.buttons.yesCancel")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default InPersonAppointmentCard;

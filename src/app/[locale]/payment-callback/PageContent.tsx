@@ -84,33 +84,16 @@ export function PaymentCallbackContent() {
     }
 
     try {
+      // Create appointment via bnoon-api (patient created internally)
       const appointmentResponse = await createAppointment({
         ...result.appointmentData,
-        // Add payment reference to appointment
       });
 
-      if (appointmentResponse?.id) {
-        const createdAppointmentId = appointmentResponse.id;
-        setAppointmentId(createdAppointmentId);
+      if (appointmentResponse?.success && appointmentResponse?.appointment?.id) {
+        // Use UUID (id) not FertiSmart appointmentId - the confirmation page uses UUID to fetch details
+        const createdAppointmentUuid = appointmentResponse.appointment.id;
+        setAppointmentId(appointmentResponse.appointment.appointmentId); // Keep numeric for display
         setState("success");
-
-        // Move ID document from temp to permanent storage
-        const idDocumentUrl = sessionStorage.getItem("idDocumentUrl");
-        if (idDocumentUrl && result.appointmentData.patientMrn) {
-          try {
-            await fetch("/api/upload-id-document", {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                tempUrl: idDocumentUrl,
-                patientMrn: result.appointmentData.patientMrn,
-              }),
-            });
-          } catch (error) {
-            console.error("Failed to move ID document to permanent storage:", error);
-            // Don't fail the flow if this fails
-          }
-        }
 
         // Clear sessionStorage
         sessionStorage.removeItem("paymentMerchantReference");
@@ -121,7 +104,7 @@ export function PaymentCallbackContent() {
         // Redirect to confirmation after short delay
         setTimeout(() => {
           const confirmParams = new URLSearchParams();
-          confirmParams.set("appointmentId", createdAppointmentId.toString());
+          confirmParams.set("appointmentId", createdAppointmentUuid);
           confirmParams.set("paymentRef", result.merchantReference || "");
           router.replace(`/${locale}/appointment-confirmation?${confirmParams.toString()}`);
         }, 2000);

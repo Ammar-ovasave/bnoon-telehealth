@@ -166,7 +166,7 @@ export default function ManageAppointmentPageContent() {
         {appointmentNotFound && appointmentIdFromUrl && !isInitializing && !isLoading && (
           <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0 w-10 h-10 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center">
+              <div className="flex-shrink-0 w-10 h-10 bg-amber-100 dark:bg-amber-900/40 rounded-base flex items-center justify-center">
                 <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div>
@@ -196,8 +196,8 @@ export default function ManageAppointmentPageContent() {
                 <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Calendar className="h-10 w-10 text-gray-400" />
                 </div>
-                <h3 className="mb-3 text-xl font-bold text-bnoon-navy dark:text-white">{t("noAppointmentsFound.title")}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noAppointmentsFound.description")}</p>
+                <h3 className="mb-3 text-xl font-bold text-bnoon-gray dark:text-white">{t("noAppointmentsFound.title")}</h3>
+                <p className="mb-8 text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noAppointmentsFound.description")}</p>
               </div>
             </div>
           ) : (

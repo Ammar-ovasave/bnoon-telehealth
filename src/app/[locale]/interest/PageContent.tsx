@@ -41,7 +41,7 @@ export const PageContent: FC = () => {
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-bnoon-navy dark:text-white mb-4 leading-tight">
             {t("title")}
           </h1>
-          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
             {t("description")}
           </p>
         </div>

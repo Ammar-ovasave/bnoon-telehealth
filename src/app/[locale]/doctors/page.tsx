@@ -10,10 +10,7 @@ import useDoctorsByService from "@/hooks/useDoctorsByService";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import BranchGuard from "@/components/BranchGuard";
-import { FEATURE_FLAGS } from "@/constants";
-import { getServiceSlug } from "@/lib/serviceMapping";
-import type { BranchId } from "@/services/bnoon-api/types";
+import Image from "next/image";
 
 export default function DoctorsListPage() {
   const searchParams = useSearchParams();
@@ -106,25 +103,171 @@ export default function DoctorsListPage() {
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-bnoon-teal/5 dark:bg-bnoon-teal/10 rounded-full blur-3xl" />
           <div className="absolute top-1/2 -left-40 w-60 h-60 bg-bnoon-navy/5 dark:bg-bnoon-teal/5 rounded-full blur-3xl" />
         </div>
-
-        {isLoading ? (
-          <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
-            <div className="w-16 h-16 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-full flex items-center justify-center">
-              <Spinner className="w-8 h-8 text-bnoon-teal" />
-            </div>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {locale === "ar" ? "جاري تحميل الأطباء..." : "Loading doctors..."}
+      ) : (
+        <div className="relative mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-24">
+          {/* Header */}
+          <div className="text-center mb-10 md:mb-12 animate-fade-in-up">
+            <h1 className="text-2xl md:text-4xl font-bold text-bnoon-gray dark:text-white mb-4 leading-tight">
+              {t("title")}
+            </h1>
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+              {t("description")}
             </p>
           </div>
-        ) : error ? (
-          <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
-            <p className="text-red-500">
-              {locale === "ar"
-                ? "حدث خطأ في تحميل الأطباء. يرجى المحاولة مرة أخرى."
-                : "Failed to load doctors. Please try again."}
-            </p>
-            <Button onClick={() => window.location.reload()} variant="outline">
-              {locale === "ar" ? "إعادة المحاولة" : "Retry"}
+
+          {/* Visit Type Selector - Compact Pills */}
+          <div className="animate-fade-in-up animation-delay-200 mb-8">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-bold text-bnoon-gray dark:text-white mb-1">{t("visitType.title")}</h2>
+                  <p className="text-base text-gray-500 dark:text-gray-400">{t("visitType.description")}</p>
+                </div>
+
+                {/* Visit Type Pills */}
+                <div className="flex gap-3">
+                  {/* Clinic Visit Pill */}
+                  <button
+                    onClick={() => handleSetAvailabilityFilter("clinic")}
+                    disabled={clinicDoctorsCount === 0}
+                    className={cn(
+                      "flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border-2 cursor-pointer",
+                      "hover:scale-[1.02] active:scale-[0.98]",
+                      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bnoon-teal/50",
+                      availabilityFilter === "clinic"
+                        ? "bg-bnoon-teal text-white border-bnoon-teal shadow-lg shadow-bnoon-teal/30"
+                        : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 shadow-sm hover:border-bnoon-teal hover:bg-bnoon-teal/5 dark:hover:bg-bnoon-teal/10 hover:shadow-md",
+                      clinicDoctorsCount === 0 && "opacity-50 cursor-not-allowed hover:scale-100 active:scale-100"
+                    )}
+                  >
+                    <span className="flex items-center justify-center w-10 h-10">
+                      {availabilityFilter === "clinic" ? (
+                        <Check className="w-6 h-6" />
+                      ) : (
+                        <Image src="/icons/Location1.png" alt="Clinic Visit" width={30} height={30} />
+                      )}
+                    </span>
+                    
+                    <span>{t("visitType.clinic.title")}</span>
+                    <span className={cn(
+                      "text-xs px-2 py-0.5 rounded-full font-bold",
+                      availabilityFilter === "clinic" ? "bg-white/20" : "bg-bnoon-teal/10 text-bnoon-teal"
+                    )}>
+                      {clinicDoctorsCount}
+                    </span>
+                  </button>
+
+                  {/* Virtual Visit Pill */}
+                  <button
+                    onClick={() => handleSetAvailabilityFilter("virtual")}
+                    disabled={virtualDoctorsCount === 0}
+                    className={cn(
+                      "flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 border-2 cursor-pointer",
+                      "hover:scale-[1.02] active:scale-[0.98]",
+                      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bnoon-navy/50",
+                      availabilityFilter === "virtual"
+                        ? "bg-bnoon-navy text-white border-bnoon-navy shadow-lg shadow-bnoon-navy/30"
+                        : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 shadow-sm hover:border-bnoon-navy hover:bg-bnoon-navy/5 dark:hover:bg-bnoon-navy/10 hover:shadow-md",
+                      virtualDoctorsCount === 0 && "opacity-50 cursor-not-allowed hover:scale-100 active:scale-100"
+                    )}
+                  >
+                   <span className="flex items-center justify-center w-10 h-10">
+                      {availabilityFilter === "virtual" ? (
+                        <Check className="w-6 h-6" />
+                      ) : (
+                        <Image src="/icons/Virtualvisit.png" alt="Clinic Visit" width={30} height={30} />
+                      )}
+                    </span>
+                    <span>{t("visitType.virtual.title")}</span>
+                    <span className={cn(
+                      "text-xs px-2 py-0.5 rounded-full font-bold",
+                      availabilityFilter === "virtual" ? "bg-white/20" : "bg-bnoon-navy/10 dark:bg-bnoon-navy/20 text-bnoon-navy dark:text-bnoon-teal"
+                    )}>
+                      {virtualDoctorsCount}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Hint message when no type selected */}
+              {!availabilityFilter && (
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <p className="text-sm text-[#800020] dark:text-amber-400 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#800020] rounded-full animate-pulse" />
+                    {locale === "ar"
+                      ? "يرجى اختيار نوع الزيارة لتتمكن من حجز موعد مع الطبيب"
+                      : "Please select a visit type to book an appointment with a doctor"}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Doctors Grid - Always Visible */}
+          <div className="animate-fade-in-up animation-delay-300">
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              layout
+            >
+              <AnimatePresence mode="popLayout">
+                {doctors.map((doctor) => (
+                  <motion.div
+                    key={doctor.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{
+                      opacity: 0,
+                      scale: 0.8,
+                      y: -20,
+                      transition: { duration: 0.2, ease: "easeOut" }
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30,
+                      opacity: { duration: 0.2 }
+                    }}
+                  >
+                    <DoctorCard
+                      doctor={doctor}
+                      selectedDoctor={selectedDoctor}
+                      setSelectedDoctor={handleDoctorChange}
+                      isLoading={loadingDoctor === doctor.id}
+                      disabled={!availabilityFilter}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Empty State */}
+            <AnimatePresence>
+              {doctors.length === 0 && (
+                <motion.div
+                  className="text-center py-16"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 md:p-12 shadow-sm border border-gray-100 dark:border-gray-700 max-w-md mx-auto">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-base flex items-center justify-center mx-auto mb-6">
+                      <Filter className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-bnoon-gray dark:text-white mb-3">{t("noDoctorsFound.title")}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{t("noDoctorsFound.description")}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Back Button */}
+          <div className="mt-12 text-center animate-fade-in-up animation-delay-300">
+            <Button onClick={handleBack} variant="outline" size="lg" className="px-8 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+              <ArrowLeft className="rtl:scale-x-[-1]" />
+              {t("buttons.backToServiceSelection")}
             </Button>
           </div>
         ) : (

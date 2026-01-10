@@ -224,7 +224,7 @@ export default function SelectDateAndTimePage() {
       <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 max-w-6xl pb-32">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-bnoon-gray dark:text-white mb-4">{t("title")}</h1>
           <p className="text-base text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6">{t("description")}</p>
 
           {/* Doctor Info Card with Visit Type */}
@@ -255,7 +255,7 @@ export default function SelectDateAndTimePage() {
 
                   {/* Doctor Info */}
                   <div className="text-start rtl:text-right">
-                    <h3 className="font-bold text-bnoon-navy dark:text-white text-base sm:text-lg">
+                    <h3 className="font-bold text-bnoon-gray dark:text-white text-base sm:text-lg">
                       {selectedDoctor.name}
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 max-w-[200px] sm:max-w-[280px] line-clamp-2">
@@ -307,7 +307,7 @@ export default function SelectDateAndTimePage() {
               <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
                 <Image src={`/icons/Calender.png`} alt="Select Date" width={20} height={20} />
               </div>
-              <h2 className="text-lg font-bold text-bnoon-navy dark:text-white">{t("selectDate")}</h2>
+              <h2 className="text-lg font-bold text-bnoon-gray dark:text-white">{t("selectDate")}</h2>
             </div>
             <Calendar
               mode="single"
@@ -341,7 +341,7 @@ export default function SelectDateAndTimePage() {
               <div className="w-10 h-10 bg-bnoon-teal/10 dark:bg-bnoon-teal/20 rounded-xl flex items-center justify-center">
                 <Clock className="w-5 h-5 text-bnoon-teal" />
               </div>
-              <h2 className="text-lg font-bold text-bnoon-navy dark:text-white">{t("selectTime")}</h2>
+              <h2 className="text-lg font-bold text-bnoon-gray dark:text-white">{t("selectTime")}</h2>
             </div>
 
             {!selectedDate ? (

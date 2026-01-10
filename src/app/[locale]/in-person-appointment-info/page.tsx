@@ -39,8 +39,8 @@ export default function InPersonAppointmentInfoPage() {
               <MapPin className="w-10 h-10 text-white" strokeWidth={1.5} />
             </div>
           </div>
-          <h1 className="text-4xl rtl:text-3xl font-bold text-bnoon-navy dark:text-white mb-4">{t("title")}</h1>
-          <p className="ltr:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
+          <h1 className="text-2xl md:text-4xl rtl:text-3xl font-bold text-bnoon-gray dark:text-white mb-4">{t("title")}</h1>
+          <p className="text-sm md:text-base ltr:text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">{t("description")}</p>
         </div>
 
         {/* Form */}
@@ -61,7 +61,7 @@ export default function InPersonAppointmentInfoPage() {
               <MapPin className="w-6 h-6 text-bnoon-teal" strokeWidth={1.5} />
             </div>
             <div>
-              <h4 className="text-sm font-medium text-bnoon-teal mb-1">{t("visitDetails.title")}</h4>
+              <h4 className="text-sm font-medium text-bnoon-gray mb-1">{t("visitDetails.title")}</h4>
               <p className="text-sm text-bnoon-navy dark:text-gray-300">{t("visitDetails.description")}</p>
             </div>
           </div>
